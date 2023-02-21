@@ -1,0 +1,37 @@
+import sqlite3
+
+sqliteConnection = sqlite3.connect('identifier.sqlite', check_same_thread=False)
+
+
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+sqliteConnection.row_factory = dict_factory
+cursor = sqliteConnection.cursor()
+
+class Student:
+    def __init__(self):
+        result = cursor.execute("select MAX(id) as id from student").fetchall()
+        self.__id = result[0]['id']
+
+    def dodaj(self, name, surname, pesel):
+        self.__id += 1
+
+        cursor.execute(f"insert into student VALUES ('{self.__id}','{name}','{surname}',{pesel})")
+        sqliteConnection.commit()
+    def usun(self,id):
+        cursor.execute(f"DELETE from student where id = '{id}'")
+        sqliteConnection.commit()
+
+    def update(self,id,name,surname,pesel):
+        cursor.execute(f"UPDATE student set name = '{name}',last_name ='{surname}', pesel = '{pesel}' where id = '{id}'")
+        sqliteConnection.commit()
+
+    def get_all(self):
+        return cursor.execute("select * from student").fetchall()
+student = Student()
+
+student.update(5,"eleba","baba",12345)

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+<label for="imie_id">imie</label>
+<input type="text" id="imie_id">
+<label for="nazwisko">nazwisko</label>
+<input type="text" id="nazwisko">
+<label for="pesel">pesel</label>
+<input type="text" id="pesel"><br><br>
+
+<table id="table_id" style=" border-collapse: collapse; border: black 1px solid"></table>
+</body>
+<script>
+    async function tableStudent() {
+        const tableStudent = document.getElementById("table_id")
+        const header = tableStudent.createTHead();
+        const headerRow = header.insertRow();
+        for (const i of ['No', 'imie', 'nazwisko', 'pesel', 'akcja']) {
+            headerRow.insertCell().innerText = i;
+        }
+        const students = await (await fetch('/student')).json();
+        let counter = 1;
+        for(const i of students){
+            const row = tableStudent.insertRow();
+            row.insertCell().innerText = `${counter++}`;
+            row.insertCell().innerText = i['name'];
+            row.insertCell().innerText = i['last_name'];
+            row.insertCell().innerText = i['pesel'];
+            row.insertCell().innerText= "x";
+
+        }
+    }
+
+    tableStudent()
+</script>
+</html>
