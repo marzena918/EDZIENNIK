@@ -3,21 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <style>
         table, th, td {
             border: 1px solid black;
             border-collapse: collapse;
         }
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 48
+}
+
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 48
+}
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 48
+}
+.sectionAdd{
+    margin-bottom: 1em;
+}
+.button{
+    font-size: 1em;
+}
     </style>
 </head>
+
 <body>
+<div class="sectionAdd">
 <label for="imie_id">imie</label>
 <input type="text" id="imie_id">
 <label for="nazwisko">nazwisko</label>
 <input type="text" id="nazwisko">
 <label for="pesel">pesel</label>
-<input type="text" id="pesel"><br><br>
-
+<input type="text" id="pesel">
+<button><span class="material-symbols-outlined button">person_add</span></button>
+</div>
 <table id="table_id" style=" border-collapse: collapse; border: black 1px solid"></table>
 </body>
 <script>
@@ -36,9 +71,10 @@
             row.insertCell().innerText = i['name'];
             row.insertCell().innerText = i['last_name'];
             row.insertCell().innerText = i['pesel'];
-            row.insertCell().innerText= "x";
+            row.insertCell().innerHTML = '<button><span class="material-symbols-outlined button">edit\n' +
+                '</span></button><button><span class="material-symbols-outlined button">person_remove</span></button>';
 
-        }
+                }
     }
 
     tableStudent()
