@@ -11,21 +11,21 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/listaUczniow', methods='POST')
+@app.route('/student', methods=['POST'])
 def dodaj():
     data = request.json
     uczniowie.dodaj(data['name'],data['last_name'], data['pesel'])
     return ''
 
 
-@app.route('/listaUczniow/<int:id>', methods='DELETE')
+@app.route('/student/<int:id>', methods=['DELETE'])
 def usun(id):
     uczniowie.usun(id)
     return ''
 
-@app.route('/listaUczniow/<int:id>', methods='PUT')
+@app.route('/student/<int:id>', methods=['PUT'])
 def update(id):
-    data = request
+    data = request.json
     uczniowie.update(data["name"],data["surname"], data["pesel"])
     return ''
 @app.route('/student')
