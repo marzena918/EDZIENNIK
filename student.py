@@ -13,15 +13,11 @@ sqliteConnection.row_factory = dict_factory
 cursor = sqliteConnection.cursor()
 
 class Student:
-    def __init__(self):
-        result = cursor.execute("select MAX(id) as id from student").fetchall()
-        self.__id = result[0]['id']
 
     def dodaj(self, name, surname, pesel):
-        self.__id += 1
-
-        cursor.execute(f"insert into student VALUES ('{self.__id}','{name}','{surname}',{pesel})")
+        cursor.execute(f"insert into student(name, last_name, pesel) VALUES ('{name}','{surname}',{pesel})")
         sqliteConnection.commit()
+
     def usun(self,id):
         cursor.execute(f"DELETE from student where id = '{id}'")
         sqliteConnection.commit()

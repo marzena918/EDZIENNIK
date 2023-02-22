@@ -10,24 +10,24 @@ uczniowie = Student()
 def index():
     return render_template('index.html')
 
-#
-# @app.route('/listaUczniow', methods='POST')
-# def dodaj():
-#     data = request
-#     uczniowie.dodaj(data['name'],data['surname'], data['pesel'])
-#     return ''
-#
-#
-# @app.route('/listaUczniow/<int:id>', methods='DELETE')
-# def usun(id):
-#     uczniowie.usun(id)
-#     return ''
-#
-# @app.route('/listaUczniow/<int:id>', methods='PUT')
-# def update(id):
-#     data = request
-#     uczniowie.update(data["name"],data["surname"], data["pesel"])
-#     return ''
+
+@app.route('/listaUczniow', methods='POST')
+def dodaj():
+    data = request.json
+    uczniowie.dodaj(data['name'],data['last_name'], data['pesel'])
+    return ''
+
+
+@app.route('/listaUczniow/<int:id>', methods='DELETE')
+def usun(id):
+    uczniowie.usun(id)
+    return ''
+
+@app.route('/listaUczniow/<int:id>', methods='PUT')
+def update(id):
+    data = request
+    uczniowie.update(data["name"],data["surname"], data["pesel"])
+    return ''
 @app.route('/student')
 def get_all():
     return uczniowie.get_all()
