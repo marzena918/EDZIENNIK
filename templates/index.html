@@ -18,27 +18,29 @@
     <input type="text" id="nazwisko">
     <label for="pesel">pesel</label>
     <input type="number" id="pesel" onkeyup="checkPesel(this)">
-    <button id="but_id" disabled="disabled" onclick="addStudent()"><span class="material-symbols-outlined button">person_add</span></button>
+    <button id="but_id" disabled="disabled" onclick="addStudent()"><span class="material-symbols-outlined button">person_add</span>
+    </button>
 </div>
 <table id="table_id" style=" border-collapse: collapse; border: black 1px solid"></table>
 </body>
 <script>
-    async function isPeselExist(pesel){
+    async function isPeselExist(pesel) {
         const response = await fetch(`/student/check_pesel/${pesel}`)
         return +(await response.text());
     }
-    async function checkPesel(peselInput){
-        if(peselInput.value.length < 2 || await isPeselExist(peselInput.value)){ // czy istnieje w bazie endpointem
+
+    async function checkPesel(peselInput) {
+        if (peselInput.value.length < 2 || await isPeselExist(peselInput.value)) { // czy istnieje w bazie endpointem
             peselInput.classList.remove("okInputData")
             peselInput.classList.add("wrongInputData")
             document.getElementById("but_id").disabled = true;
-        }
-        else{
+        } else {
             peselInput.classList.remove("wrongInputData")
             peselInput.classList.add("okInputData")
             document.getElementById("but_id").disabled = false;
         }
     }
+
     async function addStudent() {
         const data = {
             name: document.getElementById("imie_id").value,
@@ -52,6 +54,9 @@
         });
         if (response.ok) {
             await tableStudent();
+            document.getElementById("imie_id").value = '';
+            document.getElementById("nazwisko").value = '';
+            document.getElementById("pesel").value = '';
         }
     }
 
