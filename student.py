@@ -33,7 +33,7 @@ class Student:
         return cursor.execute("select * from student").fetchall()
 
     def is_pesel_exist(self, pesel) -> bool:
-        return bool(cursor.execute(f" select pesel from student where pesel = '{pesel}'").fetchall())
+        return bool(cursor.execute(f"select pesel from student where pesel = '{pesel}'").fetchall())
 
 
 student = Student()

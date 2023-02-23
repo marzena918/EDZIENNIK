@@ -24,7 +24,7 @@
 </body>
 <script>
     async function isPeselExist(pesel){
-        const response = await fetch(`/student/${pesel}`, {method: 'POST'})
+        const response = await fetch(`/student/check_pesel/${pesel}`)
         return +(await response.text());
     }
     async function checkPesel(peselInput){
