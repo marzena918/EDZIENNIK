@@ -9,8 +9,10 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
+
 sqliteConnection.row_factory = dict_factory
 cursor = sqliteConnection.cursor()
+
 
 class Student:
 
@@ -18,16 +20,20 @@ class Student:
         cursor.execute(f"insert into student(name, last_name, pesel) VALUES ('{name}','{surname}',{pesel})")
         sqliteConnection.commit()
 
-    def usun(self,id):
+    def usun(self, id):
         cursor.execute(f"DELETE from student where id = '{id}'")
         sqliteConnection.commit()
 
-    def update(self,id,name,surname,pesel):
-        cursor.execute(f"UPDATE student set name = '{name}',last_name ='{surname}', pesel = '{pesel}' where id = '{id}'")
+    def update(self, id, name, surname, pesel):
+        cursor.execute(
+            f"UPDATE student set name = '{name}',last_name ='{surname}', pesel = '{pesel}' where id = '{id}'")
         sqliteConnection.commit()
 
     def get_all(self):
         return cursor.execute("select * from student").fetchall()
-student = Student()
 
-student.update(5,"eleba","baba",12345)
+    def is_pesel_exist(self, pesel) -> bool:
+        return bool(cursor.execute(f" select pesel from student where pesel = '{pesel}'").fetchall())
+
+
+student = Student()

@@ -31,3 +31,10 @@ table, th, td {
 .button {
     font-size: 1em;
 }
+.okInputData{
+    color: green;
+}
+
+.wrongInputData{
+    color: red;
+}

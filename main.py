@@ -17,6 +17,9 @@ def dodaj():
     uczniowie.dodaj(data['name'],data['last_name'], data['pesel'])
     return ''
 
+@app.route('/student/<pesel>', methods=['POST'])
+def is_pesel_exist(pesel):
+    return '1' if uczniowie.is_pesel_exist(pesel) else '0'
 
 @app.route('/student/<int:id>', methods=['DELETE'])
 def usun(id):
