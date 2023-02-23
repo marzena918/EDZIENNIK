@@ -53,14 +53,18 @@
             headers: {'Content-Type': 'application/json'}
         });
         if (response.ok) {
-            await tableStudent();
+            await getAllStudents();
             document.getElementById("imie_id").value = '';
             document.getElementById("nazwisko").value = '';
             document.getElementById("pesel").value = '';
         }
     }
+    async function remove(studentId){
+        await fetch(`/student/${studentId}`, {method: 'DELETE'})
+        await getAllStudents()
+    }
 
-    async function tableStudent() {
+    async function getAllStudents() {
 
         const tableStudent = document.getElementById("table_id");
         tableStudent.innerHTML = '';
@@ -77,11 +81,12 @@
             row.insertCell().innerText = i['name'];
             row.insertCell().innerText = i['last_name'];
             row.insertCell().innerText = i['pesel'];
-            row.insertCell().innerHTML = '<button onclick="editData()"><span class="material-symbols-outlined button">edit' +
-                '</span></button><button><span class="material-symbols-outlined button">person_remove</span></button>';
+            row.insertCell().innerHTML =
+                '<button onclick="editData()"><span class="material-symbols-outlined button">edit</span></button>' +
+                `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
         }
     }
 
-    tableStudent()
+    getAllStudents()
 </script>
 </html>
