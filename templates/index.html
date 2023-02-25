@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="/static/main.style.css">
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 </head>
 
 <body>
@@ -31,12 +33,11 @@
         return +(await response.text());
     }
 
-    async function checkPesel(peselInput, buton,originValue) {
+    async function checkPesel(peselInput, buton, originValue) {
         let isValueNotCorrect = peselInput.value.length < 2;
-        if(!isValueNotCorrect && originValue !== +peselInput.value) {
+        if (!isValueNotCorrect && originValue !== +peselInput.value) {
             isValueNotCorrect = await isPeselExist(peselInput.value);
         }
-        // style="display:none" inline
         if (isValueNotCorrect) { // czy istnieje w bazie endpointem
             peselInput.classList.remove("okInputData")
             peselInput.classList.add("wrongInputData")
@@ -93,7 +94,8 @@
             row.insertCell().innerText = i['pesel'];
             const editButton = document.createElement("button");
             editButton.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
-            editButton.onclick = () => editData(row, i['name'], i['last_name'], i['pesel'], i['id']);
+            editButton.onclick = () => editData(editButton, row, i['name'], i['last_name'], i['pesel'], i['id']);
+            // editButton.style.display="inline";
             row.insertCell().innerHTML =
                 `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
             row.cells[4].appendChild(editButton);
@@ -101,15 +103,31 @@
 
     }
 
-    function upadeData(id, name, last_name, pesel) {
+    function upadeData(upBaton, butonExit, doneBaton, row, id, name, last_name, pesel) {
         fetch(`/student/${id}`, {
             method: 'PUT', body: JSON.stringify({name: name.value, last_name: last_name.value, pesel: pesel.value}),
             headers: {'Content-Type': 'application/json'}
         })
+        row.cells[1].innerHTML = name.value;
+        row.cells[2].innerHTML = last_name.value;
+        row.cells[3].innerHTML = pesel.value;
+        butonExit.remove();
+        doneBaton.remove();
+        upBaton.style.display = "inline";
     }
 
+    function exit(buton, bExit, bdone, row, imie, nazwisko, pesel) {
+        row.cells[1].innerHTML = imie;
+        row.cells[2].innerHTML = nazwisko;
+        row.cells[3].innerHTML = pesel;
+        bExit.remove();
+        bdone.remove();
+        buton.style.display = "inline";
 
-    async function editData(row, imie, nazwisko, pesel, id) {
+    }
+
+    async function editData(buton, row, imie, nazwisko, pesel, id) {
+        buton.style.display = "none";
         row.cells[1].innerHTML = '';
         row.cells[2].innerHTML = '';
         row.cells[3].innerHTML = '';
@@ -128,9 +146,14 @@
         const doneButton = document.createElement("button");
         doneButton.innerHTML = '<span class="material-symbols-outlined button">done</span>';
         doneButton.disabled = "disabled";
-        input3.onkeyup = () => checkPesel(input3, doneButton,pesel);
+        input3.onkeyup = () => checkPesel(input3, doneButton, pesel);
         row.cells[4].appendChild(doneButton);
-        doneButton.onclick = () => upadeData(id, input1, input2, input3);
+        doneButton.onclick = () => upadeData(buton, exitButton, doneButton, row, id, input1, input2, input3);
+        const exitButton = document.createElement("button");
+        exitButton.innerHTML = '<span class="material-symbols-outlined">close</span>'
+        row.cells[4].appendChild(exitButton)
+        exitButton.onclick = () => exit(buton, exitButton, doneButton, row, imie, nazwisko, pesel);
+
 
     }
 
