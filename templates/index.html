@@ -12,6 +12,7 @@
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 
 <body>
@@ -25,7 +26,12 @@
     <button id="but_id" disabled="disabled" onclick="addStudent()"><span class="material-symbols-outlined button">person_add</span>
     </button>
 </div>
+<a href="/student/subject">przed</a>
 <table id="table_id" style=" border-collapse: collapse; border: black 1px solid"></table>
+<div class="table_grades">
+<table id="table_oceny_id" style=" border-collapse: collapse; border: black 1px solid"></table>
+</div>
+
 </body>
 <script>
     async function isPeselExist(pesel) {
@@ -75,16 +81,48 @@
         }
     }
 
+    async function addGrade(row,religia,angielski,polski,matematyka){
+        row.cells[0][2].innerHTML='';
+        const input1 = document.createElement("input");
+        input1.type = 'text';
+        input1.innerHTML= religia;
+        row.cells[2].appendChild(input1);
+    }
+    async function oceny(id){
+        const response = await fetch(`/student/oceny/${id}`)
+        const oceny = await response.json();
+        const tableOceny = document.getElementById("table_oceny_id");
+        tableOceny.innerHTML='';
+        const header = tableOceny.createTHead();
+        const headerRow = header.insertRow();
+        const dataStudent =await fetch(`/student/daneStudenta/${id}`);
+        const fullDataStudent = await dataStudent.json();
+        const imie = fullDataStudent[0]["name"];
+        const nazwisko = fullDataStudent[0]["last_name"];
+        headerRow.insertCell().innerHTML= `OCENY: ${imie} ${nazwisko}`;
+        for (const i of ['religia','angielski','polski','matematyka']) {
+            const row = header.insertRow();
+            row.insertCell().innerText= i;
+            row.insertCell().innerHTML = oceny[0][i];
+        }
+            const buttonAdd = document.createElement("button");
+            buttonAdd.innerHTML= '<span class="material-symbols-outlined">add</span>';
+            buttonAdd.onclick= ()=>addGrade(headerRow,oceny['religia'],oceny['angielski'],oceny['polski'],oceny['matematyka']);
+            headerRow.insertCell().appendChild(buttonAdd);
+
+
+    }
+
     async function getAllStudents() {
 
         const tableStudent = document.getElementById("table_id");
         tableStudent.innerHTML = '';
         const header = tableStudent.createTHead();
         const headerRow = header.insertRow();
-        for (const i of ['No', 'imie', 'nazwisko', 'pesel', 'akcja']) {
+        for (const i of ['No', 'imie', 'nazwisko', 'pesel', 'akcja','oceny', 'frekwencja']) {
             headerRow.insertCell().innerText = i;
         }
-        const students = await (await fetch('/student')).json();
+        const students = await (await fetch('/student/all')).json();
         let counter = 1;
         for (const i of students) {
             const row = tableStudent.insertRow();
@@ -95,10 +133,14 @@
             const editButton = document.createElement("button");
             editButton.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
             editButton.onclick = () => editData(editButton, row, i['name'], i['last_name'], i['pesel'], i['id']);
-            // editButton.style.display="inline";
             row.insertCell().innerHTML =
                 `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
             row.cells[4].appendChild(editButton);
+            const editGrades = document.createElement("button");
+            editGrades.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
+            editGrades.onclick = () => window.location.href=`/student/oceny?studentId=${i['id']}`;
+            row.insertCell(5).appendChild(editGrades);
+            row.insertCell(6).innerHTML = '<button><span class="material-symbols-outlined button">edit</span></button>';
         }
 
     }
@@ -108,12 +150,7 @@
             method: 'PUT', body: JSON.stringify({name: name.value, last_name: last_name.value, pesel: pesel.value}),
             headers: {'Content-Type': 'application/json'}
         })
-        row.cells[1].innerHTML = name.value;
-        row.cells[2].innerHTML = last_name.value;
-        row.cells[3].innerHTML = pesel.value;
-        butonExit.remove();
-        doneBaton.remove();
-        upBaton.style.display = "inline";
+        exit(upBaton,butonExit,doneBaton,row,name.value,last_name.value,pesel.value)
     }
 
     function exit(buton, bExit, bdone, row, imie, nazwisko, pesel) {
@@ -124,6 +161,11 @@
         bdone.remove();
         buton.style.display = "inline";
 
+    }
+    function action_keyword(doneButton,nazwa,input){
+        if(nazwa !== input.value)
+        doneButton.disabled =false;
+        else(doneButton.disabled= true);
     }
 
     async function editData(buton, row, imie, nazwisko, pesel, id) {
@@ -142,10 +184,13 @@
         const input3 = document.createElement("input");
         input3.type = 'number';
         input3.value = pesel;
+
         row.cells[3].appendChild(input3);
         const doneButton = document.createElement("button");
         doneButton.innerHTML = '<span class="material-symbols-outlined button">done</span>';
         doneButton.disabled = "disabled";
+        input1.onkeyup = ()=>action_keyword(doneButton,imie,input1)
+        input2.onkeyup = ()=>action_keyword(doneButton,nazwisko,input2)
         input3.onkeyup = () => checkPesel(input3, doneButton, pesel);
         row.cells[4].appendChild(doneButton);
         doneButton.onclick = () => upadeData(buton, exitButton, doneButton, row, id, input1, input2, input3);
@@ -153,6 +198,7 @@
         exitButton.innerHTML = '<span class="material-symbols-outlined">close</span>'
         row.cells[4].appendChild(exitButton)
         exitButton.onclick = () => exit(buton, exitButton, doneButton, row, imie, nazwisko, pesel);
+
 
 
     }

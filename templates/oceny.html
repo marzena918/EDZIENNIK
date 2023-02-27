@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>oceny</title>
+</head>
+<body>
+<p>dfdfggghh</p>
+<div class="sectionAdd">
+    <label for="imie_id">imie</label>
+    <input type="text" id="imie_id">
+    <label for="nazwisko">nazwisko</label>
+    <input type="text" id="nazwisko">
+    <label for="pesel">pesel</label>
+    <input type="number" id="pesel" onkeyup="checkPesel(this,document.getElementById('but_id'), null)">
+    <button id="but_id" disabled="disabled" onclick="addTeacher()"><span class="material-symbols-outlined button">person_add</span>
+    </button>
+    <label for="subject">wybierz przedmiot</label><br/>
+    <select id="subject" name="subjects" multiple="true"></select>
+</div>
+</body>
+<script>
+    async function addTeacher(){
+        const imie = document.getElementById()
+    }
+    async function get_all_subjects(){
+        const subjects =await(await fetch('/student/subject/get_all/')).json();
+        for(const i of subjects){
+        const option =document.createElement("option");
+        option.value = i.name;
+        option.innerHTML = i.name;
+        }
+
+
+    }
+    async function sendSubjects() {
+        const subjects = document.getElementById("subject");
+        var listSubjects= Array.from(subjects.selectedOptions).map(element => +element.value);
+    }
+
+
+function getAllStudentNotes(){
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+  get: (searchParams, prop) => searchParams.get(prop),
+});
+    fetch(`/student/oceny/${params.studentId}`)
+}
+</script>
+</html>
