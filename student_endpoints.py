@@ -11,7 +11,7 @@ def oceny(id):
     return uczniowie.get_all_grades(id)
 # @student_blueprint.route('/student/oceny')
 # def index():
-#     return render_template('studen-oceny.html')
+#     return render_template('studen-nauczyciele.html')
 
 @student_blueprint.route('/student/daneStudenta/<id>')
 def student_data(id):

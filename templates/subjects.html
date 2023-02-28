@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+<div>
+<label for="subject_id">przedmiot</label>
+    <input type="text" id="subject_id">
+    <button onclick="dodaj()"><span class="material-symbols-outlined">add</span></button>
+</div>
+<div>
+    <table id="table_subject" style=" border-collapse: collapse; border: black 1px solid"></table>
+</div>
+</body>
+<script>
+    async function getAll(){
+        allSubject = await(await fetch('/subject/get_all')).json();
+        tableSubject = document.getElementById("table_subject");
+        tableSubject.innerHTML = ''
+        const hRow = tableSubject.createTHead();
+        hRow.innerText = 'LISTA PRZEDMIOTÓW';
+        console.log(allSubject);
+        for(const i of allSubject){
+            hRow.insertRow().innerHTML = i['name'];
+        }
+    }
+    async function dodaj(){
+        const subject = document.getElementById("subject_id").value;
+        await fetch(`/subject/add/${subject}`, {method:'POST'});
+        subject.innerHTML ='';
+        getAll();
+    }
+</script>
+</html>
