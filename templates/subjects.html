@@ -4,27 +4,41 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="/static/subjects.css">
+    <link rel="stylesheet" href="/static/main.style.css">
+
 </head>
 <body>
 <div>
 <label for="subject_id">przedmiot</label>
     <input type="text" id="subject_id">
-    <button onclick="dodaj()"><span class="material-symbols-outlined">add</span></button>
+    <button onclick="dodaj()"><span class="material-symbols-outlined button">add</span></button>
 </div>
 <div>
-    <table id="table_subject" style=" border-collapse: collapse; border: black 1px solid"></table>
+    LISTA PRZEDMIOTÓW
+    <table id="table_subject" style=" border-collapse: collapse;"></table>
 </div>
 </body>
 <script>
     async function getAll(){
-        allSubject = await(await fetch('/subject/get_all')).json();
-        tableSubject = document.getElementById("table_subject");
+        const allSubject = await(await fetch('/subject/get_all')).json();
+        const tableSubject = document.getElementById("table_subject");
         tableSubject.innerHTML = ''
-        const hRow = tableSubject.createTHead();
-        hRow.innerText = 'LISTA PRZEDMIOTÓW';
-        console.log(allSubject);
+        const hRow = tableSubject.createTHead().insertRow();
+        hRow.insertCell().innerHTML='Lp';
+        hRow.insertCell().innerHTML='nazwa';
+        hRow.insertCell().innerHTML='akcja';
+        let lp = 1;
         for(const i of allSubject){
-            hRow.insertRow().innerHTML = i['name'];
+            const row = tableSubject.insertRow();
+            row.insertCell().innerHTML = `${lp++}`;
+            row.insertCell().innerHTML = i['name'];
+             const editButton = document.createElement("button");
+            editButton.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
+            //editButton.onclick = () => editData(editButton, row, i['name'], i['last_name'], i['pesel'], i['id']);
+            row.insertCell().innerHTML =
+                `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
+            row.cells[2].appendChild(editButton);
         }
     }
     async function dodaj(){
@@ -33,5 +47,6 @@
         subject.innerHTML ='';
         getAll();
     }
+    getAll();
 </script>
 </html>
