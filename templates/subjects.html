@@ -20,6 +20,11 @@
 </div>
 </body>
 <script>
+    async function remove(subject){
+        await fetch(`/subject/remove/${subject}`, {method: 'DELETE'});
+        await getAll();
+    }
+
     async function getAll(){
         const allSubject = await(await fetch('/subject/get_all')).json();
         const tableSubject = document.getElementById("table_subject");
@@ -35,17 +40,23 @@
             row.insertCell().innerHTML = i['name'];
              const editButton = document.createElement("button");
             editButton.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
-            //editButton.onclick = () => editData(editButton, row, i['name'], i['last_name'], i['pesel'], i['id']);
+            editButton.onclick = () => editData(editButton, row, i['name']);
             row.insertCell().innerHTML =
-                `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
+                `<button onclick="remove('${i.name}')"><span class="material-symbols-outlined button">person_remove</span></button>`;
             row.cells[2].appendChild(editButton);
         }
+    }
+    async function editData(editButton,row,name){
+        editButton.style.display ='none';
+        //2 przyciski onclik
+        //pole powinno stac sie inputem
+
     }
     async function dodaj(){
         const subject = document.getElementById("subject_id").value;
         await fetch(`/subject/add/${subject}`, {method:'POST'});
         subject.innerHTML ='';
-        getAll();
+        await getAll();
     }
     getAll();
 </script>

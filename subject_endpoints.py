@@ -16,6 +16,11 @@ def add(subject):
 @subject_blueprint.route('/subject/get_all')
 def get_all():
     return classes.get_all()
+
+@subject_blueprint.route('/subject/remove/<subject>', methods=['DELETE'])
+def remove(subject):
+    classes.remove(subject)
+    return ''
 # @app.route('/subject')
 # def get_subject():
 #     return render_template('nauczyciele.html')
