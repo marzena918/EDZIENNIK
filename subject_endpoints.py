@@ -21,6 +21,11 @@ def get_all():
 def remove(subject):
     classes.remove(subject)
     return ''
+
+@subject_blueprint.route('/subject/edit/<oldSubject>/<newSubject>', methods=['PUT'])
+def edit(oldSubject,newSubject):
+    classes.edit(oldSubject,newSubject)
+    return ''
 # @app.route('/subject')
 # def get_subject():
 #     return render_template('nauczyciele.html')

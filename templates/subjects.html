@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
     <link rel="stylesheet" href="/static/subjects.css">
     <link rel="stylesheet" href="/static/main.style.css">
 
 </head>
 <body>
 <div>
-<label for="subject_id">przedmiot</label>
+    <label for="subject_id">przedmiot</label>
     <input type="text" id="subject_id">
     <button onclick="dodaj()"><span class="material-symbols-outlined button">add</span></button>
 </div>
@@ -20,25 +21,25 @@
 </div>
 </body>
 <script>
-    async function remove(subject){
+    async function remove(subject) {
         await fetch(`/subject/remove/${subject}`, {method: 'DELETE'});
         await getAll();
     }
 
-    async function getAll(){
-        const allSubject = await(await fetch('/subject/get_all')).json();
+    async function getAll() {
+        const allSubject = await (await fetch('/subject/get_all')).json();
         const tableSubject = document.getElementById("table_subject");
         tableSubject.innerHTML = ''
         const hRow = tableSubject.createTHead().insertRow();
-        hRow.insertCell().innerHTML='Lp';
-        hRow.insertCell().innerHTML='nazwa';
-        hRow.insertCell().innerHTML='akcja';
+        hRow.insertCell().innerHTML = 'Lp';
+        hRow.insertCell().innerHTML = 'nazwa';
+        hRow.insertCell().innerHTML = 'akcja';
         let lp = 1;
-        for(const i of allSubject){
+        for (const i of allSubject) {
             const row = tableSubject.insertRow();
             row.insertCell().innerHTML = `${lp++}`;
             row.insertCell().innerHTML = i['name'];
-             const editButton = document.createElement("button");
+            const editButton = document.createElement("button");
             editButton.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
             editButton.onclick = () => editData(editButton, row, i['name']);
             row.insertCell().innerHTML =
@@ -46,18 +47,52 @@
             row.cells[2].appendChild(editButton);
         }
     }
-    async function editData(editButton,row,name){
-        editButton.style.display ='none';
+
+    async function editData(editButton, row, name) {
+        editButton.style.display = 'none';
+        const accept = document.createElement("button");
+        row.cells[2].appendChild(accept)
+        accept.innerHTML='<span class="material-symbols-outlined button">done</span>'
+         const inputName = document.createElement("input");
+        inputName.type = 'text';
+        inputName.value = name;
+        row.cells[1].innerText='';
+        row.cells[1].appendChild(inputName);
+        accept.onclick = ()=> {
+            updateData(row, name, inputName.value);
+            accept.remove();
+            cancel.remove();
+            editButton.style.display='inline';
+        }
+        const cancel = document.createElement("button");
+        cancel.innerHTML = '<span class="material-symbols-outlined button">close</span>'
+        row.cells[2].appendChild(cancel);
+        cancel.onclick = () => {
+            editButton.style.display = 'inline';
+            accept.remove();
+            cancel.remove();
+            row.cells[1].innerHTML = name;
+        }
+
+
         //2 przyciski onclik
         //pole powinno stac sie inputem
 
     }
-    async function dodaj(){
+
+    async function updateData(row, oldName, newName) {
+        await fetch(`/subject/edit/${oldName}/${newName}`, {method: 'PUT'})
+         row.cells[1].innerHTML = newName;
+
+    }
+
+    async function dodaj() {
         const subject = document.getElementById("subject_id").value;
-        await fetch(`/subject/add/${subject}`, {method:'POST'});
-        subject.innerHTML ='';
+        await fetch(`/subject/add/${subject}`, {method: 'POST'});
+        subject.innerHTML = '';
         await getAll();
     }
+
     getAll();
 </script>
 </html>
