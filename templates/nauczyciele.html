@@ -25,7 +25,7 @@
 
 
 </div>
-<label for="select_id"></label><select id="select_id" ></select>
+<label for="select_id"></label><select id="select_id"></select>
 <div>
     <table id="table_id"></table>
 </div>
@@ -105,9 +105,10 @@
         }
         return a
     }
-async function createSelect(row,id){
-           const subjects = document.getElementById("select_id")
-        const subjectsTeacher = await(await fetch(`/teacher/subjectsOfTeacher/${id}`)).json();
+
+    async function createSelect(row, id) {
+        const subjects = document.getElementById("select_id")
+        const subjectsTeacher = await (await fetch(`/teacher/subjectsOfTeacher/${id}`)).json();
         for (const i of subjectsTeacher) {
             const option = document.createElement("option");
             option.value = i['subject'];
@@ -115,18 +116,18 @@ async function createSelect(row,id){
             row.cells[1].innerText = '';
             subjects.appendChild(option);
         }
-         row.cells[1].appendChild(subjects);
-}
+        row.cells[1].appendChild(subjects);
+    }
+
     async function deleteSelectSubject(row, id) {
         const select = document.getElementById("select_id").value;
         //debugger;
         await fetch(`/teacher/delete_subject_for_teacher/${id}/${select}`, {method: 'DELETE'});
-          row.cells[1].innerText = '';
-       //  select.innerHTML = '';
-       // await createSelect();
-       const subjectOfTe = await SubjectsOfTeacher(id);
+        row.cells[1].innerText = '';
+        //  select.innerHTML = '';
+        // await createSelect();
+        const subjectOfTe = await SubjectsOfTeacher(id);
         row.cells[1].innerHTML = subjectOfTe;
-
 
 
         //debugger;
@@ -135,36 +136,25 @@ async function createSelect(row,id){
     async function editSubjectsOfTeacher(butonEdit, row, id) {
 
         butonEdit.style.display = 'none';
-        const butonRemove = document.createElement("button");
-        butonRemove.innerHTML = '<span class="material-symbols-outlined button">person_remove</span>';
-        row.cells[2].appendChild(butonRemove);
+
+
         const buttonCancel = document.createElement("button");
         buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>'
-        buttonCancel.onclick = ()=>{
+        buttonCancel.onclick = () => {
             buttonCancel.remove();
             buttonAccept.remove();
-            butonEdit.style.display='inline';
+            butonEdit.style.display = 'inline';
         }
         const buttonAccept = document.createElement("button");
         buttonAccept.innerHTML = '<span class="material-symbols-outlined button">done</span>'
-        buttonAccept.onclick = ()=> {
+        buttonAccept.onclick = () => {
             buttonCancel.remove();
             buttonAccept.remove();
             deleteSelectSubject(row, id);
             butonEdit.style.display = 'inline';
         }
-        butonRemove.onclick = () => {
-            createSelect(row, id);
-            butonRemove.remove();
-            buttonAdd.remove();
-            row.cells[2].appendChild(buttonCancel)
-            row.cells[2].appendChild(buttonAccept)
-
-            //butonEdit.style.display = 'inline';
-        }
-        const buttonAdd = document.createElement("button");
-        buttonAdd.innerHTML = '<span class="material-symbols-outlined button">add</span>';
-        row.cells[2].appendChild(buttonAdd);
+        row.cells[2].appendChild(buttonCancel);
+        row.cells[2].appendChild(buttonAccept);
     }
 
     async function tableTeacher() {
