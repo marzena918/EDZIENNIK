@@ -4,74 +4,203 @@
     <meta charset="UTF-8">
     <title>oceny</title>
     <link rel="stylesheet" href="/static/main.style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 </head>
 <body>
 <p>dfdfggghh</p>
 <div class="sectionAdd">
     <label for="imie_id">imie</label>
-    <input type="text" id="imie_id">
+    <input type="text" id="imie_id" onkeyup="checkData()">
     <label for="nazwisko">nazwisko</label>
-    <input type="text" id="nazwisko">
-<!--    <label for="pesel">pesel</label>-->
-<!--    <input type="number" id="pesel" onkeyup="checkPesel(this,document.getElementById('but_id'), null)>-->
+    <input type="text" id="nazwisko" onkeyup="checkData()">
+    <label for="pesel">pesel</label>
+    <input type="number" id="pesel" onkeyup="checkData();checkPesel(this, null)">
 </div>
 <div>
-<label for="subject">wybierz przedmiot</label><br/>
-<select id="subject" name="subjects" multiple="true" onchange="checkData()"></select>
-    <button id="but_id" disabled="disabled"> <!--onchange="checkData()"--><span class="material-symbols-outlined button">person_add</span>
+    <label for="subject">wybierz przedmiot</label><br/>
+    <select id="subject" name="subjects" multiple="multiple" onchange="checkData()"></select>
+    <button id="but_id" disabled="disabled" onclick="sendDataTeacher()"><span class="material-symbols-outlined button">person_add</span>
     </button>
 
 
 </div>
+<label for="select_id"></label><select id="select_id" ></select>
+<div>
+    <table id="table_id"></table>
+</div>
 </body>
 <script>
+    async function isPeselExist(pesel) {
+        const response = await fetch(`/teacher/check_pesel/${pesel}`)
+        return +(await response.text());
+    }
 
+    async function isPeselValid(peselInput, originValue) {
+        if (peselInput.value.length < 2) {
+            return false;
+        }
+        if (originValue === +peselInput.value) {
+            return true
+        }
+        return !await isPeselExist(peselInput.value);
 
-    async function checkData(){
+    }
+
+    async function checkPesel(peselInput, originValue) {
+        if (!await isPeselValid(peselInput, originValue)) { // czy istnieje w bazie endpointem
+            peselInput.classList.remove("okInputData")
+            peselInput.classList.add("wrongInputData")
+            // buton.disabled = true;
+        } else {
+            peselInput.classList.remove("wrongInputData")
+            peselInput.classList.add("okInputData")
+            // buton.disabled = false;
+        }
+    }
+
+    async function checkData() {
         const name = document.getElementById("imie_id").value;
         const lastName = document.getElementById("nazwisko").value;
         const pesel = document.getElementById("pesel").value;
-        const selectedOpt = Array.from(document.getElementById("subject").selectedOptions).map(element => element.value)
-        if(selectedOpt){
-        }
-        if(name && lastName && pesel && selectedOpt){
-            document.getElementById("but_id").disabled = false;
-             //addTeacher();
-       }
+        const selectedOpt = Array.from(document.getElementById("subject").selectedOptions).map(element => element.value);
+
+        document.getElementById("but_id").disabled = !(name && lastName && selectedOpt && await isPeselValid(document.getElementById("pesel"), pesel));
     }
-    async function get_all_subjects(){
+
+    async function get_all_subjects() {
         const subjectsSelect = document.getElementById("subject");
 
-        const subjects =await(await fetch('/teacher/get_all_subjects')).json();
-        for(const i of subjects){
-        const option =document.createElement("option");
-        option.value = i.name;
-        option.innerHTML = i.name;
-        subjectsSelect.appendChild(option);
+        const subjects = await (await fetch('/teacher/get_all_subjects')).json();
+        for (const i of subjects) {
+            const option = document.createElement("option");
+            option.value = i.name;
+            option.innerHTML = i.name;
+            subjectsSelect.appendChild(option);
 
         }
-        //  const selectedOpt = Array.from(document.getElementById("subject").selectedOptions).map(element => element.value);
-        //
-        // if (selectedOpt) {
-        //     document.getElementById("but_id").disabled = false;
-        //     alert("dd");
-        //}
     }
 
-    async function sendSubjectsSelected() {
+    async function sendDataTeacher() {
         const subjects = document.getElementById("subject");
-        var listSubjects= Array.from(subjects.selectedOptions).map(element => element.value);
+        let listSubjects = Array.from(subjects.selectedOptions).map(element => element.value);
+        const name = document.getElementById("imie_id").value;
+        const last_name = document.getElementById("nazwisko").value;
+        const pesel = +document.getElementById("pesel").value;
+        const data = {subjects: listSubjects, name: name, last_name: last_name, pesel: pesel}
+        await fetch('/teacher/add', {
+            method: 'POST', body: JSON.stringify(data),
+            headers: {'Content-Type': 'application/json'}
+
+        })
+        document.getElementById("table_id").innerHTML = '';
+        await tableTeacher();
     }
 
-
-function getAllStudentNotes(){
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-  get: (searchParams, prop) => searchParams.get(prop),
-});
-    fetch(`/student/oceny/${params.studentId}`)
+    async function SubjectsOfTeacher(id) {
+        const result = await (await fetch(`/teacher/subjectsOfTeacher/${id}`)).json();
+        let a = '';
+        for (const i of result) {
+            a += `${i['subject']} `;
+        }
+        return a
+    }
+async function createSelect(row,id){
+           const subjects = document.getElementById("select_id")
+        const subjectsTeacher = await(await fetch(`/teacher/subjectsOfTeacher/${id}`)).json();
+        for (const i of subjectsTeacher) {
+            const option = document.createElement("option");
+            option.value = i['subject'];
+            option.innerHTML = i['subject'];
+            row.cells[1].innerText = '';
+            subjects.appendChild(option);
+        }
+         row.cells[1].appendChild(subjects);
 }
-get_all_subjects();
+    async function deleteSelectSubject(row, id) {
+        const select = document.getElementById("select_id").value;
+        //debugger;
+        await fetch(`/teacher/delete_subject_for_teacher/${id}/${select}`, {method: 'DELETE'});
+          row.cells[1].innerText = '';
+       //  select.innerHTML = '';
+       // await createSelect();
+       const subjectOfTe = await SubjectsOfTeacher(id);
+        row.cells[1].innerHTML = subjectOfTe;
 
+
+
+        //debugger;
+    }
+
+    async function editSubjectsOfTeacher(butonEdit, row, id) {
+
+        butonEdit.style.display = 'none';
+        const butonRemove = document.createElement("button");
+        butonRemove.innerHTML = '<span class="material-symbols-outlined button">person_remove</span>';
+        row.cells[2].appendChild(butonRemove);
+        const buttonCancel = document.createElement("button");
+        buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>'
+        buttonCancel.onclick = ()=>{
+            buttonCancel.remove();
+            buttonAccept.remove();
+            butonEdit.style.display='inline';
+        }
+        const buttonAccept = document.createElement("button");
+        buttonAccept.innerHTML = '<span class="material-symbols-outlined button">done</span>'
+        buttonAccept.onclick = ()=> {
+            buttonCancel.remove();
+            buttonAccept.remove();
+            deleteSelectSubject(row, id);
+            butonEdit.style.display = 'inline';
+        }
+        butonRemove.onclick = () => {
+            createSelect(row, id);
+            butonRemove.remove();
+            buttonAdd.remove();
+            row.cells[2].appendChild(buttonCancel)
+            row.cells[2].appendChild(buttonAccept)
+
+            //butonEdit.style.display = 'inline';
+        }
+        const buttonAdd = document.createElement("button");
+        buttonAdd.innerHTML = '<span class="material-symbols-outlined button">add</span>';
+        row.cells[2].appendChild(buttonAdd);
+    }
+
+    async function tableTeacher() {
+        const allTeacher = await (await fetch('/teacher/get_all_teacher')).json();
+        const tableOfTeacher = document.getElementById("table_id");
+        const Hrow = tableOfTeacher.createTHead().insertRow();
+        Hrow.insertCell().innerHTML = 'nauczyciel';
+        Hrow.insertCell().innerHTML = 'przedmiot';
+        Hrow.insertCell().innerHTML = 'akcja';
+
+        for (const j of allTeacher) {
+
+            const row = tableOfTeacher.insertRow();
+            row.insertCell().innerHTML = `${j.name} ${j.last_name}`;
+            row.insertCell().innerHTML = await SubjectsOfTeacher(j.id);
+            row.insertCell();
+            const edit = document.createElement("button");
+            edit.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
+            edit.onclick = () => editSubjectsOfTeacher(edit, row, j.id)
+            row.cells[2].appendChild(edit);
+        }
+    }
+
+    function getAllStudentNotes() {
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        });
+        fetch(`/student/oceny/${params.studentId}`)
+    }
+
+    async function init() {
+
+        await get_all_subjects();
+        await tableTeacher();
+    }
+
+    init();
 </script>
 </html>
