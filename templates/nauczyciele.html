@@ -25,7 +25,7 @@
 
 
 </div>
-<label for="select_id"></label><select id="select_id"></select>
+<label for="select_id" ></label><select id="select_id" multiple="multiple"></select>
 <div>
     <table id="table_id"></table>
 </div>
@@ -68,8 +68,8 @@
         document.getElementById("but_id").disabled = !(name && lastName && selectedOpt && await isPeselValid(document.getElementById("pesel"), pesel));
     }
 
-    async function get_all_subjects() {
-        const subjectsSelect = document.getElementById("subject");
+    async function get_all_subjects(subjectsSelect) {
+        //const subjectsSelect = document.getElementById("subject");
 
         const subjects = await (await fetch('/teacher/get_all_subjects')).json();
         for (const i of subjects) {
@@ -106,38 +106,30 @@
         return a
     }
 
-    async function createSelect(row, id) {
-        const subjects = document.getElementById("select_id")
-        const subjectsTeacher = await (await fetch(`/teacher/subjectsOfTeacher/${id}`)).json();
+    async function createMSelect(row,id){
+        const subjects = document.getElementById("select_id");
+            const subjectsTeacher = await (await fetch(`/teacher/subjectsOfTeacher/${id}`)).json();
         for (const i of subjectsTeacher) {
             const option = document.createElement("option");
             option.value = i['subject'];
             option.innerHTML = i['subject'];
-            row.cells[1].innerText = '';
+            row.cells[4].innerText = '';
             subjects.appendChild(option);
         }
-        row.cells[1].appendChild(subjects);
+        return subjects;
     }
 
     async function deleteSelectSubject(row, id) {
         const select = document.getElementById("select_id").value;
-        //debugger;
         await fetch(`/teacher/delete_subject_for_teacher/${id}/${select}`, {method: 'DELETE'});
         row.cells[1].innerText = '';
-        //  select.innerHTML = '';
-        // await createSelect();
         const subjectOfTe = await SubjectsOfTeacher(id);
         row.cells[1].innerHTML = subjectOfTe;
 
-
-        //debugger;
     }
 
     async function editSubjectsOfTeacher(butonEdit, row, id) {
-
         butonEdit.style.display = 'none';
-
-
         const buttonCancel = document.createElement("button");
         buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>'
         buttonCancel.onclick = () => {
@@ -150,31 +142,40 @@
         buttonAccept.onclick = () => {
             buttonCancel.remove();
             buttonAccept.remove();
-            deleteSelectSubject(row, id);
             butonEdit.style.display = 'inline';
         }
-        row.cells[2].appendChild(buttonCancel);
-        row.cells[2].appendChild(buttonAccept);
+        butonEdit.parentElement.appendChild(buttonCancel);
+        butonEdit.parentElement.appendChild(buttonAccept);
+        row.cells[4].innerHTML = '';
+        const select = document.getElementById("select_id");
+        const selectSubj = await get_all_subjects(select);
+        row.cells[4].appendChild(select);
     }
 
     async function tableTeacher() {
         const allTeacher = await (await fetch('/teacher/get_all_teacher')).json();
         const tableOfTeacher = document.getElementById("table_id");
         const Hrow = tableOfTeacher.createTHead().insertRow();
-        Hrow.insertCell().innerHTML = 'nauczyciel';
+        Hrow.insertCell().innerHTML = 'lp';
+        Hrow.insertCell().innerHTML = 'imie';
+        Hrow.insertCell().innerHTML = 'nazwisko';
+        Hrow.insertCell().innerHTML = 'pesel';
         Hrow.insertCell().innerHTML = 'przedmiot';
         Hrow.insertCell().innerHTML = 'akcja';
-
+        let lp = 1
         for (const j of allTeacher) {
 
             const row = tableOfTeacher.insertRow();
-            row.insertCell().innerHTML = `${j.name} ${j.last_name}`;
+            row.insertCell().innerHTML = `${lp++}`;
+            row.insertCell().innerHTML = `${j.name}`;
+            row.insertCell().innerHTML = `${j.last_name}`;
+            row.insertCell().innerHTML = `${j.pesel}`;
             row.insertCell().innerHTML = await SubjectsOfTeacher(j.id);
             row.insertCell();
             const edit = document.createElement("button");
             edit.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
             edit.onclick = () => editSubjectsOfTeacher(edit, row, j.id)
-            row.cells[2].appendChild(edit);
+            row.cells[5].appendChild(edit);
         }
     }
 
@@ -186,8 +187,8 @@
     }
 
     async function init() {
-
-        await get_all_subjects();
+    const subjectsSelect = document.getElementById("subject");
+        await get_all_subjects(subjectsSelect);
         await tableTeacher();
     }
 
