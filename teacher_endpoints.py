@@ -34,3 +34,9 @@ def subjects_of_teacher(id):
 def delete_subject_for_teacher(id,subject):
     teachers.delete_subject_for_teacher(id,subject)
     return ''
+
+@teacher_blueprint.route('/teacher/updateData', methods=['PUT'])
+def updade_teacher_and_subjects():
+    data = request.json
+    teachers.update_techAndSub(data['name'], data['lastName'], data['pesel'], data['subjects'],data['id'])
+    return ''

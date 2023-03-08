@@ -22,13 +22,16 @@ class Teacher:
 
     def subjects_of_teacher(self, id):
         return cursor.execute(f"select subject from teacher_subject where teacher_id = {id}").fetchall()
-        # res2 = result[:]
-        # if not result:
-        #     return ''
-        # else:
-        #     print(res2)
-        #     return res2
+
     def delete_subject_for_teacher(self, id,subject):
         cursor.execute(f"DELETE from teacher_subject where teacher_id = '{id}' and subject = '{subject}'")
+        sqliteConnection.commit()
+    def update_techAndSub(self,name, last_name, pesel, subjects,id):
+        cursor.execute(f"update teacher set name='{name}', last_name='{last_name}', pesel={pesel} where id = {id}")
+        sqliteConnection.commit()
+        cursor.execute(f"DELETE from teacher_subject where teacher_id ={id}")
+        for i in subjects:
+            print(i)
+            cursor.execute(f"insert into teacher_subject (teacher_id, subject) VALUES({id},'{i}')")
         sqliteConnection.commit()
 teachers = Teacher()

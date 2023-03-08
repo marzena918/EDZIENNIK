@@ -25,25 +25,37 @@
 
 
 </div>
-<label for="select_id" ></label><select id="select_id" multiple="multiple"></select>
+<label for="select_id"></label><select id="select_id" multiple="multiple" onchange="checkDataEdit()"></select>
 <div>
     <table id="table_id"></table>
+</div>
+<div>
+    <label for="pesel_id"></label><input type="number" id="pesel_id" onkeyup="checkDataEdit();checkPesel(this, null)">
+    <label for="name_id"></label><input type="text" id="name_id" onkeyup="checkDataEdit()">
+    <label for="lastName_id"></label><input type="text" id="lastName_id" onkeyup="checkDataEdit()">
 </div>
 </body>
 <script>
     async function isPeselExist(pesel) {
         const response = await fetch(`/teacher/check_pesel/${pesel}`)
+        //debugger;
         return +(await response.text());
     }
 
     async function isPeselValid(peselInput, originValue) {
+      //debugger;
+
         if (peselInput.value.length < 2) {
+
             return false;
+
         }
         if (originValue === +peselInput.value) {
             return true
+
         }
         return !await isPeselExist(peselInput.value);
+
 
     }
 
@@ -69,15 +81,12 @@
     }
 
     async function get_all_subjects(subjectsSelect) {
-        //const subjectsSelect = document.getElementById("subject");
-
         const subjects = await (await fetch('/teacher/get_all_subjects')).json();
         for (const i of subjects) {
             const option = document.createElement("option");
             option.value = i.name;
             option.innerHTML = i.name;
             subjectsSelect.appendChild(option);
-
         }
     }
 
@@ -91,7 +100,6 @@
         await fetch('/teacher/add', {
             method: 'POST', body: JSON.stringify(data),
             headers: {'Content-Type': 'application/json'}
-
         })
         document.getElementById("table_id").innerHTML = '';
         await tableTeacher();
@@ -106,50 +114,83 @@
         return a
     }
 
-    async function createMSelect(row,id){
-        const subjects = document.getElementById("select_id");
-            const subjectsTeacher = await (await fetch(`/teacher/subjectsOfTeacher/${id}`)).json();
-        for (const i of subjectsTeacher) {
-            const option = document.createElement("option");
-            option.value = i['subject'];
-            option.innerHTML = i['subject'];
-            row.cells[4].innerText = '';
-            subjects.appendChild(option);
-        }
-        return subjects;
+    // async function createMSelect(row, id) {
+    //     const subjects = document.getElementById("select_id");
+    //     const subjectsTeacher = await (await fetch(`/teacher/subjectsOfTeacher/${id}`)).json();
+    //     for (const i of subjectsTeacher) {
+    //         const option = document.createElement("option");
+    //         option.value = i['subject'];
+    //         option.innerHTML = i['subject'];
+    //         row.cells[4].innerText = '';
+    //         subjects.appendChild(option);
+    //     }
+    //     return subjects;
+    // }
+    //
+    // async function deleteSelectSubject(row, id) {
+    //     const select = document.getElementById("select_id").value;
+    //     await fetch(`/teacher/delete_subject_for_teacher/${id}/${select}`, {method: 'DELETE'});
+    //     row.cells[1].innerText = '';
+    //     const subjectOfTe = await SubjectsOfTeacher(id);
+    //     row.cells[1].innerHTML = subjectOfTe;
+
+    //}
+    async function checkDataEdit(){
+        const Iname = document.getElementById("name_id").value;
+        const IlastName = document.getElementById("lastName_id").value;
+        const Ipesel = document.getElementById("pesel_id").value;
+        const selectedOpt = Array.from(document.getElementById("select_id").selectedOptions).map(element => element.value);
+        document.getElementById("button_id").disabled = !(Iname && IlastName && selectedOpt && await isPeselValid(document.getElementById("pesel_id"),Ipesel));
+    }
+    async function updateDataTeacher(id){
+        const name = document.getElementById("name_id").value;
+        const lastName = document.getElementById("lastName_id").value;
+        const pesel =document.getElementById("pesel_id").value;
+            const subjects = Array.from(document.getElementById("select_id").selectedOptions).map(element=>element.value);
+            const data = {name: name, lastName:lastName, pesel:pesel, subjects:subjects, id:id}
+        await fetch('/teacher/updateData', {method:'PUT', body: JSON.stringify(data),
+            headers: {'Content-Type': 'application/json'}});
     }
 
-    async function deleteSelectSubject(row, id) {
-        const select = document.getElementById("select_id").value;
-        await fetch(`/teacher/delete_subject_for_teacher/${id}/${select}`, {method: 'DELETE'});
-        row.cells[1].innerText = '';
-        const subjectOfTe = await SubjectsOfTeacher(id);
-        row.cells[1].innerHTML = subjectOfTe;
-
-    }
-
-    async function editSubjectsOfTeacher(butonEdit, row, id) {
+    async function editSubjectsOfTeacher(butonEdit, row, id, name, last_name, pesel) {
         butonEdit.style.display = 'none';
         const buttonCancel = document.createElement("button");
-        buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>'
+        buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
         buttonCancel.onclick = () => {
             buttonCancel.remove();
             buttonAccept.remove();
             butonEdit.style.display = 'inline';
         }
         const buttonAccept = document.createElement("button");
-        buttonAccept.innerHTML = '<span class="material-symbols-outlined button">done</span>'
+        buttonAccept.id ='button_id';
+        buttonAccept.innerHTML = '<span class="material-symbols-outlined button">done</span>';
+        buttonAccept.disabled = 'disabled';
         buttonAccept.onclick = () => {
+            updateDataTeacher(id)
             buttonCancel.remove();
             buttonAccept.remove();
             butonEdit.style.display = 'inline';
         }
+
         butonEdit.parentElement.appendChild(buttonCancel);
         butonEdit.parentElement.appendChild(buttonAccept);
         row.cells[4].innerHTML = '';
         const select = document.getElementById("select_id");
         const selectSubj = await get_all_subjects(select);
         row.cells[4].appendChild(select);
+        const inputName = document.getElementById('name_id');
+        inputName.value = name;
+        row.cells[1].innerText = '';
+        row.cells[1].appendChild(inputName);
+        const inputLastName = document.getElementById('lastName_id');
+        inputLastName.value = last_name;
+        row.cells[2].innerText = '';
+        row.cells[2].appendChild(inputLastName);
+        const inputPesel = document.getElementById("pesel_id");
+        inputPesel.value = pesel;
+       // inputPesel.onclick = () => inputPesel.style.color = 'red';
+        row.cells[3].innerText = '';
+        row.cells[3].appendChild(inputPesel);
     }
 
     async function tableTeacher() {
@@ -174,7 +215,7 @@
             row.insertCell();
             const edit = document.createElement("button");
             edit.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
-            edit.onclick = () => editSubjectsOfTeacher(edit, row, j.id)
+            edit.onclick = () => editSubjectsOfTeacher(edit, row, j.id, j.name, j.last_name, j.pesel)
             row.cells[5].appendChild(edit);
         }
     }
@@ -187,7 +228,7 @@
     }
 
     async function init() {
-    const subjectsSelect = document.getElementById("subject");
+        const subjectsSelect = document.getElementById("subject");
         await get_all_subjects(subjectsSelect);
         await tableTeacher();
     }
