@@ -43,15 +43,16 @@
     }
 
     async function isPeselValid(peselInput, originValue) {
-      //debugger;
+      debugger;
 
         if (peselInput.value.length < 2) {
 
             return false;
 
         }
-        if (originValue === +peselInput.value) {
+        if (originValue === peselInput.value) {
             return true
+
 
         }
         return !await isPeselExist(peselInput.value);
@@ -188,7 +189,6 @@
         row.cells[2].appendChild(inputLastName);
         const inputPesel = document.getElementById("pesel_id");
         inputPesel.value = pesel;
-       // inputPesel.onclick = () => inputPesel.style.color = 'red';
         row.cells[3].innerText = '';
         row.cells[3].appendChild(inputPesel);
     }
