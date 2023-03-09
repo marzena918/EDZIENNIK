@@ -22,60 +22,44 @@
     <select id="subject" name="subjects" multiple="multiple" onchange="checkData()"></select>
     <button id="but_id" disabled="disabled" onclick="sendDataTeacher()"><span class="material-symbols-outlined button">person_add</span>
     </button>
-
-
 </div>
 <label for="select_id"></label><select id="select_id" multiple="multiple" onchange="checkDataEdit()"></select>
 <div>
     <table id="table_id"></table>
 </div>
-<div>
-    <label for="pesel_id"></label><input type="number" id="pesel_id" onkeyup="checkDataEdit();checkPesel(this, null)">
-    <label for="name_id"></label><input type="text" id="name_id" onkeyup="checkDataEdit()">
-    <label for="lastName_id"></label><input type="text" id="lastName_id" onkeyup="checkDataEdit()">
-</div>
 </body>
 <script>
     async function isPeselExist(pesel) {
         const response = await fetch(`/teacher/check_pesel/${pesel}`)
-        //debugger;
         return +(await response.text());
     }
 
     async function isPeselValid(peselInput, originValue) {
-      debugger;
-
         if (peselInput.value.length < 2) {
-
             return false;
-
         }
-        if (originValue === peselInput.value) {
+        if (originValue === +peselInput.value) {
             return true
-
-
         }
         return !await isPeselExist(peselInput.value);
-
-
     }
 
     async function checkPesel(peselInput, originValue) {
         if (!await isPeselValid(peselInput, originValue)) { // czy istnieje w bazie endpointem
-            peselInput.classList.remove("okInputData")
-            peselInput.classList.add("wrongInputData")
-            // buton.disabled = true;
+            peselInput.classList.remove("okInputData");
+            peselInput.classList.add("wrongInputData");
+            return false;
         } else {
-            peselInput.classList.remove("wrongInputData")
-            peselInput.classList.add("okInputData")
-            // buton.disabled = false;
+            peselInput.classList.remove("wrongInputData");
+            peselInput.classList.add("okInputData");
+            return true;
         }
     }
 
     async function checkData() {
         const name = document.getElementById("imie_id").value;
         const lastName = document.getElementById("nazwisko").value;
-        const pesel = document.getElementById("pesel").value;
+        const pesel = document.getElementById("pesel").value.clone();
         const selectedOpt = Array.from(document.getElementById("subject").selectedOptions).map(element => element.value);
 
         document.getElementById("but_id").disabled = !(name && lastName && selectedOpt && await isPeselValid(document.getElementById("pesel"), pesel));
@@ -136,12 +120,9 @@
     //     row.cells[1].innerHTML = subjectOfTe;
 
     //}
-    async function checkDataEdit(){
-        const Iname = document.getElementById("name_id").value;
-        const IlastName = document.getElementById("lastName_id").value;
-        const Ipesel = document.getElementById("pesel_id").value;
-        const selectedOpt = Array.from(document.getElementById("select_id").selectedOptions).map(element => element.value);
-        document.getElementById("button_id").disabled = !(Iname && IlastName && selectedOpt && await isPeselValid(document.getElementById("pesel_id"),Ipesel));
+    async function checkDataEdit(originPesel,name, lastName,select,currentPesel){
+        const selectedOpt = Array.from(select.selectedOptions).map(element => element.value);
+        document.getElementById("button_id").disabled = !(name && lastName && selectedOpt && await checkPesel(currentPesel,originPesel));
     }
     async function updateDataTeacher(id){
         const name = document.getElementById("name_id").value;
@@ -176,21 +157,30 @@
         butonEdit.parentElement.appendChild(buttonCancel);
         butonEdit.parentElement.appendChild(buttonAccept);
         row.cells[4].innerHTML = '';
-        const select = document.getElementById("select_id");
-        const selectSubj = await get_all_subjects(select);
+        const select = document.createElement('select');
+        select.multiple='multiple';
+        select.onchange = ()=> checkDataEdit(pesel,name,last_name,select,inputPesel);
+        await get_all_subjects(select);
+
         row.cells[4].appendChild(select);
-        const inputName = document.getElementById('name_id');
+        const inputName = document.createElement('input');
+        inputName.type = 'text';
+        inputName.onkeyup = ()=>checkDataEdit(pesel,name,last_name,select,inputPesel);
         inputName.value = name;
         row.cells[1].innerText = '';
         row.cells[1].appendChild(inputName);
-        const inputLastName = document.getElementById('lastName_id');
+        const inputLastName = document.createElement('input');
         inputLastName.value = last_name;
+        inputLastName.type = 'text';
         row.cells[2].innerText = '';
-        row.cells[2].appendChild(inputLastName);
-        const inputPesel = document.getElementById("pesel_id");
+        inputLastName.onkeyup = ()=> checkDataEdit(pesel,name,last_name,select,inputPesel);
+       row.cells[2].appendChild(inputLastName);
+        const inputPesel = document.createElement("input");
         inputPesel.value = pesel;
         row.cells[3].innerText = '';
-        row.cells[3].appendChild(inputPesel);
+        inputPesel.onkeyup = ()=>checkDataEdit(pesel,name,last_name,select,inputPesel);
+        inputPesel.type = 'number'
+       row.cells[3].appendChild(inputPesel);
     }
 
     async function tableTeacher() {
