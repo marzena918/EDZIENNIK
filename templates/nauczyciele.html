@@ -64,7 +64,7 @@
         buttonAccept.disabled = !(await checkPesel(inputCurrentPesel, originPesel) && name && lastName && selectedOpt.length);
     }
 
-    async function editSubjectsOfTeacher(butonEdit, row, id, name, last_name, pesel) {
+    async function editSubjectsOfTeacher(butonEdit, row, id, name, last_name, pesel, currentSubjects) {
         butonEdit.style.display = 'none';
         const buttonCancel = document.createElement("button");
         buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
@@ -83,6 +83,11 @@
         const subjectsSelect = document.createElement('select');
         subjectsSelect.multiple = 'multiple';
         await get_all_subjects(subjectsSelect);
+        for (const option of subjectsSelect.options) {
+            if (currentSubjects.indexOf(option.value) >= 0) {
+                option.selected = true;
+            }
+        }
 
         row.cells[4].appendChild(subjectsSelect);
         const inputName = document.createElement('input');
@@ -127,18 +132,19 @@
         Hrow.insertCell().innerHTML = 'przedmiot';
         Hrow.insertCell().innerHTML = 'akcja';
         let lp = 1
-        for (const j of allTeacher) {
 
+        for (const j of allTeacher) {
+            const currentSubjects = (await getSubjectsOfTeacher(j.id)).map(obj=>obj.subject);
             const row = tableOfTeacher.insertRow();
             row.insertCell().innerHTML = `${lp++}`;
             row.insertCell().innerHTML = `${j.name}`;
             row.insertCell().innerHTML = `${j.last_name}`;
             row.insertCell().innerHTML = `${j.pesel}`;
-            row.insertCell().innerHTML = (await getSubjectsOfTeacher(j.id)).map(obj => obj.subject).join(', ');
+            row.insertCell().innerHTML = currentSubjects.join(', ');
             row.insertCell();
             const edit = document.createElement("button");
             edit.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
-            edit.onclick = () => editSubjectsOfTeacher(edit, row, j.id, j.name, j.last_name, j.pesel)
+            edit.onclick = () => editSubjectsOfTeacher(edit, row, j.id, j.name, j.last_name, j.pesel, currentSubjects)
             row.cells[5].appendChild(edit);
         }
     }
