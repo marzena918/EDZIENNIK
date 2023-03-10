@@ -20,7 +20,7 @@
         <label for="subject">wybierz przedmiot</label><br/>
         <select id="subject" name="subjects" multiple="multiple" onchange="checkData()"></select>
     </div>
-    <button id="but_id" disabled="disabled" onclick="addNewTeacher(); await tableTeacher();"><span
+    <button id="acceptButtonId" disabled="disabled" onclick="addNewTeacher(); await tableTeacher();"><span
             class="material-symbols-outlined button">person_add</span>
     </button>
 </div>
@@ -55,13 +55,12 @@
         const name = document.getElementById("imie_id").value;
         const lastName = document.getElementById("nazwisko").value;
         const pesel = document.getElementById("pesel").value;
-        const selectedOpt = Array.from(document.getElementById("subject").selectedOptions).map(element => element.value);
-        document.getElementById("but_id").disabled = !(name && lastName && selectedOpt.length && await isPeselValid(document.getElementById("pesel"), pesel));
+        await checkDataEdit(document.getElementById("acceptButtonId"), null, name, lastName, document.getElementById("subject"), pesel);
     }
 
-    async function checkDataEdit(originPesel, name, lastName, select, currentPesel) {
+    async function checkDataEdit(buttonAccept, originPesel, name, lastName, select, currentPesel) {
         const selectedOpt = Array.from(select.selectedOptions).map(element => element.value);
-        document.getElementById("button_id").disabled = !(name && lastName && selectedOpt && await checkPesel(currentPesel, originPesel));
+        buttonAccept.disabled = !(name && lastName && selectedOpt.length && await checkPesel(currentPesel, originPesel));
     }
 
     async function editSubjectsOfTeacher(butonEdit, row, id, name, last_name, pesel) {
@@ -74,28 +73,21 @@
             butonEdit.style.display = 'inline';
         }
         const buttonAccept = document.createElement("button");
-        buttonAccept.id = 'button_id';
         buttonAccept.innerHTML = '<span class="material-symbols-outlined button">done</span>';
         buttonAccept.disabled = 'disabled';
-        buttonAccept.onclick = () => {
-            updateDataTeacher(id)
-            buttonCancel.remove();
-            buttonAccept.remove();
-            butonEdit.style.display = 'inline';
-        }
 
         butonEdit.parentElement.appendChild(buttonCancel);
         butonEdit.parentElement.appendChild(buttonAccept);
         row.cells[4].innerHTML = '';
-        const select = document.createElement('select');
-        select.multiple = 'multiple';
-        select.onchange = () => checkDataEdit(pesel, name, last_name, select, inputPesel);
-        await get_all_subjects(select);
+        const subjectsSelect = document.createElement('select');
+        subjectsSelect.multiple = 'multiple';
+        subjectsSelect.onchange = () => checkDataEdit(buttonAccept, pesel, name, last_name, subjectsSelect, inputPesel);
+        await get_all_subjects(subjectsSelect);
 
-        row.cells[4].appendChild(select);
+        row.cells[4].appendChild(subjectsSelect);
         const inputName = document.createElement('input');
         inputName.type = 'text';
-        inputName.onkeyup = () => checkDataEdit(pesel, name, last_name, select, inputPesel);
+        inputName.onkeyup = () => checkDataEdit(buttonAccept, pesel, name, last_name, subjectsSelect, inputPesel);
         inputName.value = name;
         row.cells[1].innerText = '';
         row.cells[1].appendChild(inputName);
@@ -103,14 +95,22 @@
         inputLastName.value = last_name;
         inputLastName.type = 'text';
         row.cells[2].innerText = '';
-        inputLastName.onkeyup = () => checkDataEdit(pesel, name, last_name, select, inputPesel);
+        inputLastName.onkeyup = () => checkDataEdit(buttonAccept, pesel, name, last_name, subjectsSelect, inputPesel);
         row.cells[2].appendChild(inputLastName);
         const inputPesel = document.createElement("input");
         inputPesel.value = pesel;
         row.cells[3].innerText = '';
-        inputPesel.onkeyup = () => checkDataEdit(pesel, name, last_name, select, inputPesel);
+        inputPesel.onkeyup = () => checkDataEdit(buttonAccept, pesel, name, last_name, subjectsSelect, inputPesel);
         inputPesel.type = 'number'
         row.cells[3].appendChild(inputPesel);
+        buttonAccept.onclick = async () => {
+            await updateDataTeacher(id, inputName, inputLastName, inputPesel, subjectsSelect)
+            buttonCancel.remove();
+            buttonAccept.remove();
+            butonEdit.style.display = 'inline';
+
+            //tableTeacher();
+        }
     }
 
     async function tableTeacher() {

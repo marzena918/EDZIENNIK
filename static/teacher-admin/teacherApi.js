@@ -25,12 +25,10 @@ async function getSubjectsOfTeacher(id) {
     return await (await fetch(`/teacher/subjectsOfTeacher/${id}`)).json();
 }
 
-async function updateDataTeacher(id) {
-    const name = document.getElementById("name_id").value;
-    const lastName = document.getElementById("lastName_id").value;
-    const pesel = document.getElementById("pesel_id").value;
-    const subjects = Array.from(document.getElementById("select_id").selectedOptions).map(element => element.value);
-    const data = {name: name, lastName: lastName, pesel: pesel, subjects: subjects, id: id}
+async function updateDataTeacher(id,inputName,inputLastName,inputPesel,subjectsSelect) {
+    const subjects = Array.from(subjectsSelect.selectedOptions).map(element => element.value);
+    const data = {name: inputName.value, lastName: inputLastName.value, pesel: inputPesel.valueAsNumber,
+        subjects: subjects, id: id}
     await fetch('/teacher/updateData', {
         method: 'PUT', body: JSON.stringify(data),
         headers: {'Content-Type': 'application/json'}
