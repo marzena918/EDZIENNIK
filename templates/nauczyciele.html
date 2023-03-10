@@ -54,10 +54,9 @@
     async function checkData() {
         const name = document.getElementById("imie_id").value;
         const lastName = document.getElementById("nazwisko").value;
-        const pesel = document.getElementById("pesel").value.clone();
+        const pesel = document.getElementById("pesel").value;
         const selectedOpt = Array.from(document.getElementById("subject").selectedOptions).map(element => element.value);
-
-        document.getElementById("but_id").disabled = !(name && lastName && selectedOpt && await isPeselValid(document.getElementById("pesel"), pesel));
+        document.getElementById("but_id").disabled = !(name && lastName && selectedOpt.length && await isPeselValid(document.getElementById("pesel"), pesel));
     }
 
     async function checkDataEdit(originPesel, name, lastName, select, currentPesel) {
