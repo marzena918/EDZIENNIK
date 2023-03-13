@@ -110,8 +110,14 @@
             buttonCancel.remove();
             buttonAccept.remove();
             butonEdit.style.display = 'inline';
-
-            //tableTeacher();
+            inputName.remove();
+            row.cells[1].innerHTML = inputName.value;
+            inputPesel.remove();
+            row.cells[3].innerHTML = inputPesel.value;
+            inputLastName.remove();
+            row.cells[2].innerHTML = inputLastName.value;
+            subjectsSelect.remove();
+            row.cells[4].innerHTML = Array.from(subjectsSelect.selectedOptions).map(element => element.value).join(', ');
         }
 
         inputName.onkeyup = () => checkDataEdit(buttonAccept, pesel, name, last_name, subjectsSelect, inputPesel);
