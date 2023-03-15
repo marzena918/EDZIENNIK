@@ -33,12 +33,15 @@ class Classs:
 
     def list_of_students(self):
         return cursor.execute(f"select name, last_name, id from student").fetchall()
-        # do zmian - nie umiem
+
 
     def students_without_class(self):
         return cursor.execute(f"select name, last_name,id from student "
                               f"where id not in (select student_id from class_student)").fetchall()
-    #zle
+
+    def list_of_student_for_class(self, id):
+        return cursor.execute(f"select name, last_name,id from student "
+                              f"where id in (select student_id from class_student where class_id = {id})").fetchall()
 
 
 classs = Classs()

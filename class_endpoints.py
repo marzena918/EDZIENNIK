@@ -34,6 +34,10 @@ def update():
     return ''
 
 
+@class_blueprint.route('/class/listStudentInThisClass/<id>')
+def list_student_of_class(id):
+    return classs.list_of_student_for_class(id)
+
 @class_blueprint.route('/class/listStudentInClass')
 def list_of_students_endpoint():
     return classs.list_of_students()

@@ -20,13 +20,37 @@
     <table id="classTableId"></table>
     <ul id="studentsTableId"></ul>
     <ul id="ul_id"></ul>
+    <ul id="ul2_id"></ul>
 </div>
 
 </body>
 <script>
 
+async function createStudentsForEdit(id) {
+    const ul = document.getElementById("ul2_id");
+    ul.innerText = '';
+    const studentsWithoutClass =await(await fetch('/class/studentWithoutClass')).json();
+    const studentsAssignedForClass = await(await fetch(`/class/listStudentInThisClass/${id}`)).json();
+    for(const i of studentsWithoutClass){
+        const li = document.createElement("li");
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        li.appendChild(input);
+        li.innerHTML += `<span>${i.name} ${i.last_name}`;
+        ul.appendChild(li);
+    }
+    for(const j of studentsAssignedForClass){
+        const li2 = document.createElement("li");
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.defaultChecked = true;
+        li2.appendChild(input);
+        li2.innerHTML += `<span>${j.name} ${j.last_name}`;
+        ul.appendChild(li2);
 
-  async  function listStudentForChoose(){
+    }
+}
+  async function listStudentForChoose(){
         const ul = document.getElementById("ul_id");
         ul.innerText = '';
         const allStudentsInClass = await (await fetch(`/class/studentWithoutClass`)).json();
@@ -41,10 +65,10 @@
        }
 
     }
-    async function listStudents() {
+    async function listStudents(id) {
         const ul = document.getElementById("studentsTableId");
         ul.innerHTML = '';
-        const allStudentsInClass = await (await fetch(`/class/listStudentInClass`)).json();
+        const allStudentsInClass = await (await fetch(`/class/listStudentInThisClass/${id}`)).json();
         for(const i of allStudentsInClass){
            const li= document.createElement("li");
             li.innerHTML = `${i.name} ${i.last_name}`;
@@ -100,12 +124,11 @@
             const butonEdit = document.createElement("button");
             butonEdit.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
             butonEdit.onclick = async () => {
-                editClass(butonEdit, j.name, j.tutor, row, j.id);
-
-
+                await editClass(butonEdit, j.name, j.tutor, row, j.id);
+                await createStudentsForEdit(j.id);
             }
             row.cells[3].appendChild(butonEdit);
-            row.cells[1].onclick = async()=>listStudents();
+            row.cells[1].onclick = async()=>listStudents(j.id);
         }
     }
 
@@ -146,6 +169,8 @@
             buttonCancel.remove();
             buttonAccept.remove();
             buttonEdit.style.display = 'inline';
+            row.cells[1].innerHTML = inputName.value;
+            row.cells[2].innerHTML = inputTutor.value;
         }
         buttonAccept.onclick = async () => {
             await updateData(id, inputName, inputTutor)
