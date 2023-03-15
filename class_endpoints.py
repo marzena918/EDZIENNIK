@@ -27,12 +27,16 @@ def add_class():
     return ''
 
 
-@class_blueprint.route('/class/update', methods=['POST'])
+@class_blueprint.route('/class/update', methods=['PUT'])
 def update():
     data = request.json
-    classs.update(data['name'], data['tutor'], data['id'])
+    classs.update(data['name'], data['tutor'], data['id'], data['students'])
     return ''
 
+@class_blueprint.route('class/addStudentsForClass', methods=['POST'])
+def addStudentsForClass():
+    data = request.json
+    classs.addStudentsForClass(data['students'], data['class_id'])
 
 @class_blueprint.route('/class/listStudentInThisClass/<id>')
 def list_student_of_class(id):
