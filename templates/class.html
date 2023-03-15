@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>class</title>
+    <link rel="stylesheet" href="/static/main.style.css">
+    <link rel="stylesheet" href="/static/class.style.css">
+
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+</head>
+<body>
+<div class="sectionAdd">
+    <label for="nameClassId">nazwa klasy </label><input type="text" id="nameClassId">
+    <label for="tutorClassId">wychowawca</label><select id="tutorClassId"></select>
+    <button id="studensId" onclick="listStudentForChoose()">uczniowie</button>
+    <button id="butAddId"><span class="material-symbols-outlined button" onclick="addClass()">add</span></button>
+</div>
+<div class="flex-container">
+    <table id="classTableId"></table>
+    <ul id="studentsTableId"></ul>
+    <ul id="ul_id"></ul>
+</div>
+
+</body>
+<script>
+
+
+  async  function listStudentForChoose(){
+        const ul = document.getElementById("ul_id");
+        ul.innerText = '';
+        const allStudentsInClass = await (await fetch(`/class/studentWithoutClass`)).json();
+        for(const i of allStudentsInClass){
+            const li = document.createElement("li");
+            const input = document.createElement("input");
+            input.type = 'checkbox';
+            input.value = i.id;
+            li.appendChild(input);
+            li.innerHTML +=`<span>${i.name} ${i.last_name}</span>`
+            ul.appendChild(li);
+       }
+
+    }
+    async function listStudents() {
+        const ul = document.getElementById("studentsTableId");
+        ul.innerHTML = '';
+        const allStudentsInClass = await (await fetch(`/class/listStudentInClass`)).json();
+        for(const i of allStudentsInClass){
+           const li= document.createElement("li");
+            li.innerHTML = `${i.name} ${i.last_name}`;
+            ul.appendChild(li);
+        }
+
+    }
+
+    async function addClass() {
+        const name = document.getElementById("nameClassId").value;
+        const tutor = document.getElementById("tutorClassId").value;
+        const checkBox = document.getElementById("ul_id");
+        const listCheckbox = []
+        for(const i of checkBox.childNodes){
+            if(i.childNodes[0]['checked']){
+                listCheckbox.push(+i.childNodes[0].value);
+            }
+        }
+        await fetch('/class/add_class', {
+            method: 'POST',
+            body: JSON.stringify({name: name, tutor: tutor, students :listCheckbox}),
+            headers: {'Content-Type': 'application/json'}
+        });
+        await refreshClassTable();
+    }
+
+    async function get_all_teacher(select) {
+        const teacher = await (await fetch('/class/get_all_teacher')).json()
+        for (const i of teacher) {
+            const option = document.createElement("option");
+            option.innerHTML = `${i.name} ${i.last_name}`
+            select.appendChild(option);
+        }
+    }
+
+    async function refreshClassTable() {
+        const classTable = document.getElementById("classTableId");
+        classTable.innerHTML = '';
+        const allClasses = await (await fetch('/class/get_all')).json();
+        const hRow = classTable.createTHead().insertRow();
+        hRow.insertCell().innerHTML = 'lp';
+        hRow.insertCell().innerHTML = 'nazwa';
+        hRow.insertCell().innerHTML = 'wychowawca';
+        hRow.insertCell().innerHTML = 'akcja';
+        let lp = 1;
+
+        for (const j of allClasses) {
+            const row = classTable.insertRow();
+            row.insertCell().innerHTML = `${lp++}`;
+            row.insertCell().innerHTML = j.name;
+            row.insertCell().innerHTML = j.tutor;
+            row.insertCell();
+            const butonEdit = document.createElement("button");
+            butonEdit.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
+            butonEdit.onclick = async () => {
+                editClass(butonEdit, j.name, j.tutor, row, j.id);
+
+
+            }
+            row.cells[3].appendChild(butonEdit);
+            row.cells[1].onclick = async()=>listStudents();
+        }
+    }
+
+    async function updateData(id, inputName, inputTutor) {
+        const data = {name: inputName.value, tutor: inputTutor.value, id: id}
+        await fetch('/class/update', {
+            method: 'POST', body: JSON.stringify(data),
+            headers: {'Content-Type': 'application/json'}
+        })
+    }
+
+    function checkInput(inputName, oldName, buttonAccept) {
+        buttonAccept.disabled = inputName.value === oldName;
+
+    }
+
+    async function editClass(buttonEdit, name, tutor, row, id) {
+        buttonEdit.style.display = 'none';
+        const inputName = document.createElement("input");
+        row.cells[1].innerText = '';
+        inputName.type = 'text';
+        inputName.value = name;
+        inputName.onkeyup = () => checkInput(inputName, name, buttonAccept)
+        row.cells[1].appendChild(inputName);
+        const inputTutor = document.createElement('select');
+        await get_all_teacher(inputTutor);
+        row.cells[2].innerHTML = '';
+        row.cells[2].appendChild(inputTutor);
+        inputTutor.onchange = () => checkInput(inputTutor, tutor, buttonAccept)
+        const buttonAccept = document.createElement("button");
+        buttonAccept.innerHTML = '<span class="material-symbols-outlined button">done</span>';
+        buttonAccept.disabled = 'disabled';
+        const buttonCancel = document.createElement("button");
+        buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
+        row.cells[3].appendChild(buttonAccept)
+        row.cells[3].appendChild(buttonCancel)
+        buttonCancel.onclick = () => {
+            buttonCancel.remove();
+            buttonAccept.remove();
+            buttonEdit.style.display = 'inline';
+        }
+        buttonAccept.onclick = async () => {
+            await updateData(id, inputName, inputTutor)
+            buttonCancel.remove();
+            buttonAccept.remove();
+            buttonEdit.style.display = 'inline';
+            inputName.remove();
+            inputTutor.remove();
+            row.cells[1].innerHTML = inputName.value;
+            row.cells[2].innerHTML = inputTutor.value;
+        }
+
+    }
+
+    async function init() {
+        const select = document.getElementById("tutorClassId");
+        await refreshClassTable()
+        await get_all_teacher(select)
+    }
+
+    init()
+</script>
+</html>
