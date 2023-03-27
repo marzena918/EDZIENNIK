@@ -12,6 +12,10 @@ def index():
 def get_all_subjects():
     return marks.get_all_subjects()
 
-@marks_blueprint.route('getAllClasses')
+@marks_blueprint.route('/getAllClasses')
 def getAllClasses():
     return marks.getAllClasses()
+
+@marks_blueprint.route('/listStudentInThisClass/<id>')
+def listStudentInThisClass(id):
+    return marks.listStudentOfClass(id)

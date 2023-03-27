@@ -7,14 +7,34 @@
     <link rel="stylesheet" href="/static/class.style.css">
 </head>
 <body>
-<div class="under">
-    <label for="przedmioty_id">przedmioty</label><select id="przedmioty_id" ></select>
-    <label for="klasa_id">klasy</label><select id="klasa_id"></select>
-    <button id="addMark" onclick="addMark();" >dodaj ocene</button>
+<div>
+    <label for="przedmioty_id">przedmioty</label><select id="przedmioty_id" class="under"></select>
+    <label for="klasa_id">klasy</label><select id="klasa_id" ></select>
+    <button id="addMark" onclick="findStudents()">wybierz uczniow</button>
 </div>
+ <div class="table_grades">
+     <table id="table_id"></table>
+ </div>
 </body>
 <script>
+async function findStudents(){
+    document.getElementById("table_id").innerHTML = '';
+    const id = document.getElementById("klasa_id").value;
+    const students = await(await fetch(`/listStudentInThisClass/${id}`)).json();
+    const table = document.getElementById("table_id");
+    const hRow = table.createTHead().insertRow();
+    for(const i of['lp','imie','nazwisko', 'oceny','akcja']){
+        hRow.insertCell().innerHTML = i;
+    }
+    let lp = 1
+    for(const j of students){
+        const row = table.insertRow();
+        row.insertCell().innerHTML =`${lp++}`;
+        row.insertCell().innerHTML =j.name;
+        row.insertCell().innerHTML =j.last_name;
 
+    }
+}
 
    async function selectOfSubjects() {
         const subjects = await(await fetch('/getAllSubjects')).json();
@@ -32,7 +52,7 @@
        const select = document.getElementById("klasa_id");
        for (const i of subjects) {
            const selectChild = document.createElement("option");
-           selectChild.value = i.name;
+           selectChild.value = i.id;
            selectChild.innerHTML = i.name;
            select.appendChild(selectChild);
        }

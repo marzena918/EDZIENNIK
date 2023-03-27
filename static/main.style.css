@@ -66,6 +66,7 @@ table, th, td {
 }
 
 .under{
-    border-bottom-left-radius: 5px;
-    : 10px;
+  /*display:flex;*/
+  /*  gap: 8px;*/
+    display: -moz-flex;
 }
