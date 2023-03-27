@@ -3,8 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>marks</title>
+     <link rel="stylesheet" href="/static/main.style.css">
+    <link rel="stylesheet" href="/static/class.style.css">
 </head>
 <body>
-
+<div class="under">
+    <label for="przedmioty_id">przedmioty</label><select id="przedmioty_id" ></select>
+    <label for="klasa_id">klasy</label><select id="klasa_id"></select>
+    <button id="addMark" onclick="addMark();" >dodaj ocene</button>
+</div>
 </body>
+<script>
+
+
+   async function selectOfSubjects() {
+        const subjects = await(await fetch('/getAllSubjects')).json();
+        const select = document.getElementById("przedmioty_id");
+        for(const i of subjects){
+            const selectChild = document.createElement("option");
+            selectChild.value = i.name;
+            selectChild.innerHTML = i.name;
+            select.appendChild(selectChild);
+        }
+    }
+
+   async function selectOfClasses() {
+       const subjects = await (await fetch('/getAllClasses')).json();
+       const select = document.getElementById("klasa_id");
+       for (const i of subjects) {
+           const selectChild = document.createElement("option");
+           selectChild.value = i.name;
+           selectChild.innerHTML = i.name;
+           select.appendChild(selectChild);
+       }
+   }
+
+       async function get_all() {
+           await selectOfSubjects();
+           await selectOfClasses();
+       }
+       get_all();
+
+
+</script>
 </html>
