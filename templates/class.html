@@ -208,7 +208,7 @@
             inputName.remove();
             inputTutor.remove();
             row.cells[1].innerHTML = inputName.value;
-            row.cells[2].innerHTML = inputTutor.value;
+            row.cells[2].innerHTML = inputTutor.selectedOptions[0].innerHTML;
             document.getElementById("ul2_id").innerText = '';
         }
 
