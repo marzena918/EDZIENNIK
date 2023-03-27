@@ -59,3 +59,8 @@ table, th, td {
   'GRAD' 0,
   'opsz' 48
 }
+
+.menu{
+    display: flex;
+    gap: 10px;
+}
