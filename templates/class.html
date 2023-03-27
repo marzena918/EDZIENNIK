@@ -21,11 +21,12 @@
     <ul id="studentsTableId"></ul>
     <ul id="ul_id"></ul>
     <ul id="ul2_id"></ul>
+    <ul id="ul3_id"></ul>
 </div>
 
 </body>
 <script>
-    async function createStudentsForEdit(id, buttonAccept) {
+    async function createStudentsForEdit(id) {
         const ul = document.getElementById("ul2_id");
         ul.innerText = '';
         const studentsWithoutClass = await (await fetch('/class/studentWithoutClass')).json();
@@ -39,7 +40,6 @@
             li.innerHTML += `<span>${i.name} ${i.last_name}`;
             ul.appendChild(li);
         }
-
         for (const j of studentsAssignedForClass) {
             const li = document.createElement("li");
             const input = document.createElement("input");
@@ -124,7 +124,7 @@
             const row = classTable.insertRow();
             row.insertCell().innerHTML = `${lp++}`;
             row.insertCell().innerHTML = j.name;
-            row.insertCell().innerHTML = j.tutor;
+            row.insertCell().innerHTML = `${j['name']} ${j['last_name']}`;
             row.insertCell();
             const butonEdit = document.createElement("button");
             butonEdit.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
@@ -146,28 +146,40 @@
         });
     }
 
-    function checkInput(inputName, oldName, buttonAccept) {
-        buttonAccept.disabled = inputName.value === oldName;
+    function disableEditAcceptIfNoChanges(inputName, oldName, inputTeacher, oldTeacher, ulListInput, oldStudents, buttonAccept) {
+        const nowaListaStudentow = []
+        for (const i of ulListInput.childNodes) {
+            if (i.childNodes[0]['checked']) {
+                nowaListaStudentow.push(+i.childNodes[0].value);
+            }
+        }
+        const theSame = nowaListaStudentow.length === oldStudents.length && nowaListaStudentow.every(e => oldStudents.indexOf(e) >=0);
+        buttonAccept.disabled = inputName.value === oldName && inputTeacher.value === oldTeacher && theSame;
 
     }
 
     async function editClass(buttonEdit, name, tutor, row, id) {
+        const oldStudents = await(await fetch(`/class/listStudentInThisClass/${id}`)).json();
         buttonEdit.style.display = 'none';
         const inputName = document.createElement("input");
         row.cells[1].innerText = '';
         inputName.type = 'text';
         inputName.value = name;
-        inputName.onkeyup = () => checkInput(inputName, name, buttonAccept)
         row.cells[1].appendChild(inputName);
         const inputTutor = document.createElement('select');
         await get_all_teacher(inputTutor);
         row.cells[2].innerHTML = '';
         row.cells[2].appendChild(inputTutor);
-        inputTutor.onchange = () => checkInput(inputTutor, tutor, buttonAccept)
         const buttonAccept = document.createElement("button");
         buttonAccept.innerHTML = '<span class="material-symbols-outlined button">done</span>';
         buttonAccept.disabled = 'disabled';
-        await createStudentsForEdit(id, buttonAccept);
+        await createStudentsForEdit(id);
+        const ul = document.getElementById("ul2_id");
+        for(const i of ul.childNodes){
+            i.childNodes[0].onchange = ()=> disableEditAcceptIfNoChanges(inputTutor, tutor, inputName,name, ul, oldStudents, buttonAccept);
+        }
+        inputTutor.onchange = () => disableEditAcceptIfNoChanges(inputTutor, tutor, inputName,name, ul, oldStudents, buttonAccept);
+        inputName.onkeyup = () => disableEditAcceptIfNoChanges(inputTutor, tutor, inputName,name, ul, oldStudents,buttonAccept);
         const buttonCancel = document.createElement("button");
         buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
         row.cells[3].appendChild(buttonAccept)
@@ -179,6 +191,7 @@
             row.cells[1].innerHTML = inputName.value;
             row.cells[2].innerHTML = inputTutor.value;
             document.getElementById("ul2_id").innerText = '';
+            document.getElementById("ul3_id").innerText = '';
         }
         buttonAccept.onclick = async () => {
 

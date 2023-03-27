@@ -2,7 +2,7 @@ from student import cursor
 
 class Classes:
     def get_all(self):
-        return cursor.execute("select * from subject").fetchall()
+        return cursor.execute("select * from class join teacher on class.tutor = teacher.id").fetchall()
 
     def add(self, subject):
         cursor.execute(f"insert into subject VALUES ('{subject}')")

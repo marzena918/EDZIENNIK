@@ -16,7 +16,8 @@ cursor = sqliteConnection.cursor()
 
 class Classs:
     def get_all(self):
-        return cursor.execute("select * from class").fetchall()
+        return cursor.execute("select * from class join teacher on class.tutor = teacher.id").fetchall()
+
 
     def get_all_teacher(self):
         return cursor.execute("select name, last_name, id from teacher").fetchall()
