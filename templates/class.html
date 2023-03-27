@@ -99,13 +99,16 @@
         await refreshClassTable();
     }
 
-    async function get_all_teacher(select) {
+    async function get_all_teacher(select, tutorId) {
         const teacher = await (await fetch('/class/get_all_teacher')).json()
         for (const i of teacher) {
             const option = document.createElement("option");
             option.innerHTML = `${i.name} ${i.last_name}`;
             option.value = i.id;
             select.appendChild(option);
+            if(i.id === tutorId){
+                option.selected = true;
+            }
         }
     }
 
@@ -167,7 +170,7 @@
         inputName.value = name;
         row.cells[1].appendChild(inputName);
         const inputTutor = document.createElement('select');
-        await get_all_teacher(inputTutor);
+        await get_all_teacher(inputTutor,tutor );
         row.cells[2].innerHTML = '';
         row.cells[2].appendChild(inputTutor);
         const buttonAccept = document.createElement("button");
