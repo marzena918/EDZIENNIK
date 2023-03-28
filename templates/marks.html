@@ -36,17 +36,18 @@
         }
     }
 
-    async function sendData(id,notes) {
+    async function sendData(id,notes,row) {
         const mark = document.getElementById("mark_id");
         const subject = document.getElementById("przedmioty_id").value;
-        //const notes = document.getElementById("notes_id").value;
         const data = {id:id,mark: mark.childNodes[0].value, notes:notes.childNodes[1].value, subject:subject}
-         await fetch('/degre/addDegre', {method:'POST', body:JSON.stringify(data),  headers: {'Content-Type': 'application/json'}})
+         await fetch('/degre/addDegre', {method:'POST', body:JSON.stringify(data),  headers: {'Content-Type': 'application/json'}});
+        row.cells[3].innerHTML += `,${mark.childNodes[0].value}`;
+
 
 
     }
 
-    async function addDegre(id) {
+    async function addDegre(id,row) {
         createSelectWithDegreToChoose();
         const notes = document.getElementById("notes_id");
        const notesChild = document.createElement("textarea");
@@ -55,9 +56,8 @@
         butonDone.innerHTML='<span class="material-symbols-outlined button">done</span>';
         const parentDone = document.getElementById("done_id");
         parentDone.appendChild(butonDone);
-       // const data = {id: id, mark: mark, notes: notes.value, subject: subject};
         butonDone.onclick=async ()=>
-           await sendData(id,notes)
+           await sendData(id,notes,row)
     }
 
     async function findStudents() {
@@ -79,8 +79,15 @@
             row.insertCell().innerHTML;
             const add = document.createElement("button");
             add.innerHTML = '<span class="material-symbols-outlined button">add</span>';
-            add.onclick = async () => await addDegre(j.id);
+            add.onclick = async () => await addDegre(j.id, row);
             row.cells[4].appendChild(add);
+            const subject = document.getElementById("przedmioty_id").value;
+            const degreWithThisSubjectForThisStudent = await(await fetch(`/degre/degreWithThisSubjectForThisStudent/${subject}/${j.id}`)).json();
+            let listDegre = []
+            for(const i of degreWithThisSubjectForThisStudent){
+                listDegre.push(i.mark);
+            }
+            row.cells[3].innerHTML=listDegre;
 
         }
     }
