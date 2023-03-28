@@ -3,43 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>marks</title>
-     <link rel="stylesheet" href="/static/main.style.css">
+    <link rel="stylesheet" href="/static/main.style.css">
     <link rel="stylesheet" href="/static/class.style.css">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 <body>
 <div>
     <label for="przedmioty_id">przedmioty</label><select id="przedmioty_id" class="under"></select>
-    <label for="klasa_id">klasy</label><select id="klasa_id" ></select>
+    <label for="klasa_id">klasy</label><select id="klasa_id"></select>
     <button id="addMark" onclick="findStudents()">wybierz uczniow</button>
 </div>
- <div class="table_grades">
-     <table id="table_id"></table>
- </div>
+<div class="sectionAdd" id="mark_id"></div>
+<div class="sectionAdd" id="notes_id">
+</div>
+<div class="sectionAdd" id="done_id"></div>
+<div class="table_grades">
+    <table id="table_id"></table>
+
+</div>
 </body>
 <script>
-async function findStudents(){
-    document.getElementById("table_id").innerHTML = '';
-    const id = document.getElementById("klasa_id").value;
-    const students = await(await fetch(`/listStudentInThisClass/${id}`)).json();
-    const table = document.getElementById("table_id");
-    const hRow = table.createTHead().insertRow();
-    for(const i of['lp','imie','nazwisko', 'oceny','akcja']){
-        hRow.insertCell().innerHTML = i;
+    function createSelectWithDegreToChoose() {
+        const parent = document.getElementById("mark_id");
+        const select = document.createElement('select');
+        for (const i of ['1', '1', '-2', '2', '2+', '-3', '3', '3+', '-4', '4', '4+', '-5', '5', '5+', '-6', '6']) {
+            const option = document.createElement("option");
+            option.innerHTML = i;
+            select.appendChild(option);
+            parent.appendChild(select);
+        }
     }
-    let lp = 1
-    for(const j of students){
-        const row = table.insertRow();
-        row.insertCell().innerHTML =`${lp++}`;
-        row.insertCell().innerHTML =j.name;
-        row.insertCell().innerHTML =j.last_name;
+
+    async function sendData(id,notes) {
+        const mark = document.getElementById("mark_id");
+        const subject = document.getElementById("przedmioty_id").value;
+        //const notes = document.getElementById("notes_id").value;
+        const data = {id:id,mark: mark.childNodes[0].value, notes:notes.childNodes[1].value, subject:subject}
+         await fetch('/degre/addDegre', {method:'POST', body:JSON.stringify(data),  headers: {'Content-Type': 'application/json'}})
+
 
     }
-}
 
-   async function selectOfSubjects() {
-        const subjects = await(await fetch('/getAllSubjects')).json();
+    async function addDegre(id) {
+        createSelectWithDegreToChoose();
+        const notes = document.getElementById("notes_id");
+       const notesChild = document.createElement("textarea");
+       notes.appendChild(notesChild);
+        const butonDone = document.createElement("button");
+        butonDone.innerHTML='<span class="material-symbols-outlined button">done</span>';
+        const parentDone = document.getElementById("done_id");
+        parentDone.appendChild(butonDone);
+       // const data = {id: id, mark: mark, notes: notes.value, subject: subject};
+        butonDone.onclick=async ()=>
+           await sendData(id,notes)
+    }
+
+    async function findStudents() {
+        document.getElementById("table_id").innerHTML = '';
+         const id = document.getElementById("klasa_id").value;
+        const students = await (await fetch(`/listStudentInThisClass/${id}`)).json();
+        const table = document.getElementById("table_id");
+        const hRow = table.createTHead().insertRow();
+        for (const i of ['lp', 'imie', 'nazwisko', 'oceny', 'akcja']) {
+            hRow.insertCell().innerHTML = i;
+        }
+        let lp = 1
+        for (const j of students) {
+            const row = table.insertRow();
+            row.insertCell().innerHTML = `${lp++}`;
+            row.insertCell().innerHTML = j.name;
+            row.insertCell().innerHTML = j.last_name;
+            row.insertCell().innerHTML;
+            row.insertCell().innerHTML;
+            const add = document.createElement("button");
+            add.innerHTML = '<span class="material-symbols-outlined button">add</span>';
+            add.onclick = async () => await addDegre(j.id);
+            row.cells[4].appendChild(add);
+
+        }
+    }
+
+    async function selectOfSubjects() {
+        const subjects = await (await fetch('/getAllSubjects')).json();
         const select = document.getElementById("przedmioty_id");
-        for(const i of subjects){
+        for (const i of subjects) {
             const selectChild = document.createElement("option");
             selectChild.value = i.name;
             selectChild.innerHTML = i.name;
@@ -47,22 +96,23 @@ async function findStudents(){
         }
     }
 
-   async function selectOfClasses() {
-       const subjects = await (await fetch('/getAllClasses')).json();
-       const select = document.getElementById("klasa_id");
-       for (const i of subjects) {
-           const selectChild = document.createElement("option");
-           selectChild.value = i.id;
-           selectChild.innerHTML = i.name;
-           select.appendChild(selectChild);
-       }
-   }
+    async function selectOfClasses() {
+        const subjects = await (await fetch('/getAllClasses')).json();
+        const select = document.getElementById("klasa_id");
+        for (const i of subjects) {
+            const selectChild = document.createElement("option");
+            selectChild.value = i.id;
+            selectChild.innerHTML = i.name;
+            select.appendChild(selectChild);
+        }
+    }
 
-       async function get_all() {
-           await selectOfSubjects();
-           await selectOfClasses();
-       }
-       get_all();
+    async function get_all() {
+        await selectOfSubjects();
+        await selectOfClasses();
+    }
+
+    get_all();
 
 
 </script>
