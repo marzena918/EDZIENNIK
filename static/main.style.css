@@ -26,6 +26,7 @@ table, th, td {
 
 .sectionAdd {
     margin-bottom: 1em;
+    border: black solid 1px;
 }
 
 .table_grades{
