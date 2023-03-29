@@ -15,3 +15,9 @@ def add_degre():
 @degre_blueprint.route('/degre/degreWithThisSubjectForThisStudent/<subject>/<student_id>')
 def degreWithThisSubjectForThisStudent(subject, student_id):
     return degre.findDegreForStudentWithSubject(subject, student_id)
+
+
+@degre_blueprint.route('/degre/degreForDelete/<int:degre_for_delete_id>', methods=['DELETE'])
+def remove_degre(degre_for_delete_id):
+    degre.remove_degre(degre_for_delete_id)
+    return ''
