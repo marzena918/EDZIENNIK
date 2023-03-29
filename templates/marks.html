@@ -47,7 +47,7 @@
 
     }
 
-    async function addDegre(id,row) {
+    async function addDegree(id, row) {
        createSelectWithDegreToChoose();
         const notes = document.getElementById("notes_id");
        const notesChild = document.createElement("textarea");
@@ -122,7 +122,7 @@
             row.insertCell().innerHTML;
             const add = document.createElement("button");
             add.innerHTML = '<span class="material-symbols-outlined button">add</span>';
-            add.onclick = async () => await addDegre(j.id, row);
+            add.onclick = async () => await addDegree(j.id, row);
             row.cells[4].appendChild(add);
             const subject = document.getElementById("przedmioty_id").value;
             const degreWithThisSubjectForThisStudent = await(await fetch(`/degre/degreWithThisSubjectForThisStudent/${subject}/${j.id}`)).json();
