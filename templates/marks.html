@@ -33,6 +33,7 @@
             select.appendChild(option);
             parent.appendChild(select);
         }
+
     }
 
     async function sendData(id,notes,row) {
@@ -47,7 +48,7 @@
     }
 
     async function addDegre(id,row) {
-        createSelectWithDegreToChoose();
+       createSelectWithDegreToChoose();
         const notes = document.getElementById("notes_id");
        const notesChild = document.createElement("textarea");
        notes.appendChild(notesChild);
@@ -57,6 +58,49 @@
         parentDone.appendChild(butonDone);
         butonDone.onclick=async ()=>
            await sendData(id,notes,row)
+    }
+
+    async function removeSelectGrade(select) {
+        const degreId = select.selectedOptions[0].value;
+        await fetch(`/degre/degreForDelete/${degreId}`, {method: 'DELETE'});
+    }
+
+    async function removeDegre(row,remove,add,subject, student_id) {
+        const degreWithThisSubjectForThisStudent = await(await fetch(`/degre/degreWithThisSubjectForThisStudent/${subject}/${student_id}`)).json();
+        remove.style.display='none';
+        add.style.display='none';
+        const done = document.createElement('button');
+        done.innerHTML='<span class="material-symbols-outlined button">done</span>';
+        row.cells[4].appendChild(done)
+        const select = document.createElement('select');
+        const selectParent = document.getElementById('gradesDeleteId');
+        for(const i of degreWithThisSubjectForThisStudent){
+            const option = document.createElement("option");
+            option.innerHTML = i.mark;
+            option.value= i.id;
+            select.appendChild(option);
+            selectParent.appendChild(select);
+        }
+
+        done.onclick=async()=>{
+            remove.style.display='inline';
+            add.style.display='inline';
+            done.style.display='none';
+            cancel.style.display='none';
+            await removeSelectGrade(select);
+            select.remove();
+        }
+        const cancel = document.createElement('button');
+        cancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
+        row.cells[4].appendChild(cancel);
+        cancel.onclick=()=>{
+            select.remove();
+            done.style.display='none';
+            cancel.style.display='none';
+            remove.style.display='inline';
+            add.style.display='inline';
+
+        }
     }
 
     async function findStudents() {
@@ -87,6 +131,10 @@
                 listDegre.push(i.mark);
             }
             row.cells[3].innerHTML=listDegre;
+            const buttonRemove = document.createElement("button");
+            buttonRemove.innerHTML='<span class="material-symbols-outlined button">remove</span>';
+            row.cells[4].appendChild(buttonRemove);
+            buttonRemove.onclick= ()=> removeDegre(row,buttonRemove,add,subject,j.id)
 
         }
     }
