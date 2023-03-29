@@ -32,11 +32,9 @@
         }
         return select;
     }
-        //butonDone,id,notes,row, select
     async function postDegree(done,id,notes,row,selectMarks) {
-        //const mark = document.getElementById("sectionAddId");
         const subject = document.getElementById("przedmioty_id").value;
-        const data = {id:id,mark: selectMarks.value, notes:notes.value, subject:subject}// todo: zmienic na StudentId
+        const data = {studentId:id,mark: selectMarks.value, notes:notes.value, subject:subject}
          await fetch('/degre/addDegre', {method:'POST', body:JSON.stringify(data),  headers: {'Content-Type': 'application/json'}});
         if(row.cells[3].innerHTML.length > 0){
             row.cells[3].innerHTML += ",";
@@ -45,10 +43,7 @@
         degreeSpan.title = notes.value;
         degreeSpan.innerHTML =selectMarks.value;
         row.cells[3].appendChild(degreeSpan);
-        // const degreeSpan = creteEl;
-        // degreeSpan.title = notes;
-        // degreeSpan.innerHTML = `${mark.childNodes[0].value}`;
-        //row.cells[3].innerHTML += `${mark.childNodes[0].value}`;
+
 
 
 
