@@ -11,6 +11,9 @@ def add_degre():
     degre.add_degre(data['studentId'], data['mark'], data['notes'], data['subject'])
     return ''
 
+@degre_blueprint.route('/degre/gradesId/<id>/<mark>/<notes>/<subject>')
+def get_grades_id(id,mark,notes,subject):
+    return degre.grades_id(id,mark,notes,subject)
 
 @degre_blueprint.route('/degre/degreWithThisSubjectForThisStudent/<subject>/<student_id>')
 def degreWithThisSubjectForThisStudent(subject, student_id):
