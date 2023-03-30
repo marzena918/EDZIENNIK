@@ -84,25 +84,22 @@
     }
 
 
-    async function addDegree(buttonAdd, id, row) {
+    async function addDegree(buttonAdd,bRemove, id, row) {
         const parent = document.getElementById("sectionAddId");
         parent.style.display = 'flex';
         const select = document.getElementById("newGradeId");
         const notes = document.getElementById("newNotesID");
-       // parent.appendChild(notes);
         const butonDone = document.getElementById("buttonDoneId");
-        //butonDone.innerHTML = '<span class="material-symbols-outlined button">done</span>';
-       // parent.appendChild(butonDone);
         butonDone.onclick = async () => {
             await postDegree(butonDone, id, notes, row, select);
             parent.style.display = 'none';
             buttonAdd.disabled = false;
+            bRemove.disabled = false;
         }
         const buttonCancel = document.getElementById("buttonCancelId");
-        //buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
-       // parent.appendChild(buttonCancel);
         buttonCancel.onclick = () => {
             buttonAdd.disabled = false;
+            bRemove.disabled = false;
             parent.style.display='none';
         }
     }
@@ -123,8 +120,6 @@
         remove.disabled = true;
         add.disabled = true;
         const done = document.getElementById('doneButtonId');
-        // done.innerHTML = '<span class="material-symbols-outlined button">done</span>';
-        // row.cells[4].appendChild(done)
         const select = document.createElement('select');
 
         for (const i of degreWithThisSubjectForThisStudent) {
@@ -142,12 +137,7 @@
             await removeSelectGrade(select, row,selectParent);
         }
         const cancel = document.getElementById("cancelButtonId");
-        // cancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
-        // row.cells[4].appendChild(cancel);
         cancel.onclick = () => {
-            //select.remove();
-            // done.style.display = 'none';
-            // cancel.style.display = 'none';
             selectParent.style.display='none';
             remove.disabled = false;
             add.disabled = false;
@@ -178,7 +168,8 @@
             add.innerHTML = '<span class="material-symbols-outlined button">add</span>';
             add.onclick = async () => {
                 add.disabled = true;
-                await addDegree(add, j.id, row);
+                buttonRemove.disabled=true;
+                await addDegree(add,buttonRemove, j.id, row);
             }
             row.cells[4].appendChild(add);
             const subject = document.getElementById("przedmioty_id").value;
