@@ -41,6 +41,11 @@
     <button id="buttonDoneId"><span class="material-symbols-outlined button">done</span></button>
     <button id="buttonCancelId"><span class="material-symbols-outlined button">close</span></button>
 </div>
+<div class="newGradeContent" id="sectionAddIdRemove" style="display: none">
+   <button id="cancelButtonId"><span class="material-symbols-outlined button">close</span></button>
+    <button id="doneButtonId"><span class="material-symbols-outlined button">done</span></button>
+
+</div>
 <div class="flex-container" id="gradesDeleteId">
     <table id="table_id"></table>
 </div>
@@ -102,23 +107,26 @@
         }
     }
 
-    async function removeSelectGrade(select, row) {
+    async function removeSelectGrade(select, row,selectParent) {
         const degreId = select.selectedOptions[0].value;
         await fetch(`/degre/degreForDelete/${degreId}`, {method: 'DELETE'});
         row.childNodes[3].childNodes[0].value;
         document.getElementById(`grade_${degreId}`).remove();
+        selectParent.style.display='none';
 
     }
 
     async function removeDegre(row, remove, add, subject, student_id) {
+            const selectParent = document.getElementById('sectionAddIdRemove');
+            selectParent.style.display='block';
         const degreWithThisSubjectForThisStudent = await (await fetch(`/degre/degreWithThisSubjectForThisStudent/${subject}/${student_id}`)).json();
-        remove.style.display = 'none';
-        add.style.display = 'none';
-        const done = document.createElement('button');
-        done.innerHTML = '<span class="material-symbols-outlined button">done</span>';
-        row.cells[4].appendChild(done)
+        remove.disabled = true;
+        add.disabled = true;
+        const done = document.getElementById('doneButtonId');
+        // done.innerHTML = '<span class="material-symbols-outlined button">done</span>';
+        // row.cells[4].appendChild(done)
         const select = document.createElement('select');
-        const selectParent = document.getElementById('gradesDeleteId');
+
         for (const i of degreWithThisSubjectForThisStudent) {
             const option = document.createElement("option");
             option.innerHTML = i.mark;
@@ -129,22 +137,20 @@
         }
 
         done.onclick = async () => {
-            remove.style.display = 'inline';
-            add.style.display = 'inline';
-            done.style.display = 'none';
-            cancel.style.display = 'none';
-            await removeSelectGrade(select, row);
-            select.remove();
+            remove.disabled = false;
+            add.disabled = false;
+            await removeSelectGrade(select, row,selectParent);
         }
-        const cancel = document.createElement('button');
-        cancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
-        row.cells[4].appendChild(cancel);
+        const cancel = document.getElementById("cancelButtonId");
+        // cancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
+        // row.cells[4].appendChild(cancel);
         cancel.onclick = () => {
-            select.remove();
-            done.style.display = 'none';
-            cancel.style.display = 'none';
-            remove.style.display = 'inline';
-            add.style.display = 'inline';
+            //select.remove();
+            // done.style.display = 'none';
+            // cancel.style.display = 'none';
+            selectParent.style.display='none';
+            remove.disabled = false;
+            add.disabled = false;
 
         }
     }
