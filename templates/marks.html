@@ -55,23 +55,23 @@
 
     async function addDegree(buttonAdd, id, row) {
         const parent = document.getElementById("sectionAddId");
+        parent.style.display = 'flex';
         const select = createSelectWithDegreToChoose(parent);
         const notes = document.createElement("textarea");
         parent.appendChild(notes);
         const butonDone = document.createElement("button");
         butonDone.innerHTML = '<span class="material-symbols-outlined button">done</span>';
         parent.appendChild(butonDone);
-        butonDone.onclick = async () =>
+        butonDone.onclick = async () => {
             await postDegree(butonDone, id, notes, row, select);
+            parent.style.display = 'none';
+        }
         const buttonCancel = document.createElement("button");
         buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
         parent.appendChild(buttonCancel);
         buttonCancel.onclick = () => {
             buttonAdd.disabled = false;
-            butonDone.style.display = 'none';
-            notes.style.display = 'none';
-            select.style.display = 'none';
-            buttonCancel.style.display = 'none';
+            parent.style.display='none';
         }
     }
 
@@ -192,7 +192,7 @@
 
 
 </script>
-<div class="sectionAdd" id="sectionAddId"></div>
+<div class="newGradeContent" id="sectionAddId" style="display: none"></div>
 <div class="flex-container" id="gradesDeleteId">
     <table id="table_id"></table>
 </div>
