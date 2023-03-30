@@ -11,15 +11,18 @@
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 </head>
-<body>
+<body class="mainContent">
 <div>
     <label for="przedmioty_id">przedmioty</label><select id="przedmioty_id" class="under"></select>
     <label for="klasa_id">klasy</label><select id="klasa_id"></select>
     <button id="addMark" onclick="findStudents()">wybierz uczniow</button>
 </div>
+<div class="newGradeContent" id="sectionAddId" style="display: none"></div>
+<div class="flex-container" id="gradesDeleteId">
+    <table id="table_id"></table>
+</div>
+
 <script>
-
-
     function createSelectWithDegreToChoose(parent) {
         const select = document.createElement('select');
         for (const i of ['1', '1+', '-2', '2', '2+', '-3', '3', '3+', '-4', '4', '4+', '-5', '5', '5+', '-6', '6', '6+']) {
@@ -65,6 +68,7 @@
         butonDone.onclick = async () => {
             await postDegree(butonDone, id, notes, row, select);
             parent.style.display = 'none';
+            buttonAdd.disabled = false;
         }
         const buttonCancel = document.createElement("button");
         buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
@@ -192,9 +196,5 @@
 
 
 </script>
-<div class="newGradeContent" id="sectionAddId" style="display: none"></div>
-<div class="flex-container" id="gradesDeleteId">
-    <table id="table_id"></table>
-</div>
 </body>
 </html>

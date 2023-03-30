@@ -20,3 +20,9 @@
     left: 30%;
     background-color: aliceblue;
 }
+
+.mainContent{
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
