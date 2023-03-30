@@ -1,0 +1,8 @@
+.grade{
+    background-color: aquamarine;
+}
+
+.gradeList{
+    display: flex;
+    gap: 3px;
+}

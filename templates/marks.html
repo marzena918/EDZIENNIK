@@ -5,6 +5,7 @@
     <title>marks</title>
     <link rel="stylesheet" href="/static/main.style.css">
     <link rel="stylesheet" href="/static/class.style.css">
+    <link rel="stylesheet" href="/static/degree.css">
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
     <link rel="stylesheet"
@@ -16,12 +17,9 @@
     <label for="klasa_id">klasy</label><select id="klasa_id"></select>
     <button id="addMark" onclick="findStudents()">wybierz uczniow</button>
 </div>
-<div class="sectionAdd" id="sectionAddId"></div>
-<div class="flex-container" id="gradesDeleteId">
-    <table id="table_id"></table>
-</div>
-</body>
 <script>
+
+
     function createSelectWithDegreToChoose(parent) {
         const select = document.createElement('select');
         for (const i of ['1', '1+', '-2', '2', '2+', '-3', '3', '3+', '-4', '4', '4+', '-5', '5', '5+', '-6', '6', '6+']) {
@@ -41,20 +39,21 @@
             body: JSON.stringify(data),
             headers: {'Content-Type': 'application/json'}
         });
-        const idDegre = await (await fetch(`/degre/gradesId/${id}/${selectMarks.value}/${notes.value}/${subject}`)).json()
-        if (row.cells[3].innerHTML.length > 0) {
-            row.cells[3].innerHTML += ",";
-        }
-        const degreeSpan = document.createElement("span");
-        degreeSpan.title = notes.value;
-        degreeSpan.value = idDegre[0].id;
-        degreeSpan.innerHTML = selectMarks.value;
-        row.cells[3].appendChild(degreeSpan);
-        //TODO: nadac ocenie id by pozniej moc usunac
-
+        const idDegre = await (await fetch(`/degre/gradesId/${id}/${selectMarks.value}/${notes.value}/${subject}`)).json();
+        addSingleGrade(row.cells[3].childNodes[0], notes.value,idDegre[0].id,selectMarks.value);
     }
 
-    async function addDegree(id, row) {
+    function addSingleGrade(parent, notes, id, grade) {
+        const degreeSpan = document.createElement("span");
+        degreeSpan.classList.add("grade");
+        degreeSpan.title = notes;
+        degreeSpan.id = `grade_${id}`;
+        degreeSpan.innerHTML = grade;
+        parent.appendChild(degreeSpan);
+    }
+
+
+    async function addDegree(buttonAdd, id, row) {
         const parent = document.getElementById("sectionAddId");
         const select = createSelectWithDegreToChoose(parent);
         const notes = document.createElement("textarea");
@@ -68,6 +67,7 @@
         buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
         parent.appendChild(buttonCancel);
         buttonCancel.onclick = () => {
+            buttonAdd.disabled = false;
             butonDone.style.display = 'none';
             notes.style.display = 'none';
             select.style.display = 'none';
@@ -79,11 +79,8 @@
         const degreId = select.selectedOptions[0].value;
         await fetch(`/degre/degreForDelete/${degreId}`, {method: 'DELETE'});
         row.childNodes[3].childNodes[0].value;
-        for(const i of row.childNodes[3].childNodes){
-            if(i.value=== +degreId){
-                i.remove();
-            }
-        }
+        document.getElementById(`grade_${degreId}`).remove();
+
     }
 
     async function removeDegre(row, remove, add, subject, student_id) {
@@ -140,22 +137,22 @@
             row.insertCell().innerHTML = `${lp++}`;
             row.insertCell().innerHTML = j.name;
             row.insertCell().innerHTML = j.last_name;
-            row.insertCell().innerHTML;
+            const div = document.createElement("div");
+            div.classList.add("gradeList");
+            row.insertCell().appendChild(div);
             row.insertCell().innerHTML;
             const add = document.createElement("button");
             add.innerHTML = '<span class="material-symbols-outlined button">add</span>';
-            add.onclick = async () => await addDegree(j.id, row);
+            add.onclick = async () => {
+                add.disabled = true;
+                await addDegree(add, j.id, row);
+            }
             row.cells[4].appendChild(add);
             const subject = document.getElementById("przedmioty_id").value;
             const degreWithThisSubjectForThisStudent = await (await fetch(`/degre/degreWithThisSubjectForThisStudent/${subject}/${j.id}`)).json();
             for (const i of degreWithThisSubjectForThisStudent) {
-                const degreeSpan = document.createElement("span");
-                degreeSpan.title = i.notes;
-                degreeSpan.value = i.id;
-                degreeSpan.innerHTML = i.mark;
-                row.cells[3].appendChild(degreeSpan);
+                addSingleGrade(row.cells[3].childNodes[0], i.notes, i.id, i.mark);
             }
-
             const buttonRemove = document.createElement("button");
             buttonRemove.innerHTML = '<span class="material-symbols-outlined button">remove</span>';
             row.cells[4].appendChild(buttonRemove);
@@ -195,4 +192,9 @@
 
 
 </script>
+<div class="sectionAdd" id="sectionAddId"></div>
+<div class="flex-container" id="gradesDeleteId">
+    <table id="table_id"></table>
+</div>
+</body>
 </html>
