@@ -17,7 +17,30 @@
     <label for="klasa_id">klasy</label><select id="klasa_id"></select>
     <button id="addMark" onclick="findStudents()">wybierz uczniow</button>
 </div>
-<div class="newGradeContent" id="sectionAddId" style="display: none"></div>
+<div class="newGradeContent" id="sectionAddId" style="display: none">
+    <select id="newGradeId">
+        <option>1</option>
+        <option>1+</option>
+        <option>-2</option>
+        <option>2</option>
+        <option>+2</option>
+        <option>-3</option>
+        <option>3</option>
+        <option>+3</option>
+        <option>-4</option>
+        <option>4</option>
+        <option>+4</option>
+        <option>-5</option>
+        <option>5</option>
+        <option>+5</option>
+        <option>-6</option>
+        <option>6</option>
+        <option>+6</option>
+    </select>
+    <textarea id="newNotesID"></textarea>
+    <button id="buttonDoneId"><span class="material-symbols-outlined button">done</span></button>
+    <button id="buttonCancelId"><span class="material-symbols-outlined button">close</span></button>
+</div>
 <div class="flex-container" id="gradesDeleteId">
     <table id="table_id"></table>
 </div>
@@ -59,20 +82,20 @@
     async function addDegree(buttonAdd, id, row) {
         const parent = document.getElementById("sectionAddId");
         parent.style.display = 'flex';
-        const select = createSelectWithDegreToChoose(parent);
-        const notes = document.createElement("textarea");
-        parent.appendChild(notes);
-        const butonDone = document.createElement("button");
-        butonDone.innerHTML = '<span class="material-symbols-outlined button">done</span>';
-        parent.appendChild(butonDone);
+        const select = document.getElementById("newGradeId");
+        const notes = document.getElementById("newNotesID");
+       // parent.appendChild(notes);
+        const butonDone = document.getElementById("buttonDoneId");
+        //butonDone.innerHTML = '<span class="material-symbols-outlined button">done</span>';
+       // parent.appendChild(butonDone);
         butonDone.onclick = async () => {
             await postDegree(butonDone, id, notes, row, select);
             parent.style.display = 'none';
             buttonAdd.disabled = false;
         }
-        const buttonCancel = document.createElement("button");
-        buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
-        parent.appendChild(buttonCancel);
+        const buttonCancel = document.getElementById("buttonCancelId");
+        //buttonCancel.innerHTML = '<span class="material-symbols-outlined button">close</span>';
+       // parent.appendChild(buttonCancel);
         buttonCancel.onclick = () => {
             buttonAdd.disabled = false;
             parent.style.display='none';
