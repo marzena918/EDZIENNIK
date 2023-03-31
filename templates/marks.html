@@ -37,12 +37,12 @@
         <option>6</option>
         <option>+6</option>
     </select>
-    <textarea id="newNotesID"></textarea>
+    <textarea id="newNotesID" placeholder="notatka"></textarea>
     <button id="buttonDoneId"><span class="material-symbols-outlined button">done</span></button>
     <button id="buttonCancelId"><span class="material-symbols-outlined button">close</span></button>
 </div>
 <div class="newGradeContent" id="sectionAddIdRemove" style="display: none">
-   <button id="cancelButtonId"><span class="material-symbols-outlined button">close</span></button>
+    <button id="cancelButtonId"><span class="material-symbols-outlined button">close</span></button>
     <button id="doneButtonId"><span class="material-symbols-outlined button">done</span></button>
 
 </div>
@@ -71,7 +71,7 @@
             headers: {'Content-Type': 'application/json'}
         });
         const idDegre = await (await fetch(`/degre/gradesId/${id}/${selectMarks.value}/${notes.value}/${subject}`)).json();
-        addSingleGrade(row.cells[3].childNodes[0], notes.value,idDegre[0].id,selectMarks.value);
+        addSingleGrade(row.cells[3].childNodes[0], notes.value, idDegre[0].id, selectMarks.value);
     }
 
     function addSingleGrade(parent, notes, id, grade) {
@@ -84,7 +84,7 @@
     }
 
 
-    async function addDegree(buttonAdd,bRemove, id, row) {
+    async function addDegree(buttonAdd, bRemove, id, row) {
         const parent = document.getElementById("sectionAddId");
         parent.style.display = 'flex';
         const select = document.getElementById("newGradeId");
@@ -100,22 +100,22 @@
         buttonCancel.onclick = () => {
             buttonAdd.disabled = false;
             bRemove.disabled = false;
-            parent.style.display='none';
+            parent.style.display = 'none';
         }
     }
 
-    async function removeSelectGrade(select, row,selectParent) {
+    async function removeSelectGrade(select, row, selectParent) {
         const degreId = select.selectedOptions[0].value;
         await fetch(`/degre/degreForDelete/${degreId}`, {method: 'DELETE'});
         row.childNodes[3].childNodes[0].value;
         document.getElementById(`grade_${degreId}`).remove();
-        selectParent.style.display='none';
+        selectParent.style.display = 'none';
 
     }
 
     async function removeDegre(row, remove, add, subject, student_id) {
-            const selectParent = document.getElementById('sectionAddIdRemove');
-            selectParent.style.display='block';
+        const selectParent = document.getElementById('sectionAddIdRemove');
+        selectParent.style.display = 'block';
         const degreWithThisSubjectForThisStudent = await (await fetch(`/degre/degreWithThisSubjectForThisStudent/${subject}/${student_id}`)).json();
         remove.disabled = true;
         add.disabled = true;
@@ -134,14 +134,15 @@
         done.onclick = async () => {
             remove.disabled = false;
             add.disabled = false;
-            await removeSelectGrade(select, row,selectParent);
+            await removeSelectGrade(select, row, selectParent);
+            select.remove();
         }
         const cancel = document.getElementById("cancelButtonId");
         cancel.onclick = () => {
-            selectParent.style.display='none';
+            selectParent.style.display = 'none';
             remove.disabled = false;
             add.disabled = false;
-
+            select.remove();
         }
     }
 
@@ -168,8 +169,8 @@
             add.innerHTML = '<span class="material-symbols-outlined button">add</span>';
             add.onclick = async () => {
                 add.disabled = true;
-                buttonRemove.disabled=true;
-                await addDegree(add,buttonRemove, j.id, row);
+                buttonRemove.disabled = true;
+                await addDegree(add, buttonRemove, j.id, row);
             }
             row.cells[4].appendChild(add);
             const subject = document.getElementById("przedmioty_id").value;
