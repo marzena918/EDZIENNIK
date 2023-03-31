@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>marks</title>
+    <script src="/static/menu.js"></script>
     <link rel="stylesheet" href="/static/main.style.css">
     <link rel="stylesheet" href="/static/class.style.css">
     <link rel="stylesheet" href="/static/degree.css">
@@ -12,6 +13,8 @@
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 </head>
 <body class="mainContent">
+<div id="menu_id" class="menu"></div>
+<script> createMenu(document.getElementById('menu_id'));</script>
 <div>
     <label for="przedmioty_id">przedmioty</label><select id="przedmioty_id" class="under"></select>
     <label for="klasa_id">klasy</label><select id="klasa_id"></select>
@@ -51,17 +54,6 @@
 </div>
 
 <script>
-    function createSelectWithDegreToChoose(parent) {
-        const select = document.createElement('select');
-        for (const i of ['1', '1+', '-2', '2', '2+', '-3', '3', '3+', '-4', '4', '4+', '-5', '5', '5+', '-6', '6', '6+']) {
-            const option = document.createElement("option");
-            option.innerHTML = i;
-            select.appendChild(option);
-            parent.appendChild(select);
-        }
-        return select;
-    }
-
     async function postDegree(done, id, notes, row, selectMarks) {
         const subject = document.getElementById("przedmioty_id").value;
         const data = {studentId: id, mark: selectMarks.value, notes: notes.value, subject: subject}
