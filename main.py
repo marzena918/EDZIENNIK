@@ -1,6 +1,7 @@
 from flask import Flask
 
 from class_endpoints import class_blueprint
+from configuration_hours_endpoints import configuration_hours_blueprint
 from degre_endpoints import degre_blueprint
 from mark_endopoints import marks_blueprint
 from student_endpoints import student_blueprint
@@ -16,5 +17,6 @@ app.register_blueprint(teacher_blueprint, url_prefix='/')
 app.register_blueprint(class_blueprint, url_prefix='/')
 app.register_blueprint(marks_blueprint, url_prefix='/')
 app.register_blueprint(degre_blueprint, url_prefix='/')
+app.register_blueprint(configuration_hours_blueprint, url_prefix='/')
 
 app.run(port=4000)
