@@ -27,65 +27,34 @@
             method: 'POST', body: JSON.stringify(data),
             headers: {'Content-Type': 'application/json'}
         });
-        // row.cells[1].type = 'text';
-        // row.cells[1].innerHTML = inputFrom.value;
-        // row.cells[2].type = 'text';
-        // row.cells[2].innerHTML = inputUntil.value;
-        // bCancel.disabled = false;
-        // bAdd.remove();
-        // const bEdit = document.createElement("button");
-        // bEdit.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
-        // row.cells[3].appendChild(bEdit);
-        // bEdit.onclick = () => {
-        //     row.cells[1].type = 'input';
-        //     row.cells[1].innerHTML = inputFrom.value;
-        //     row.cells[2].type = 'input';
-        //     row.cells[2].innerHTML = inputUntil.value;
-        // }
-
-
     }
 
     async function getTable() {
         document.getElementById("table_id").innerText = '';
+        const times = await (await fetch('/configuration_hours/getAllTime')).json();
         const table = document.getElementById("table_id");
         const tRow = table.createTHead().insertRow();
         for (const i of ['lp', 'od godziny', 'do godziny']) {
             tRow.insertCell().innerText = i;
         }
-        let i =1;
-       do {
+
+      for(let i =1; i<=10; i++){
             const row = table.insertRow();
-            row.insertCell().innerHTML = `${i++}`;
+            row.insertCell().innerHTML = `${i}`;
             row.insertCell();
             const inputFrom = document.createElement("input");
             inputFrom.type = 'text';
+            //inputFrom.value = k.from_hour//row.cells[0].innerHTML === `${times[i].lp}` ? times[i]['from_hour'] : '';
             row.cells[1].appendChild(inputFrom);
             inputFrom.onchange=()=>saveHours(inputFrom,inputUntil,row);
             row.insertCell();
             const inputUntil = document.createElement("input");
             inputUntil.type = 'text';
+          // inputUntil.value = row.cells[0].innerHTML === `${times[i].lp}` ? times[i]['until_hours'] : '';
             row.cells[2].appendChild(inputUntil);
             inputUntil.onchange=()=>saveHours(inputFrom,inputUntil,row);
-            // const bAdd = document.createElement("button")
-            // bAdd.innerHTML = '<span class="material-symbols-outlined button">add</span>';
-            // row.cells[3].appendChild(bAdd);
-            // bAdd.onclick = () => saveHours(inputFrom, inputUntil, row, bCancel, bAdd)
-            // const bCancel = document.createElement("button");
-            // bCancel.innerHTML = '<span class="material-symbols-outlined button">remove</span>';
-            // bCancel.disabled = true;
-            // bCancel.onclick = () => {
-            //     row.cells[1].type = 'text';
-            //     row.cells[1].innerHTML = inputFrom.value;
-            //     row.cells[2].type = 'text';
-            //     row.cells[2].innerHTML = inputUntil.value;
-            // }
-            // row.cells[3].appendChild(bCancel);
-
         }
-        while (i < 11)
     }
-
 
     getTable();
 </script>
