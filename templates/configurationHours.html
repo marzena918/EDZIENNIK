@@ -22,7 +22,7 @@
 
     async function saveHours(inputFrom, inputUntil, row) {
         const lp = row.cells[0].innerHTML;
-        const data = {inputFrom: inputFrom.value, inputUntil: inputUntil.value, lp:lp}
+        const data = {inputFrom: inputFrom.value, inputUntil: inputUntil.value, lp: lp}
         await fetch('/configurationHours/saveHours', {
             method: 'POST', body: JSON.stringify(data),
             headers: {'Content-Type': 'application/json'}
@@ -38,7 +38,7 @@
             tRow.insertCell().innerText = i;
         }
 
-      for(let i =1; i<=10; i++){
+        for (let i = 1; i <= 10; i++) {
             const row = table.insertRow();
             row.insertCell().innerHTML = `${i}`;
             row.insertCell();
@@ -46,13 +46,13 @@
             inputFrom.type = 'text';
             //inputFrom.value = k.from_hour//row.cells[0].innerHTML === `${times[i].lp}` ? times[i]['from_hour'] : '';
             row.cells[1].appendChild(inputFrom);
-            inputFrom.onchange=()=>saveHours(inputFrom,inputUntil,row);
+            inputFrom.onchange = () => saveHours(inputFrom, inputUntil, row);
             row.insertCell();
             const inputUntil = document.createElement("input");
             inputUntil.type = 'text';
-          // inputUntil.value = row.cells[0].innerHTML === `${times[i].lp}` ? times[i]['until_hours'] : '';
+            // inputUntil.value = row.cells[0].innerHTML === `${times[i].lp}` ? times[i]['until_hours'] : '';
             row.cells[2].appendChild(inputUntil);
-            inputUntil.onchange=()=>saveHours(inputFrom,inputUntil,row);
+            inputUntil.onchange = () => saveHours(inputFrom, inputUntil, row);
         }
     }
 
