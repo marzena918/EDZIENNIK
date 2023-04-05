@@ -20,8 +20,7 @@
 <script>
 
 
-    async function saveHours(inputFrom, inputUntil, row) {
-        const lp = row.cells[0].innerHTML;
+    async function saveHours(inputFrom, inputUntil, lp) {
         const data = {inputFrom: inputFrom.value, inputUntil: inputUntil.value, lp: lp}
         await fetch('/configurationHours/saveHours', {
             method: 'POST', body: JSON.stringify(data),
@@ -50,7 +49,7 @@
                 inputFrom.value = times[i]['from_hour'];
             }
             row.cells[1].appendChild(inputFrom);
-            inputFrom.onchange = () => saveHours(inputFrom, inputUntil, row);
+            inputFrom.onchange = () => saveHours(inputFrom, inputUntil, i);
             row.insertCell();
             const inputUntil = document.createElement("input");
             inputUntil.type = 'text';
@@ -58,7 +57,7 @@
                 inputUntil.value = times[i]['until_hours'];
             }
             row.cells[2].appendChild(inputUntil);
-            inputUntil.onchange = () => saveHours(inputFrom, inputUntil, row);
+            inputUntil.onchange = () => saveHours(inputFrom, inputUntil, i);
         }
     }
 
