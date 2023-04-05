@@ -31,7 +31,9 @@
 
     async function getTable() {
         document.getElementById("table_id").innerText = '';
-        const times = await (await fetch('/configuration_hours/getAllTime')).json();
+        const times = {};
+        (await (await fetch('/configuration_hours/getAllTime')).json()).forEach(e=>times[e.lp]=e);
+
         const table = document.getElementById("table_id");
         const tRow = table.createTHead().insertRow();
         for (const i of ['lp', 'od godziny', 'do godziny']) {
@@ -44,13 +46,17 @@
             row.insertCell();
             const inputFrom = document.createElement("input");
             inputFrom.type = 'text';
-            //inputFrom.value = k.from_hour//row.cells[0].innerHTML === `${times[i].lp}` ? times[i]['from_hour'] : '';
+            if (times[i]) {
+                inputFrom.value = times[i]['from_hour'];
+            }
             row.cells[1].appendChild(inputFrom);
             inputFrom.onchange = () => saveHours(inputFrom, inputUntil, row);
             row.insertCell();
             const inputUntil = document.createElement("input");
             inputUntil.type = 'text';
-            // inputUntil.value = row.cells[0].innerHTML === `${times[i].lp}` ? times[i]['until_hours'] : '';
+            if (times[i]) {
+                inputUntil.value = times[i]['until_hours'];
+            }
             row.cells[2].appendChild(inputUntil);
             inputUntil.onchange = () => saveHours(inputFrom, inputUntil, row);
         }
