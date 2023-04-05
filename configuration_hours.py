@@ -10,5 +10,8 @@ class Configuration_hours:
             f"insert into configurations_hours(lp,from_hour, until_hours) VALUES ({lp},'{i_from}', '{i_until}')")
         sqliteConnection.commit()
 
+    def get_all(self):
+       return cursor.execute("select * from configurations_hours").fetchall()
+
 
 configuration_hours_py = Configuration_hours()

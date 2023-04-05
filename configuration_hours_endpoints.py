@@ -9,6 +9,9 @@ configuration_hours_blueprint = Blueprint('configuration_hours_blueprint', __nam
 def index():
     return render_template('configurationHours.html')
 
+@configuration_hours_blueprint.route('/configuration_hours/getAllTime')
+def get_all():
+    return configuration_hours_py.get_all()
 
 @configuration_hours_blueprint.route('/configurationHours/saveHours', methods=['POST'])
 def saveHours():
