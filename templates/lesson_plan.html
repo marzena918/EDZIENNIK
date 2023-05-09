@@ -16,15 +16,25 @@
 <script> createMenu(document.getElementById('menu_id'));</script>
 <div>
     <br><label for="listOfClasses_id">wybierz przedmiot</label><br/>
-    <select id="listOfClasses_id" name="listOfClasses" onchange="sendNameClass()"></select>
+    <select id="listOfClasses_id" name="listOfClasses"></select>
 </div>
 <div class="flex-container" id="plannLessonId">
     <table id="table_id"></table>
 </div>
 </body>
 <script>
+
+    async function save(){
+    const clases = document.getElementById("listOfClasses_id").value;
+
+    }
+
+
     async function selectOfTeachers(select){
         const listOfTeacher =await(await fetch('/teacher/get_all_teacher')).json();
+        const emptyOption = document.createElement("option");
+        emptyOption.innerHTML = '';
+        select.add(emptyOption);
         for(const i of listOfTeacher){
             const option = document.createElement("option");
             option.innerHTML = `${i.name} ${i.last_name}`;
@@ -37,6 +47,9 @@
     }
     async function selOfSubjects(select) {
         const listOfSubject = await (await fetch('/subject/get_all')).json();
+         const emptyOption = document.createElement("option");
+        emptyOption.innerHTML = '';
+        select.add(emptyOption);
         for (const i of listOfSubject) {
             const option = document.createElement("option");
             option.innerHTML = i.name;
@@ -49,7 +62,6 @@
         const hours = await (await fetch('/lessonPlan/getAllTime')).json();
         const tableOfLessonPlan = document.getElementById("table_id");
         const Hrow = tableOfLessonPlan.createTHead().insertRow();
-        //Hrow.insertCell().innerHTML = 'godziny';
         for (const i of ['godziny', 'poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek']) {
             Hrow.insertCell().innerHTML = i;
 
@@ -58,7 +70,6 @@
             for (const j of hours) {
                 const row = tableOfLessonPlan.insertRow();
                 row.insertCell().innerHTML = `${j.from_hour}-${j.until_hours}`;
-
                 for(let i =1; i <= 5; i++){
                     const selectTeachers = document.createElement("select");
                 const selectSubject = document.createElement("select");
@@ -68,26 +79,6 @@
                 row.cells[i].appendChild(selectTeachers);
                 row.cells[i].appendChild(selectSubject);
                 }
-                // const selectTeachers = document.createElement("select");
-                // const selectSubject = document.createElement("select");
-                // await selectOfTeachers(selectTeachers);
-                // await selOfSubjects(selectSubject);
-                // row.insertCell().innerHTML = '';
-                // row.cells[1].appendChild(selectTeachers);
-                // row.cells[1].appendChild(selectSubject);
-                //
-                // const selectTeachersW = document.createElement("select");
-                // const selectSubjectW = document.createElement("select");
-                // await selectOfTeachers(selectTeachersW);
-                // await selOfSubjects(selectSubjectW);
-                // row.insertCell().innerHTML='';
-                //  row.cells[2].appendChild(selectTeachersW);
-                // row.cells[2].appendChild(selectSubjectW);
-                // row.insertCell().innerHTML='s';
-                // row.insertCell().innerHTML='c';
-                // row.insertCell().innerHTML='ap';
-
-
             }
         }
 
