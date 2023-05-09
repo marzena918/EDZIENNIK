@@ -18,6 +18,10 @@ function createMenu(parentObject) {
     const configurationHours = document.createElement("a");
     configurationHours.href = "/configuration_hours";
     configurationHours.innerHTML = 'configuration hours';
+    const lessonPlan = document.createElement("a");
+    lessonPlan.href="/lessonPlan";
+    lessonPlan.innerHTML= 'lesson plan';
+    parentObject.appendChild(lessonPlan);
     parentObject.appendChild(configurationHours);
     parentObject.appendChild(nauczyciele);
     parentObject.appendChild(subjects);
