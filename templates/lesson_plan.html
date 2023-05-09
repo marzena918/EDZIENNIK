@@ -24,30 +24,29 @@
 </body>
 <script>
 
-    async function save(){
-    const clases = document.getElementById("listOfClasses_id").value;
+    async function save() {
+        const clases = document.getElementById("listOfClasses_id").value;
 
     }
 
 
-    async function selectOfTeachers(select){
-        const listOfTeacher =await(await fetch('/teacher/get_all_teacher')).json();
+    function selectOfTeachers(select, listOfTeacher) {
         const emptyOption = document.createElement("option");
         emptyOption.innerHTML = '';
         select.add(emptyOption);
-        for(const i of listOfTeacher){
+        for (const i of listOfTeacher) {
             const option = document.createElement("option");
             option.innerHTML = `${i.name} ${i.last_name}`;
-            option.value= i.id;
+            option.value = i.id;
             select.appendChild(option);
 
         }
         return select
 
     }
-    async function selOfSubjects(select) {
-        const listOfSubject = await (await fetch('/subject/get_all')).json();
-         const emptyOption = document.createElement("option");
+
+    async function selOfSubjects(select, listOfSubject) {
+        const emptyOption = document.createElement("option");
         emptyOption.innerHTML = '';
         select.add(emptyOption);
         for (const i of listOfSubject) {
@@ -57,6 +56,7 @@
         }
         return select;
     }
+
     async function getTable() {
         document.getElementById("table_id").innerHTML = '';
         const hours = await (await fetch('/lessonPlan/getAllTime')).json();
@@ -66,40 +66,42 @@
             Hrow.insertCell().innerHTML = i;
 
         }
-
-            for (const j of hours) {
-                const row = tableOfLessonPlan.insertRow();
-                row.insertCell().innerHTML = `${j.from_hour}-${j.until_hours}`;
-                for(let i =1; i <= 5; i++){
-                    const selectTeachers = document.createElement("select");
+        const listOfTeacher = await (await fetch('/teacher/get_all_teacher')).json();
+        const listOfSubject = await (await fetch('/subject/get_all')).json();
+        for (const j of hours) {
+            const row = tableOfLessonPlan.insertRow();
+            row.insertCell().innerHTML = `${j.from_hour}-${j.until_hours}`;
+            for (let i = 1; i <= 5; i++) {
+                const selectTeachers = document.createElement("select");
                 const selectSubject = document.createElement("select");
-                await selectOfTeachers(selectTeachers);
-                await selOfSubjects(selectSubject);
+                await selectOfTeachers(selectTeachers, listOfTeacher);
+                await selOfSubjects(selectSubject, listOfSubject);
                 row.insertCell().innerHTML = '';
                 row.cells[i].appendChild(selectTeachers);
                 row.cells[i].appendChild(selectSubject);
-                }
             }
+        }
+    }
+
+
+    async function listOfClasses() {
+        const name_classes = await (await fetch('/lessonPlan/get_all_names_class')).json();
+        const select_name_classes = document.getElementById("listOfClasses_id");
+        for (const i of name_classes) {
+            const option = document.createElement("option");
+            option.value = i['class.id'];
+            option.innerHTML = i['name_class'];
+            select_name_classes.appendChild(option);
         }
 
 
-        async function listOfClasses() {
-            const name_classes = await (await fetch('/lessonPlan/get_all_names_class')).json();
-            const select_name_classes = document.getElementById("listOfClasses_id");
-            for (const i of name_classes) {
-            const option = document.createElement("option");
-            option.value = i['class.id'];
-                option.innerHTML= i['name_class'];
-                select_name_classes.appendChild(option);
-            }
-
-
-
     }
-    async function init(){
+
+    async function init() {
         await listOfClasses();
         await getTable();
     }
+
     init();
 
 </script>
