@@ -11,7 +11,7 @@ class Configuration_hours:
         sqliteConnection.commit()
 
     def get_all(self):
-       return cursor.execute("select * from configurations_hours").fetchall()
+        return cursor.execute("select * from configurations_hours").fetchall()
 
 
-configuration_hours_py = Configuration_hours()
+configuration_of_hours = Configuration_hours()

@@ -18,32 +18,65 @@
     <br><label for="listOfClasses_id">wybierz przedmiot</label><br/>
     <select id="listOfClasses_id" name="listOfClasses" onchange="sendNameClass()"></select>
 </div>
+<div class="flex-container" id="plannLessonId">
+    <table id="table_id"></table>
+</div>
 </body>
 <script>
-    // document.getElementById("table_id").innerHTML = '';
-    // const allTeacher = await (await fetch('/teacher/get_all_teacher')).json();
-    // const tableOfTeacher = document.getElementById("table_id");
-    // const Hrow = tableOfTeacher.createTHead().insertRow();
-    // Hrow.insertCell().innerHTML = 'lp';
-    // Hrow.insertCell().innerHTML = 'imie';
-    // Hrow.insertCell().innerHTML = 'nazwisko';
-    // Hrow.insertCell().innerHTML = 'pesel';
-    // Hrow.insertCell().innerHTML = 'przedmiot';
-    // Hrow.insertCell().innerHTML = 'akcja';
-    // let lp = 1
-    //
-    // for (const j of allTeacher) {
-    //     const currentSubjects = (await getSubjectsOfTeacher(j.id)).map(obj => obj.subject);
-    //     const row = tableOfTeacher.insertRow();
-    //     row.insertCell().innerHTML = `${lp++}`;
-    //     row.insertCell().innerHTML = `${j.name}`;
-    //     row.insertCell().innerHTML = `${j.last_name}`;
-    //     row.insertCell().innerHTML = `${j.pesel}`;
-    //     row.insertCell().innerHTML = currentSubjects.join(', ');
-    //     row.insertCell();
+    async function selectOfTeachers(select){
+        const listOfTeacher =await(await fetch('/teacher/get_all_teacher')).json();
+        for(const i of listOfTeacher){
+            const option = document.createElement("option");
+            option.innerHTML = `${i.name} ${i.last_name}`;
+            option.value= i.id;
+            select.appendChild(option);
+
+        }
+        return select
+
+    }
+    async function selOfSubjects(select) {
+        const listOfSubject = await (await fetch('/subject/get_all')).json();
+        for (const i of listOfSubject) {
+            const option = document.createElement("option");
+            option.innerHTML = i.name;
+            select.appendChild(option);
+        }
+        return select;
+    }
+    async function getTable() {
+        document.getElementById("table_id").innerHTML = '';
+       // const selectOfTeacher = selectOfTeachers();
+
+        //const listOfSubject= await(await fetch('/subject/get_all')).json();
+        const hours = await (await fetch('/lessonPlan/getAllTime')).json();
+        const tableOfLessonPlan = document.getElementById("table_id");
+        const Hrow = tableOfLessonPlan.createTHead().insertRow();
+        for (const i of ['godziny', 'poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek', 'sobota', 'niedziela'])
+            Hrow.insertCell().innerHTML = i;
+
+        // let lp = 1
+        //
+        for (const j of hours) {
+            //     const currentSubjects = (await getSubjectsOfTeacher(j.id)).map(obj => obj.subject);
+            const row = tableOfLessonPlan.insertRow();
+            row.insertCell().innerHTML = `${j.from_hour}-${j.until_hours}`;
+
+            const selectTeachers = document.createElement("select");
+            const selectSubject = document.createElement("select");
+           await selectOfTeachers(selectTeachers);
+           await selOfSubjects(selectSubject);
+            row.insertCell().innerHTML = '';
+            row.cells[1].appendChild(selectTeachers);
+            row.cells[1].appendChild(selectSubject);
+           // row.cells[1].appendChild(selectOfTeacher);
+            // row.cells[1].appendChild(selectOfSubject)
+        }
+    }
+
 
         async function listOfClasses() {
-            const name_classes = await (await fetch('/get_all_names_class')).json();
+            const name_classes = await (await fetch('/lessonPlan/get_all_names_class')).json();
             const select_name_classes = document.getElementById("listOfClasses_id");
             for (const i of name_classes) {
             const option = document.createElement("option");
@@ -55,6 +88,11 @@
 
 
     }
-    listOfClasses();
+    async function init(){
+        await listOfClasses();
+        await getTable();
+    }
+    init();
+
 </script>
 </html>

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 
-from configuration_hours import configuration_hours_py
+from configuration_hours import configuration_of_hours
 
 configuration_hours_blueprint = Blueprint('configuration_hours_blueprint', __name__)
 
@@ -11,10 +11,10 @@ def index():
 
 @configuration_hours_blueprint.route('/configuration_hours/getAllTime')
 def get_all():
-    return configuration_hours_py.get_all()
+    return configuration_of_hours.get_all()
 
 @configuration_hours_blueprint.route('/configurationHours/saveHours', methods=['POST'])
 def saveHours():
     data = request.json
-    configuration_hours_py.save_hours(data['inputFrom'], data['inputUntil'], data['lp'])
+    configuration_of_hours.save_hours(data['inputFrom'], data['inputUntil'], data['lp'])
     return ''
