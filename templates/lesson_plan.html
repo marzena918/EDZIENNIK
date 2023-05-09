@@ -30,7 +30,8 @@
     }
 
 
-    function selectOfTeachers(select, listOfTeacher) {
+    function selectOfTeachers(listOfTeacher) {
+        const select = document.createElement("select");
         const emptyOption = document.createElement("option");
         emptyOption.innerHTML = '';
         select.add(emptyOption);
@@ -42,10 +43,10 @@
 
         }
         return select
-
     }
 
-    async function selOfSubjects(select, listOfSubject) {
+    async function selOfSubjects( listOfSubject) {
+        const select = document.createElement("select");
         const emptyOption = document.createElement("option");
         emptyOption.innerHTML = '';
         select.add(emptyOption);
@@ -72,10 +73,8 @@
             const row = tableOfLessonPlan.insertRow();
             row.insertCell().innerHTML = `${j.from_hour}-${j.until_hours}`;
             for (let i = 1; i <= 5; i++) {
-                const selectTeachers = document.createElement("select");
-                const selectSubject = document.createElement("select");
-                await selectOfTeachers(selectTeachers, listOfTeacher);
-                await selOfSubjects(selectSubject, listOfSubject);
+                const selectTeachers = selectOfTeachers(listOfTeacher);
+                const selectSubject= selOfSubjects(listOfSubject);
                 row.insertCell().innerHTML = '';
                 row.cells[i].appendChild(selectTeachers);
                 row.cells[i].appendChild(selectSubject);
