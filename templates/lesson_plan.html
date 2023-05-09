@@ -29,30 +29,14 @@
 
     }
 
-
-    function selectOfTeachers(listOfTeacher) {
+    function createSelect(elements, optionInitializer) {
         const select = document.createElement("select");
         const emptyOption = document.createElement("option");
         emptyOption.innerHTML = '';
         select.add(emptyOption);
-        for (const i of listOfTeacher) {
+        for (const i of elements) {
             const option = document.createElement("option");
-            option.innerHTML = `${i.name} ${i.last_name}`;
-            option.value = i.id;
-            select.appendChild(option);
-
-        }
-        return select
-    }
-
-    async function selOfSubjects( listOfSubject) {
-        const select = document.createElement("select");
-        const emptyOption = document.createElement("option");
-        emptyOption.innerHTML = '';
-        select.add(emptyOption);
-        for (const i of listOfSubject) {
-            const option = document.createElement("option");
-            option.innerHTML = i.name;
+            optionInitializer(option, i);
             select.appendChild(option);
         }
         return select;
@@ -73,8 +57,13 @@
             const row = tableOfLessonPlan.insertRow();
             row.insertCell().innerHTML = `${j.from_hour}-${j.until_hours}`;
             for (let i = 1; i <= 5; i++) {
-                const selectTeachers = selectOfTeachers(listOfTeacher);
-                const selectSubject= selOfSubjects(listOfSubject);
+                const selectTeachers = createSelect(listOfTeacher,
+                    (option, i) => {
+                        option.innerHTML = `${i.name} ${i.last_name}`;
+                        option.value = i.id;
+                    });
+                const selectSubject = createSelect(
+                    listOfSubject, (option, element) => option.innerHTML = element.name);
                 row.insertCell().innerHTML = '';
                 row.cells[i].appendChild(selectTeachers);
                 row.cells[i].appendChild(selectSubject);
