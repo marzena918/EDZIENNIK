@@ -14,8 +14,47 @@
 <body>
 <div id="menu_id" class="menu"></div>
 <script> createMenu(document.getElementById('menu_id'));</script>
+<div>
+    <br><label for="listOfClasses_id">wybierz przedmiot</label><br/>
+    <select id="listOfClasses_id" name="listOfClasses" onchange="sendNameClass()"></select>
+</div>
 </body>
 <script>
+    // document.getElementById("table_id").innerHTML = '';
+    // const allTeacher = await (await fetch('/teacher/get_all_teacher')).json();
+    // const tableOfTeacher = document.getElementById("table_id");
+    // const Hrow = tableOfTeacher.createTHead().insertRow();
+    // Hrow.insertCell().innerHTML = 'lp';
+    // Hrow.insertCell().innerHTML = 'imie';
+    // Hrow.insertCell().innerHTML = 'nazwisko';
+    // Hrow.insertCell().innerHTML = 'pesel';
+    // Hrow.insertCell().innerHTML = 'przedmiot';
+    // Hrow.insertCell().innerHTML = 'akcja';
+    // let lp = 1
+    //
+    // for (const j of allTeacher) {
+    //     const currentSubjects = (await getSubjectsOfTeacher(j.id)).map(obj => obj.subject);
+    //     const row = tableOfTeacher.insertRow();
+    //     row.insertCell().innerHTML = `${lp++}`;
+    //     row.insertCell().innerHTML = `${j.name}`;
+    //     row.insertCell().innerHTML = `${j.last_name}`;
+    //     row.insertCell().innerHTML = `${j.pesel}`;
+    //     row.insertCell().innerHTML = currentSubjects.join(', ');
+    //     row.insertCell();
 
+        async function listOfClasses() {
+            const name_classes = await (await fetch('/get_all_names_class')).json();
+            const select_name_classes = document.getElementById("listOfClasses_id");
+            for (const i of name_classes) {
+            const option = document.createElement("option");
+            option.value = i['class.id'];
+                option.innerHTML= i['name_class'];
+                select_name_classes.appendChild(option);
+            }
+
+
+
+    }
+    listOfClasses();
 </script>
 </html>
