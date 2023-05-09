@@ -23,6 +23,15 @@
 </div>
 </body>
 <script>
+    class LessonPlan {
+        monday = {};
+        tuesday = {};
+        wednesday = {};
+        thursday = {};
+        friday = {};
+    }
+
+    const lessonPlan = new LessonPlan();
 
     async function save() {
         const clases = document.getElementById("listOfClasses_id").value;
@@ -42,9 +51,18 @@
         return select;
     }
 
+    function initLessonPlan(lessonPlan, hours) {
+        hours.forEach(h => lessonPlan.monday[h.id] = {subject: null, teacher: null});
+        hours.forEach(h => lessonPlan.tuesday[h.id] = {subject: null, teacher: null});
+        hours.forEach(h => lessonPlan.wednesday[h.id] = {subject: null, teacher: null});
+        hours.forEach(h => lessonPlan.thursday[h.id] = {subject: null, teacher: null});
+        hours.forEach(h => lessonPlan.friday[h.id] = {subject: null, teacher: null});
+    }
+
     async function getTable() {
         document.getElementById("table_id").innerHTML = '';
         const hours = await (await fetch('/lessonPlan/getAllTime')).json();
+        initLessonPlan(lessonPlan, hours);
         const tableOfLessonPlan = document.getElementById("table_id");
         const Hrow = tableOfLessonPlan.createTHead().insertRow();
         for (const i of ['godziny', 'poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek']) {
@@ -53,17 +71,21 @@
         }
         const listOfTeacher = await (await fetch('/teacher/get_all_teacher')).json();
         const listOfSubject = await (await fetch('/subject/get_all')).json();
+        const days = [null, lessonPlan.monday, lessonPlan.tuesday, lessonPlan.wednesday, lessonPlan.thursday, lessonPlan.friday]
         for (const j of hours) {
             const row = tableOfLessonPlan.insertRow();
             row.insertCell().innerHTML = `${j.from_hour}-${j.until_hours}`;
             for (let i = 1; i <= 5; i++) {
                 const selectTeachers = createSelect(listOfTeacher,
-                    (option, i) => {
-                        option.innerHTML = `${i.name} ${i.last_name}`;
-                        option.value = i.id;
-                    });
+                    (option, teacher) => {
+                        option.innerHTML = `${teacher.name} ${teacher.last_name}`;
+                        option.value = teacher.id;
+                });
+                selectTeachers.onchange = () => days[i][j.id].teacher = selectTeachers.selectedOptions[0].value;
                 const selectSubject = createSelect(
-                    listOfSubject, (option, element) => option.innerHTML = element.name);
+                    listOfSubject, (option, subject) => {option.innerHTML = subject.name;}
+                );
+                selectSubject.onchange = () => days[i][j.id].subject = selectSubject.selectedOptions[0].value;
                 row.insertCell().innerHTML = '';
                 row.cells[i].appendChild(selectTeachers);
                 row.cells[i].appendChild(selectSubject);
