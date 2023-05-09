@@ -46,33 +46,50 @@
     }
     async function getTable() {
         document.getElementById("table_id").innerHTML = '';
-       // const selectOfTeacher = selectOfTeachers();
-
-        //const listOfSubject= await(await fetch('/subject/get_all')).json();
         const hours = await (await fetch('/lessonPlan/getAllTime')).json();
         const tableOfLessonPlan = document.getElementById("table_id");
         const Hrow = tableOfLessonPlan.createTHead().insertRow();
-        for (const i of ['godziny', 'poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek', 'sobota', 'niedziela'])
+        //Hrow.insertCell().innerHTML = 'godziny';
+        for (const i of ['godziny', 'poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek']) {
             Hrow.insertCell().innerHTML = i;
 
-        // let lp = 1
-        //
-        for (const j of hours) {
-            //     const currentSubjects = (await getSubjectsOfTeacher(j.id)).map(obj => obj.subject);
-            const row = tableOfLessonPlan.insertRow();
-            row.insertCell().innerHTML = `${j.from_hour}-${j.until_hours}`;
-
-            const selectTeachers = document.createElement("select");
-            const selectSubject = document.createElement("select");
-           await selectOfTeachers(selectTeachers);
-           await selOfSubjects(selectSubject);
-            row.insertCell().innerHTML = '';
-            row.cells[1].appendChild(selectTeachers);
-            row.cells[1].appendChild(selectSubject);
-           // row.cells[1].appendChild(selectOfTeacher);
-            // row.cells[1].appendChild(selectOfSubject)
         }
-    }
+
+            for (const j of hours) {
+                const row = tableOfLessonPlan.insertRow();
+                row.insertCell().innerHTML = `${j.from_hour}-${j.until_hours}`;
+
+                for(let i =1; i <= 5; i++){
+                    const selectTeachers = document.createElement("select");
+                const selectSubject = document.createElement("select");
+                await selectOfTeachers(selectTeachers);
+                await selOfSubjects(selectSubject);
+                row.insertCell().innerHTML = '';
+                row.cells[i].appendChild(selectTeachers);
+                row.cells[i].appendChild(selectSubject);
+                }
+                // const selectTeachers = document.createElement("select");
+                // const selectSubject = document.createElement("select");
+                // await selectOfTeachers(selectTeachers);
+                // await selOfSubjects(selectSubject);
+                // row.insertCell().innerHTML = '';
+                // row.cells[1].appendChild(selectTeachers);
+                // row.cells[1].appendChild(selectSubject);
+                //
+                // const selectTeachersW = document.createElement("select");
+                // const selectSubjectW = document.createElement("select");
+                // await selectOfTeachers(selectTeachersW);
+                // await selOfSubjects(selectSubjectW);
+                // row.insertCell().innerHTML='';
+                //  row.cells[2].appendChild(selectTeachersW);
+                // row.cells[2].appendChild(selectSubjectW);
+                // row.insertCell().innerHTML='s';
+                // row.insertCell().innerHTML='c';
+                // row.insertCell().innerHTML='ap';
+
+
+            }
+        }
 
 
         async function listOfClasses() {
