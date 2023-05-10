@@ -106,7 +106,7 @@
         const select_name_classes = document.getElementById("listOfClasses_id");
         for (const i of name_classes) {
             const option = document.createElement("option");
-            option.value = i['class.id'];
+            option.value = i['id'];
             option.innerHTML = i['name_class'];
             select_name_classes.appendChild(option);
         }
