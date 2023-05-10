@@ -18,6 +18,7 @@
     <br><label for="listOfClasses_id">wybierz przedmiot</label><br/>
     <select id="listOfClasses_id" name="listOfClasses"></select>
 </div>
+<button onclick="save()">zapisz</button>
 <div class="flex-container" id="plannLessonId">
     <table id="table_id"></table>
 </div>
@@ -34,8 +35,12 @@
     const lessonPlan = new LessonPlan();
 
     async function save() {
-        const clases = document.getElementById("listOfClasses_id").value;
-
+        const clases = document.getElementById("listOfClasses_id").selectedOptions[0].value;
+        await fetch(`/lessonPlan/save/${clases}`, {
+            method: 'POST',
+            body: JSON.stringify(lessonPlan),
+            headers: {'Content-Type': 'application/json'}
+        });
     }
 
     function createSelect(elements, optionInitializer) {
@@ -80,10 +85,12 @@
                     (option, teacher) => {
                         option.innerHTML = `${teacher.name} ${teacher.last_name}`;
                         option.value = teacher.id;
-                });
+                    });
                 selectTeachers.onchange = () => days[i][j.id].teacher = selectTeachers.selectedOptions[0].value;
                 const selectSubject = createSelect(
-                    listOfSubject, (option, subject) => {option.innerHTML = subject.name;}
+                    listOfSubject, (option, subject) => {
+                        option.innerHTML = subject.name;
+                    }
                 );
                 selectSubject.onchange = () => days[i][j.id].subject = selectSubject.selectedOptions[0].value;
                 row.insertCell().innerHTML = '';
