@@ -12,11 +12,3 @@ lesson_plan_blueprint = Blueprint('lesson_plan_blueprint', __name__)
 def index():
     return render_template('lesson_plan.html')
 
-@lesson_plan_blueprint.route('/lessonPlan/get_all_names_class')
-def get_all_name_class():
-    return lesson_plan.get_all()
-
-@lesson_plan_blueprint.route('/lessonPlan/getAllTime')
-def get_all_time():
-    return lesson_plan.get_all_hours()
-    return ''

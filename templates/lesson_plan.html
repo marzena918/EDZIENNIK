@@ -66,7 +66,7 @@
 
     async function getTable() {
         document.getElementById("table_id").innerHTML = '';
-        const hours = await (await fetch('/lessonPlan/getAllTime')).json();
+        const hours = await (await fetch('/configuration_hours/getAllTime')).json();
         initLessonPlan(lessonPlan, hours);
         const tableOfLessonPlan = document.getElementById("table_id");
         const Hrow = tableOfLessonPlan.createTHead().insertRow();
@@ -102,7 +102,7 @@
 
 
     async function listOfClasses() {
-        const name_classes = await (await fetch('/lessonPlan/get_all_names_class')).json();
+        const name_classes = await (await fetch('/class/get_all')).json();
         const select_name_classes = document.getElementById("listOfClasses_id");
         for (const i of name_classes) {
             const option = document.createElement("option");
