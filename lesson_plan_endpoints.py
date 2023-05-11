@@ -12,3 +12,7 @@ def save(clases):
     data = request.json
     lesson_plan.save(clases,data)
     return ''
+
+@lesson_plan_blueprint.route('/lesson_plan/get_all_lesson_plan/<id_class>')
+def get_all0(id_class):
+    return lesson_plan.get_plan(id_class)

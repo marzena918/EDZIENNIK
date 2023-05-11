@@ -55,13 +55,46 @@
         }
         return select;
     }
+    function isFull(data){
+         for(const i of data){
+            if (i['teacher'] || i['subject'] !== 0){
+                return 1
+            }
+        }
+        return 0;
+    }
 
-    function initLessonPlan(lessonPlan, hours) {
-        hours.forEach(h => lessonPlan.monday[h.id] = {subject: null, teacher: null});
-        hours.forEach(h => lessonPlan.tuesday[h.id] = {subject: null, teacher: null});
-        hours.forEach(h => lessonPlan.wednesday[h.id] = {subject: null, teacher: null});
-        hours.forEach(h => lessonPlan.thursday[h.id] = {subject: null, teacher: null});
-        hours.forEach(h => lessonPlan.friday[h.id] = {subject: null, teacher: null});
+    async function initLessonPlan(lessonPlan, hours) {
+        const id_class = document.getElementById("listOfClasses_id").value;
+        const dataOfBase = await(await fetch(`/lesson_plan/get_all_lesson_plan/${id_class}`)).json();
+        if (isFull(dataOfBase)){
+            //id_clasy pobierz/wyslij endpoint i pobierz wszystko. zrob fora i sprawdz kazdy dzien i zrob slownik z niego
+            for(const wiersz of dataOfBase){
+                    if(wiersz['day']=== 'poniedziałek'){
+                        lessonPlan.monday['hour_id'] = {subject : wiersz['subject'], teacher: wiersz['teacher']}
+                    }
+                       if(wiersz['day']=== 'wtorek'){
+                        lessonPlan.tuesday['hour_id'] = {subject : wiersz['subject'], teacher: wiersz['teacher']}
+                    }
+                       if(wiersz['day']=== 'środa'){
+                        lessonPlan.wednesday['hour_id'] = {subject : wiersz['subject'], teacher: wiersz['teacher']}
+                    }
+                       if(wiersz['day']=== 'czwartek'){
+                        lessonPlan.thursday['hour_id'] = {subject : wiersz['subject'], teacher: wiersz['teacher']}
+                    }
+                       if(wiersz['day']=== 'piątek'){
+                        lessonPlan.friday['hour_id'] = {subject : wiersz['subject'], teacher: wiersz['teacher']}
+                    }
+                }
+            }
+
+        else {
+            hours.forEach(h => lessonPlan.monday[h.id] = {subject: null, teacher: null});
+            hours.forEach(h => lessonPlan.tuesday[h.id] = {subject: null, teacher: null});
+            hours.forEach(h => lessonPlan.wednesday[h.id] = {subject: null, teacher: null});
+            hours.forEach(h => lessonPlan.thursday[h.id] = {subject: null, teacher: null});
+            hours.forEach(h => lessonPlan.friday[h.id] = {subject: null, teacher: null});
+        }
     }
 
     async function getTable() {

@@ -22,5 +22,8 @@ class LessonPlan:
                                f"{sub_teach['teacher'] if sub_teach['teacher'] else 0}, {clases_id})")
         sqliteConnection.commit()
 
+    def get_plan(self, class_id):
+        return cursor.execute(f"select * from lesson_plan where classes_id = {class_id}").fetchall()
+
 
 lesson_plan = LessonPlan()
