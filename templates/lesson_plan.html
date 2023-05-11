@@ -55,9 +55,10 @@
         }
         return select;
     }
-    function isFull(data){
-         for(const i of data){
-            if (i['teacher'] || i['subject'] !== 0){
+
+    function isFull(data) {
+        for (const i of data) {
+            if (i['teacher'] || i['subject'] !== 0) {
                 return 1
             }
         }
@@ -66,29 +67,27 @@
 
     async function initLessonPlan(lessonPlan, hours) {
         const id_class = document.getElementById("listOfClasses_id").value;
-        const dataOfBase = await(await fetch(`/lesson_plan/get_all_lesson_plan/${id_class}`)).json();
-        if (isFull(dataOfBase)){
+        const dataOfBase = await (await fetch(`/lesson_plan/get_all_lesson_plan/${id_class}`)).json();
+        if (isFull(dataOfBase)) {
             //id_clasy pobierz/wyslij endpoint i pobierz wszystko. zrob fora i sprawdz kazdy dzien i zrob slownik z niego
-            for(const wiersz of dataOfBase){
-                    if(wiersz['day']=== 'poniedziałek'){
-                        lessonPlan.monday['hour_id'] = {subject : wiersz['subject'], teacher: wiersz['teacher']}
-                    }
-                       if(wiersz['day']=== 'wtorek'){
-                        lessonPlan.tuesday['hour_id'] = {subject : wiersz['subject'], teacher: wiersz['teacher']}
-                    }
-                       if(wiersz['day']=== 'środa'){
-                        lessonPlan.wednesday['hour_id'] = {subject : wiersz['subject'], teacher: wiersz['teacher']}
-                    }
-                       if(wiersz['day']=== 'czwartek'){
-                        lessonPlan.thursday['hour_id'] = {subject : wiersz['subject'], teacher: wiersz['teacher']}
-                    }
-                       if(wiersz['day']=== 'piątek'){
-                        lessonPlan.friday['hour_id'] = {subject : wiersz['subject'], teacher: wiersz['teacher']}
-                    }
+            for (const wiersz of dataOfBase) {
+                if (wiersz['day'] === 'poniedziałek') {
+                    lessonPlan.monday[wiersz['hour_id']] = {subject: wiersz['subject'], teacher: wiersz['teacher']}
+                }
+                if (wiersz['day'] === 'wtorek') {
+                    lessonPlan.tuesday[wiersz['hour_id']] = {subject: wiersz['subject'], teacher: wiersz['teacher']}
+                }
+                if (wiersz['day'] === 'środa') {
+                    lessonPlan.wednesday[wiersz['hour_id']] = {subject: wiersz['subject'], teacher: wiersz['teacher']}
+                }
+                if (wiersz['day'] === 'czwartek') {
+                    lessonPlan.thursday[wiersz['hour_id']] = {subject: wiersz['subject'], teacher: wiersz['teacher']}
+                }
+                if (wiersz['day'] === 'piątek') {
+                    lessonPlan.friday[wiersz['hour_id']] = {subject: wiersz['subject'], teacher: wiersz['teacher']}
                 }
             }
-
-        else {
+        } else {
             hours.forEach(h => lessonPlan.monday[h.id] = {subject: null, teacher: null});
             hours.forEach(h => lessonPlan.tuesday[h.id] = {subject: null, teacher: null});
             hours.forEach(h => lessonPlan.wednesday[h.id] = {subject: null, teacher: null});
@@ -118,11 +117,19 @@
                     (option, teacher) => {
                         option.innerHTML = `${teacher.name} ${teacher.last_name}`;
                         option.value = teacher.id;
-                    });
+                        if (teacher.id === days[i][j.id].teacher) {
+                            option.selected = true;
+                        }
+                    })
+
+
                 selectTeachers.onchange = () => days[i][j.id].teacher = selectTeachers.selectedOptions[0].value;
                 const selectSubject = createSelect(
                     listOfSubject, (option, subject) => {
                         option.innerHTML = subject.name;
+                        if(subject.name === days[i][j.id].subject){
+                            option.selected = true;
+                        }
                     }
                 );
                 selectSubject.onchange = () => days[i][j.id].subject = selectSubject.selectedOptions[0].value;
@@ -130,6 +137,7 @@
                 row.cells[i].appendChild(selectTeachers);
                 row.cells[i].appendChild(selectSubject);
             }
+
         }
     }
 
