@@ -16,7 +16,7 @@
 <script> createMenu(document.getElementById('menu_id'));</script>
 <div>
     <br><label for="listOfClasses_id">wybierz przedmiot</label><br/>
-    <select id="listOfClasses_id" name="listOfClasses"></select>
+    <select id="listOfClasses_id" name="listOfClasses" onchange="getTable()"></select>
 </div>
 <button onclick="save()">zapisz</button>
 <div class="flex-container" id="plannLessonId">
@@ -69,24 +69,11 @@
         const id_class = document.getElementById("listOfClasses_id").value;
         const dataOfBase = await (await fetch(`/lesson_plan/get_all_lesson_plan/${id_class}`)).json();
         if (isFull(dataOfBase)) {
-            //id_clasy pobierz/wyslij endpoint i pobierz wszystko. zrob fora i sprawdz kazdy dzien i zrob slownik z niego
-            for (const wiersz of dataOfBase) {
-                if (wiersz['day'] === 'poniedziałek') {
-                    lessonPlan.monday[wiersz['hour_id']] = {subject: wiersz['subject'], teacher: wiersz['teacher']}
-                }
-                if (wiersz['day'] === 'wtorek') {
-                    lessonPlan.tuesday[wiersz['hour_id']] = {subject: wiersz['subject'], teacher: wiersz['teacher']}
-                }
-                if (wiersz['day'] === 'środa') {
-                    lessonPlan.wednesday[wiersz['hour_id']] = {subject: wiersz['subject'], teacher: wiersz['teacher']}
-                }
-                if (wiersz['day'] === 'czwartek') {
-                    lessonPlan.thursday[wiersz['hour_id']] = {subject: wiersz['subject'], teacher: wiersz['teacher']}
-                }
-                if (wiersz['day'] === 'piątek') {
-                    lessonPlan.friday[wiersz['hour_id']] = {subject: wiersz['subject'], teacher: wiersz['teacher']}
-                }
+           const dic = {"poniedziałek": lessonPlan.monday, "wtorek": lessonPlan.tuesday, "środa": lessonPlan.wednesday, "czwartek" :lessonPlan.thursday, "piątek":lessonPlan.friday};
+            for(const i of dataOfBase){
+                dic[i['day']][i['hour_id']] = {subject: i['subject'], teacher: i['teacher']}
             }
+
         } else {
             hours.forEach(h => lessonPlan.monday[h.id] = {subject: null, teacher: null});
             hours.forEach(h => lessonPlan.tuesday[h.id] = {subject: null, teacher: null});
