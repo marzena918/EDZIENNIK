@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>obecnosc</title>
-     <script src="/static/menu.js"></script>
+    <script src="/static/menu.js"></script>
     <link rel="stylesheet" href="/static/main.style.css">
     <link rel="stylesheet" href="/static/class.style.css">
     <link rel="stylesheet"
@@ -14,60 +14,78 @@
 <script> createMenu(document.getElementById('menu_id'));</script>
 <label for="classes_id">wybierz klase</label><select id="classes_id" onchange="displayData()"></select>
 <div id="calendar_id"></div>
-<table class="table_grades" id = "table_id"></table>
+<ul id="ul_id"></ul>
+<table class="table_grades" id="table_id"></table>
 </body>
 <script>
-    async function createClases(){
+    async function createClases() {
         const clasesParent = document.getElementById("classes_id")
         const allClases = await (await fetch('/class/get_all')).json();
-        for(const i of allClases){
+        for (const i of allClases) {
             const option = document.createElement("option");
             option.innerHTML = i['name_class'];
             option.value = i['id'];
             clasesParent.appendChild(option);
         }
     }
-    async function subHourPerDay(day,classes){
+
+    async function subHourPerDay(day, classes) {
+        const hours = await (await fetch('/attendance/getAllHour')).json();
+        const subHour = await (await fetch(`/attendance/getDayAndClasses/${day}/${classes}`)).json();
+        const ul = document.getElementById("ul_id");
+        ul.innerHTML = 'godzina - lekcja';
+        for (const k of subHour) {
+            const li = document.createElement("li");
+            li.innerHTML = `${hours[k['hour_id']]}- ${k.subject}`;
+            ul.appendChild(li);
+            li.onclick = async () => await createAttendanceList(classes, subHour, hours)
+
+        }
+    }
+
+    async function createAttendanceList(classes, subHour, hours) {
         document.getElementById("table_id").innerHTML = '';
-        const hours = await(await fetch('/attendance/getAllHour')).json();
-        const students = await(await fetch(`/class/listStudentInThisClass/${classes}`)).json();
-        const subHour = await(await fetch(`/attendance/getDayAndClasses/${day}/${classes}`)).json();
+        const students = await (await fetch(`/class/listStudentInThisClass/${classes}`)).json();
         const table = document.getElementById("table_id");
         const hRow = table.createTHead().insertRow();
-        for(const i of ['lp','godzina-lekcja', 'uczeń', 'obecny', 'spóźniony']){
-            hRow.insertCell().innerHTML= i;
+        for (const i of ['lp', 'uczeń', 'obecny', 'spóźniony']) {
+            hRow.insertCell().innerHTML = i;
         }
         let lp = 1;
-        const row = table.insertRow();
-        for(const j of subHour){
-        row.insertCell().innerHTML = `${lp++}`;
-        row.insertCell().innerHTML = `${hours[j['hour_id']]}- ${j.subject}`;
-        row.insertCell(students[lp-2]);
-        const inputPresent = document.createElement("input");
-        inputPresent.type ='checkbox';
-        const inputLate = document.createElement("input");
-        inputLate.type = 'checkbox';
-        row.cells[3].appendChild(inputPresent);
-        row.cells[4].appendChild(inputLate);
+        for (const j of students) {
+            const row = table.insertRow();
+            row.insertCell().innerHTML = `${lp++}`;
+            row.insertCell().innerHTML = `${j.name} ${j.last_name}`
+           // row.insertCell().innerHTML = `${hours[j['hour_id']]}- ${j.subject}`;
+            //row.insertCell().innerHTML = `${students[lp - 2]['name']} ${students[lp - 2]['last_name']}`;
+            const inputPresent = document.createElement("input");
+            inputPresent.type = 'checkbox';
+            row.insertCell().appendChild(inputPresent);
+            const inputLate = document.createElement("input");
+            inputLate.type = 'checkbox';
+            row.insertCell().appendChild(inputLate);
+
         }
 
 
     }
-    async function displayData(){
+
+    async function displayData() {
         //wyswietl data/zamien ja na dany dzien i wyswietl lp/godzina-lekcja/uczen/spoz/obec
         const data = document.createElement("input");
         data.type = 'date';
         // const days = {1: "monday", 2: "tuesday", 3: "wednesday", 4:'thursday', 5:"friday"};
-        const days = {1: "poniedziałek", 2: "wtorek", 3:"środa", 4:"czwartek", 5:"piątek"}
+        const days = {1: "poniedziałek", 2: "wtorek", 3: "środa", 4: "czwartek", 5: "piątek"}
         const calendar = document.getElementById("calendar_id");
         calendar.innerHTML = '';
         calendar.appendChild(data);
         const classes = document.getElementById("classes_id").value;
-         data.onchange =()=> subHourPerDay(days[(data.valueAsDate.getDay())],classes);
+        data.onchange = () => subHourPerDay(days[(data.valueAsDate.getDay())], classes);
 
 
     }
+
     createClases();
-   // displayData();
+    // displayData();
 </script>
 </html>
