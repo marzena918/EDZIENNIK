@@ -11,3 +11,7 @@ def init():
 @attendance_blueprint.route('/attendance/getDayAndClasses/<day>/<classes>')
 def get_sub_hour(day, classes):
     return attendance.get_sub_hour(day,classes)
+
+@attendance_blueprint.route('/attendance/getAllHour')
+def get_all_hour():
+    return attendance.get_all_hour()

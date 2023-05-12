@@ -14,6 +14,7 @@
 <script> createMenu(document.getElementById('menu_id'));</script>
 <label for="classes_id">wybierz klase</label><select id="classes_id" onchange="displayData()"></select>
 <div id="calendar_id"></div>
+<table class="table_grades" id = "table_id"></table>
 </body>
 <script>
     async function createClases(){
@@ -27,7 +28,28 @@
         }
     }
     async function subHourPerDay(day,classes){
+        document.getElementById("table_id").innerHTML = '';
+        const hours = await(await fetch('/attendance/getAllHour')).json();
+        const students = await(await fetch(`/class/listStudentInThisClass/${classes}`)).json();
         const subHour = await(await fetch(`/attendance/getDayAndClasses/${day}/${classes}`)).json();
+        const table = document.getElementById("table_id");
+        const hRow = table.createTHead().insertRow();
+        for(const i of ['lp','godzina-lekcja', 'uczeń', 'obecny', 'spóźniony']){
+            hRow.insertCell().innerHTML= i;
+        }
+        let lp = 1;
+        const row = table.insertRow();
+        for(const j of subHour){
+        row.insertCell().innerHTML = `${lp++}`;
+        row.insertCell().innerHTML = `${hours[j['hour_id']]}- ${j.subject}`;
+        row.insertCell(students[lp-2]);
+        const inputPresent = document.createElement("input");
+        inputPresent.type ='checkbox';
+        const inputLate = document.createElement("input");
+        inputLate.type = 'checkbox';
+        row.cells[3].appendChild(inputPresent);
+        row.cells[4].appendChild(inputLate);
+        }
 
 
     }
@@ -42,7 +64,6 @@
         calendar.appendChild(data);
         const classes = document.getElementById("classes_id").value;
          data.onchange =()=> subHourPerDay(days[(data.valueAsDate.getDay())],classes);
-        //day =(days[(data.valueAsDate.getDay())]);
 
 
     }
