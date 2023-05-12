@@ -1,3 +1,5 @@
+import datetime
+
 from student import cursor, sqliteConnection
 class Attendance:
     def get_sub_hour(self,day,classes):
@@ -7,7 +9,6 @@ class Attendance:
         for i in is_full:
             if i['subject'] != '0':
                 res.append(i)
-                print(i['subject'])
         return res
 
     def get_all_hour(self):
@@ -15,6 +16,14 @@ class Attendance:
         res = cursor.execute(f" select id, from_hour, until_hours from configurations_hours").fetchall()
         for i in res:
             di[i['id']]="-".join([i['from_hour'],i['until_hours']])
-        print(di)
         return di
+
+    def save(self,student, hour, subject, classes, date, inputPresent, inputLate):
+        cursor.execute(f"delete from attendance where student= {student} and hour = {hour}")
+
+        cursor.execute(f"insert into attendance (day, hour, class, student, lesson, present, late) VALUES ({'10-10-1999'}, {hour}, "
+                       f"{classes}, {student}, '{subject}', {bool(inputPresent)}, {bool(inputLate)})")
+
+        sqliteConnection.commit()
+
 attendance = Attendance()
