@@ -12,6 +12,41 @@
 <body>
 <div id="menu_id" class="menu"></div>
 <script> createMenu(document.getElementById('menu_id'));</script>
-
+<label for="classes_id">wybierz klase</label><select id="classes_id" onchange="displayData()"></select>
+<div id="calendar_id"></div>
 </body>
+<script>
+    async function createClases(){
+        const clasesParent = document.getElementById("classes_id")
+        const allClases = await (await fetch('/class/get_all')).json();
+        for(const i of allClases){
+            const option = document.createElement("option");
+            option.innerHTML = i['name_class'];
+            option.value = i['id'];
+            clasesParent.appendChild(option);
+        }
+    }
+    async function subHourPerDay(day,classes){
+        const subHour = await(await fetch(`/attendance/getDayAndClasses/${day}/${classes}`)).json();
+
+
+    }
+    async function displayData(){
+        //wyswietl data/zamien ja na dany dzien i wyswietl lp/godzina-lekcja/uczen/spoz/obec
+        const data = document.createElement("input");
+        data.type = 'date';
+        // const days = {1: "monday", 2: "tuesday", 3: "wednesday", 4:'thursday', 5:"friday"};
+        const days = {1: "poniedziałek", 2: "wtorek", 3:"środa", 4:"czwartek", 5:"piątek"}
+        const calendar = document.getElementById("calendar_id");
+        calendar.innerHTML = '';
+        calendar.appendChild(data);
+        const classes = document.getElementById("classes_id").value;
+         data.onchange =()=> subHourPerDay(days[(data.valueAsDate.getDay())],classes);
+        //day =(days[(data.valueAsDate.getDay())]);
+
+
+    }
+    createClases();
+   // displayData();
+</script>
 </html>
