@@ -38,9 +38,19 @@
             const li = document.createElement("li");
             li.innerHTML = `${hours[k['hour_id']]}- ${k.subject}`;
             ul.appendChild(li);
-            li.onclick = async () => await createAttendanceList(classes, all_date, k['subject'], k['hour_id'])
+            li.onclick = async () => await createAttendanceList(classes, all_date,k['subject'], k['hour_id'])
 
         }
+    }
+    async function isCheckbox(listAllAttendanceForChecbox,j,hour,classes,subject,all_date,input){
+        for(const i of listAllAttendanceForChecbox){
+         if(i.student === j.id && i.hour ===hour &&
+            i.class ===+classes && i.lesson ===subject
+            && i.day ===all_date) {
+             input.checked = Boolean(i.present);
+         }
+
+            }
     }
 
     async function createAttendanceList(classes, all_date, subject, hour) {
@@ -51,6 +61,7 @@
         for (const i of ['lp', 'uczeń', 'obecny', 'spóźniony']) {
             hRow.insertCell().innerHTML = i;
         }
+        const listAllAttendanceForChecbox= await(await fetch('/attendance/listOfAllCheckbox')).json();
         let lp = 1;
         for (const j of students) {
             const row = table.insertRow();
@@ -58,14 +69,14 @@
             row.insertCell().innerHTML = `${j.name} ${j.last_name}`
             const inputPresent = document.createElement("input");
             inputPresent.type = 'checkbox';
-             //wyslac j.id-id studenta, id godziny, sub,klasa_id, cala data
+            isCheckbox(listAllAttendanceForChecbox,j,hour,classes,subject,all_date,inputPresent)
             inputPresent.onchange = async()=> {
                 const data = {
                     student_id: j.id,
                     hour: hour,
                     subject: subject,
                     classes: classes,
-                    date: all_date,
+                    date:all_date,
                     inputPresent: inputPresent.checked,
                     inputLate: inputLate.checked
                 };
@@ -78,6 +89,7 @@
             row.insertCell().appendChild(inputPresent);
             const inputLate = document.createElement("input");
             inputLate.type = 'checkbox';
+            isCheckbox(listAllAttendanceForChecbox,j,hour,classes,subject,all_date,inputLate)
               inputLate.onchange =async ()=>{
                   const data = {
                     student_id: j.id,
@@ -102,21 +114,18 @@
     }
 
     async function displayData() {
-        //wyswietl data/zamien ja na dany dzien i wyswietl lp/godzina-lekcja/uczen/spoz/obec
         const data = document.createElement("input");
         data.type = 'date';
-        // const days = {1: "monday", 2: "tuesday", 3: "wednesday", 4:'thursday', 5:"friday"};
         const days = {1: "poniedziałek", 2: "wtorek", 3: "środa", 4: "czwartek", 5: "piątek"}
         const calendar = document.getElementById("calendar_id");
         calendar.innerHTML = '';
         calendar.appendChild(data);
         const classes = document.getElementById("classes_id").value;
-        data.onchange = () => subHourPerDay(days[(data.valueAsDate.getDay())],data.valueAsDate, classes);
+        data.onchange = () => subHourPerDay(days[(data.valueAsDate.getDay())],data.value, classes);
 
 
     }
 
     createClases();
-    // displayData();
 </script>
 </html>

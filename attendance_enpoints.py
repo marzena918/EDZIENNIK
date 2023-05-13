@@ -17,9 +17,12 @@ def get_all_hour():
     return attendance.get_all_hour()
 
 @attendance_blueprint.route('/attendance/saveAttendance', methods=['POST'])
-
 def save_attendance():
     body = request.json
     attendance.save(body['student_id'], body['hour'], body['subject'], body['classes'], body['date'],
                     body['inputPresent'], body['inputLate'])
     return ''
+
+@attendance_blueprint.route('attendance/listOfAllCheckbox')
+def allCheckbox():
+    return attendance.all_checkbox()

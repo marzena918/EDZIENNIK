@@ -1,5 +1,6 @@
 import datetime
 
+
 from student import cursor, sqliteConnection
 class Attendance:
     def get_sub_hour(self,day,classes):
@@ -20,10 +21,13 @@ class Attendance:
 
     def save(self,student, hour, subject, classes, date, inputPresent, inputLate):
         cursor.execute(f"delete from attendance where student= {student} and hour = {hour}")
-
-        cursor.execute(f"insert into attendance (day, hour, class, student, lesson, present, late) VALUES ({'10-10-1999'}, {hour}, "
+        cursor.execute(f"insert into attendance (day, hour, class, student, lesson, present, late) VALUES ('{date}', {hour}, "
                        f"{classes}, {student}, '{subject}', {bool(inputPresent)}, {bool(inputLate)})")
 
         sqliteConnection.commit()
+    def all_checkbox(self):
+        return cursor.execute("select *  from attendance").fetchall()
+
+
 
 attendance = Attendance()
