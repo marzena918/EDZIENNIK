@@ -23,6 +23,28 @@
 </body>
 <script>
 
+    async function sendData(subject, j, hour, classes, all_date, inputLate, inputPresent) {
+
+        const late = (inputLate.checked === true) ? (inputPresent.checked = true) : (0);
+        const present = (inputPresent.checked === true) ? (1) : (0);
+        const Ip= (late!==0) ?(present):(1);
+        const data2 = {
+            student_id: j.id,
+            hour: hour,
+            subject: subject,
+            classes: classes,
+            date: all_date,
+            inputPresent: Ip,
+            inputLate: late
+        }
+        await fetch('/attendance/saveAttendance', {
+            method: 'POST',
+            body: JSON.stringify(data2),
+            headers: {'Content-Type': 'application/json'}
+        });
+    }
+
+
     async function createClases() {
         const clasesParent = document.getElementById("classes_id")
         const allClases = await (await fetch('/class/get_all')).json();
@@ -30,9 +52,8 @@
             const option = document.createElement("option");
             option.innerHTML = i['name_class'];
             option.value = i['id'];
-
             clasesParent.appendChild(option);
-            clasesParent.onchange = ()=>displayData();
+            clasesParent.onchange = () => displayData();
         }
     }
 
@@ -47,7 +68,6 @@
             li.innerHTML = `${hours[k['hour_id']]}- ${k.subject}`;
             ul.appendChild(li);
             li.onclick = async () => await createAttendanceList(classes, all_date, k['subject'], k['hour_id'])
-
         }
     }
 
@@ -58,7 +78,6 @@
                 && i.day === all_date) {
                 input.checked = Boolean(i[pL]);
             }
-
         }
     }
 
@@ -79,46 +98,13 @@
             const inputPresent = document.createElement("input");
             inputPresent.type = 'checkbox';
             row.insertCell().appendChild(inputPresent);
-
             isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, inputPresent, "present")
             const inputLate = document.createElement("input");
             inputLate.type = 'checkbox';
             row.insertCell().appendChild(inputLate);
             isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, inputLate, "late")
-            inputLate.onclick = async () => {
-                const data2 = {
-                    student_id: j.id,
-                    hour: hour,
-                    subject: subject,
-                    classes: classes,
-                    date: all_date,
-                    inputPresent: ((inputPresent.checked === true) ? (1) : (0)),
-                    inputLate: ((inputLate.checked === true) ? (1) : (0))
-                }
-
-                await fetch('/attendance/saveAttendance', {
-                    method: 'POST',
-                    body: JSON.stringify(data2),
-                    headers: {'Content-Type': 'application/json'}
-                });
-            }
-
-            inputPresent.onclick = async () => {
-                const data = {
-                    student_id: j.id,
-                    hour: hour,
-                    subject: subject,
-                    classes: classes,
-                    date: all_date,
-                    inputPresent: ((inputPresent.checked === true) ? (1) : (0)),
-                    inputLate: ((inputLate.checked === true) ? (1) : (0))
-                };
-                await fetch('/attendance/saveAttendance', {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: {'Content-Type': 'application/json'}
-                });
-            }
+            inputLate.onclick = async () => sendData(subject, j, hour, classes, all_date, inputLate, inputPresent);
+            inputPresent.onclick = async () => sendData(subject, j, hour, classes, all_date, inputLate, inputPresent);
         }
     }
 
