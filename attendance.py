@@ -22,11 +22,12 @@ class Attendance:
         cursor.execute(f"delete from attendance where student= {student} and hour = {hour}")
         cursor.execute(
             f"insert into attendance (day, hour, class, student, lesson, present, late) VALUES ('{date}', {hour}, "
-            f"{classes}, {student}, '{subject}', {bool(inputPresent)}, {bool(inputLate)})")
+            f"{classes}, {student}, '{subject}', {inputPresent}, {inputLate})")
 
         sqliteConnection.commit()
 
     def all_checkbox(self):
+        print(cursor.execute("select * from attendance").fetchall())
         return cursor.execute("select *  from attendance").fetchall()
 
 

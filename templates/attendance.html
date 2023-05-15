@@ -12,9 +12,13 @@
 <body>
 <div id="menu_id" class="menu"></div>
 <script> createMenu(document.getElementById('menu_id'));</script>
-<label for="classes_id">wybierz klase</label><select id="classes_id" onclick="displayData()"></select>
-<div id="calendar_id"></div>
-<ul id="ul_id"></ul>
+<label for="classes_id">wybierz klase</label><select id="classes_id" onclick="displayData()"
+                                                     style="margin-top: 10px; margin-bottom: 10px;"></select>
+<div style="margin-bottom: 10px;"><label for="date_id"></label><input type="date" id="date_id"
+                                                                      onclick="displayData()">
+</div>
+<label for="ul_id">godzina - lekcja</label>
+<ul id="ul_id" style=" display: flex; gap:25px; margin-bottom: 10px;"></ul>
 <table class="table_grades" id="table_id"></table>
 </body>
 <script>
@@ -31,14 +35,14 @@
     }
 
     async function subHourPerDay(day, all_date, classes) {
-         document.getElementById("table_id").innerHTML = '';
+        document.getElementById("table_id").innerHTML = '';
         const hours = await (await fetch('/attendance/getAllHour')).json();
         const subHour = await (await fetch(`/attendance/getDayAndClasses/${day}/${classes}`)).json();
         document.getElementById("ul_id").innerHTML = '';
         const ul = document.getElementById("ul_id");
-        ul.innerHTML = 'godzina - lekcja';
+        // ul.innerHTML = 'godzina - lekcja';
         for (const k of subHour) {
-            const li = document.createElement("li");
+            const li = document.createElement("button");
             li.innerHTML = `${hours[k['hour_id']]}- ${k.subject}`;
             ul.appendChild(li);
             li.onclick = async () => await createAttendanceList(classes, all_date, k['subject'], k['hour_id'])
@@ -46,12 +50,12 @@
         }
     }
 
-    async function isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, input) {
+    async function isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, input, pL) {
         for (const i of listAllAttendanceForChecbox) {
             if (i.student === j.id && i.hour === hour &&
                 i.class === +classes && i.lesson === subject
                 && i.day === all_date) {
-                input.checked = Boolean(i.present);
+                input.checked = Boolean(i[pL]);
             }
 
         }
@@ -73,16 +77,40 @@
             row.insertCell().innerHTML = `${j.name} ${j.last_name}`
             const inputPresent = document.createElement("input");
             inputPresent.type = 'checkbox';
-            isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, inputPresent)
-            inputPresent.onchange = async () => {
+            row.insertCell().appendChild(inputPresent);
+
+            isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, inputPresent, "present")
+            const inputLate = document.createElement("input");
+            inputLate.type = 'checkbox';
+            row.insertCell().appendChild(inputLate);
+            isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, inputLate, "late")
+            inputLate.onclick = async () => {
+                const data2 = {
+                    student_id: j.id,
+                    hour: hour,
+                    subject: subject,
+                    classes: classes,
+                    date: all_date,
+                    inputPresent: ((inputPresent.checked === true) ? (1) : (0)),
+                    inputLate: ((inputLate.checked === true) ? (1) : (0))
+                }
+
+                await fetch('/attendance/saveAttendance', {
+                    method: 'POST',
+                    body: JSON.stringify(data2),
+                    headers: {'Content-Type': 'application/json'}
+                });
+            }
+
+            inputPresent.onclick = async () => {
                 const data = {
                     student_id: j.id,
                     hour: hour,
                     subject: subject,
                     classes: classes,
                     date: all_date,
-                    inputPresent: inputPresent.checked,
-                    inputLate: inputLate.checked
+                    inputPresent: ((inputPresent.checked === true) ? (1) : (0)),
+                    inputLate: ((inputLate.checked === true) ? (1) : (0))
                 };
                 await fetch('/attendance/saveAttendance', {
                     method: 'POST',
@@ -90,27 +118,6 @@
                     headers: {'Content-Type': 'application/json'}
                 });
             }
-            row.insertCell().appendChild(inputPresent);
-            const inputLate = document.createElement("input");
-            inputLate.type = 'checkbox';
-            isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, inputLate)
-            inputLate.onchange = async () => {
-                const data = {
-                    student_id: j.id,
-                    hour: hour,
-                    subject: subject,
-                    classes: classes,
-                    date: all_date,
-                    inputPresent: inputPresent.checked,
-                    inputLate: inputLate.checked
-                }
-                await fetch('/attendance/saveAttendance', {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: {'Content-Type': 'application/json'}
-                });
-            }
-            row.insertCell().appendChild(inputLate);
 
         }
 
@@ -118,12 +125,13 @@
     }
 
     async function displayData() {
-        const data = document.createElement("input");
-        data.type = 'date';
+        // const data = document.createElement("input");
+        // data.type = 'date';
+        const data = document.getElementById("date_id");
         const days = {1: "poniedziałek", 2: "wtorek", 3: "środa", 4: "czwartek", 5: "piątek"}
-        const calendar = document.getElementById("calendar_id");
-        calendar.innerHTML = '';
-        calendar.appendChild(data);
+        // const calendar = document.getElementById("calendar_id");
+        // calendar.innerHTML = '';
+        // calendar.appendChild(data);
         const classes = document.getElementById("classes_id").value;
         data.onchange = () => subHourPerDay(days[(data.valueAsDate.getDay())], data.value, classes);
 
