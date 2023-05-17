@@ -27,7 +27,6 @@ class Attendance:
         sqliteConnection.commit()
 
     def all_checkbox(self):
-        print(cursor.execute("select * from attendance").fetchall())
         return cursor.execute("select *  from attendance").fetchall()
 
 

@@ -24,18 +24,14 @@
 <script>
 
     async function sendData(subject, j, hour, classes, all_date, inputLate, inputPresent) {
-
-        const late = (inputLate.checked === true) ? (inputPresent.checked = true) : (0);
-        const present = (inputPresent.checked === true) ? (1) : (0);
-        const Ip= (late!==0) ?(present):(1);
         const data2 = {
             student_id: j.id,
             hour: hour,
             subject: subject,
             classes: classes,
             date: all_date,
-            inputPresent: Ip,
-            inputLate: late
+            inputPresent: inputPresent.checked,
+            inputLate: inputLate.checked
         }
         await fetch('/attendance/saveAttendance', {
             method: 'POST',
@@ -71,12 +67,13 @@
         }
     }
 
-    async function isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, input, pL) {
+    async function isCheckboxChecked(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, input, pL) {
         for (const i of listAllAttendanceForChecbox) {
             if (i.student === j.id && i.hour === hour &&
                 i.class === +classes && i.lesson === subject
                 && i.day === all_date) {
-                input.checked = Boolean(i[pL]);
+                input.checked = i[pL];
+                break;
             }
         }
     }
@@ -90,6 +87,10 @@
             hRow.insertCell().innerHTML = i;
         }
         const listAllAttendanceForChecbox = await (await fetch('/attendance/listOfAllCheckbox')).json();
+        bb = {};
+        for(l of listAllAttendanceForChecbox){
+            bb[[l.student, l.hour, l.class, l.lesson, l.day]] = [l.present, l.late]
+        }
         let lp = 1;
         for (const j of students) {
             const row = table.insertRow();
@@ -98,12 +99,20 @@
             const inputPresent = document.createElement("input");
             inputPresent.type = 'checkbox';
             row.insertCell().appendChild(inputPresent);
-            isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, inputPresent, "present")
+
             const inputLate = document.createElement("input");
             inputLate.type = 'checkbox';
             row.insertCell().appendChild(inputLate);
-            isCheckbox(listAllAttendanceForChecbox, j, hour, classes, subject, all_date, inputLate, "late")
-            inputLate.onclick = async () => sendData(subject, j, hour, classes, all_date, inputLate, inputPresent);
+            if(bb[[j.id,hour, classes,subject,all_date]]) {
+                inputPresent.checked = bb[[j.id, hour, classes, subject, all_date]][0];
+                inputLate.checked = bb[[j.id, hour, classes, subject, all_date]][1]
+            }
+            inputLate.onclick = async () => {
+                if(inputLate.checked){
+                    inputPresent.checked = true;
+                }
+                sendData(subject, j, hour, classes, all_date, inputLate, inputPresent);
+            }
             inputPresent.onclick = async () => sendData(subject, j, hour, classes, all_date, inputLate, inputPresent);
         }
     }
