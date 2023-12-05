@@ -7,7 +7,7 @@ marks_blueprint = Blueprint('marks_blueprint', __name__)
 @marks_blueprint.route('/marks')
 def index():
     return render_template('marks.html')
-()
+
 @marks_blueprint.route('/getAllSubjects')
 def get_all_subjects():
     return marks.get_all_subjects()

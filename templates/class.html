@@ -110,7 +110,7 @@
             option.innerHTML = `${i.name} ${i.last_name}`;
             option.value = i.id;
             select.appendChild(option);
-            if(i.id === tutorId){
+            if(i.id === +tutorId){
                 option.selected = true;
             }
         }
@@ -132,11 +132,12 @@
             row.insertCell().innerHTML = `${lp++}`;
             row.insertCell().innerHTML = j.name_class;
             row.insertCell().innerHTML = `${j['name']} ${j['last_name']}`;
+            row.cells[2].id=j.id_teacher
             row.insertCell();
             const butonEdit = document.createElement("button");
             butonEdit.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
             butonEdit.onclick = async () => {
-                await editClass(butonEdit, j.name, j.tutor, row, j.id);
+                await editClass(butonEdit, row.cells[1].innerText, row.cells[2].innerText, row, j.id,row.cells[2].id);
 
 
             }
@@ -165,8 +166,8 @@
 
     }
 
-    async function editClass(buttonEdit, name, tutor, row, id) {
-        const oldStudents = await(await fetch(`/class/listStudentInThisClass/${id}`)).json();
+    async function editClass(buttonEdit, name, tutor, row, id_class, id_teacher) {
+        const oldStudents = await(await fetch(`/class/listStudentInThisClass/${id_class}`)).json();
         buttonEdit.style.display = 'none';
         const inputName = document.createElement("input");
         row.cells[1].innerText = '';
@@ -174,13 +175,13 @@
         inputName.value = name;
         row.cells[1].appendChild(inputName);
         const inputTutor = document.createElement('select');
-        await get_all_teacher(inputTutor,tutor );
+        await get_all_teacher(inputTutor,row.cells[2].id);
         row.cells[2].innerHTML = '';
         row.cells[2].appendChild(inputTutor);
         const buttonAccept = document.createElement("button");
         buttonAccept.innerHTML = '<span class="material-symbols-outlined button">done</span>';
         buttonAccept.disabled = 'disabled';
-        await createStudentsForEdit(id);
+        await createStudentsForEdit(id_class);
         const ul = document.getElementById("ul2_id");
         for(const i of ul.childNodes){
             i.childNodes[0].onchange = ()=> disableEditAcceptIfNoChanges(inputTutor, tutor, inputName,name, ul, oldStudents, buttonAccept);
@@ -196,7 +197,7 @@
             buttonAccept.remove();
             buttonEdit.style.display = 'inline';
             row.cells[1].innerHTML = inputName.value;
-            row.cells[2].innerHTML = inputTutor.value;
+            row.cells[2].innerHTML = tutor;
             document.getElementById("ul2_id").innerText = '';
             document.getElementById("ul3_id").innerText = '';
         }
@@ -208,7 +209,7 @@
                     checkStudents.push(+i.childNodes[0].value);
                 }
             }
-            await updateData(id, inputName, inputTutor, checkStudents)
+            await updateData(id_class, inputName, inputTutor, checkStudents)
             buttonCancel.remove();
             buttonAccept.remove();
             buttonEdit.style.display = 'inline';
@@ -216,6 +217,7 @@
             inputTutor.remove();
             row.cells[1].innerHTML = inputName.value;
             row.cells[2].innerHTML = inputTutor.selectedOptions[0].innerHTML;
+            row.cells[2].id = +inputTutor.value;
             document.getElementById("ul2_id").innerText = '';
         }
 

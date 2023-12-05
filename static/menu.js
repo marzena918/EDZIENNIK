@@ -31,4 +31,5 @@ function createMenu(parentObject) {
     parentObject.appendChild(subjects);
     parentObject.appendChild(index);
     parentObject.appendChild(marks);
+    parentObject.appendChild(classs);
 }

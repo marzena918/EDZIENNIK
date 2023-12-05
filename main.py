@@ -24,3 +24,15 @@ app.register_blueprint(lesson_plan_blueprint, url_prefix='/')
 app.register_blueprint(attendance_blueprint, url_prefix='/')
 
 app.run(port=4000)
+#
+# import socketserver
+#
+# class MyHandler(socketserver.BaseRequestHandler):
+#     def handle(self):
+#         while 1:
+#             dataReceived = self.request.recv(1024)
+#             if not dataReceived: break
+#             self.request.send(dataReceived)
+#
+# myServer = SocketServer.TCPServer(('',8881), MyHandler)
+# myServer.serve_forever(  )
