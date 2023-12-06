@@ -16,7 +16,7 @@
 <script> createMenu(document.getElementById('menu_id'));</script>
 <div>
     <br><label for="listOfClasses_id">wybierz przedmiot</label><br/>
-    <select id="listOfClasses_id" name="listOfClasses" onchange="getTable()"></select>
+    <select id="listOfClasses_id" name="listOfClasses" onchange="createLessonPlanTable()"></select>
 </div>
 <button onclick="save()">zapisz</button>
 <div class="flex-container" id="plannLessonId">
@@ -65,9 +65,10 @@
         return 0;
     }
 
-    async function initLessonPlan(lessonPlan, hours) {
+    async function initLessonPlan(lessonPlan) {
+        const hours = await (await fetch('/configuration_hours/getAllTime')).json();
         const id_class = document.getElementById("listOfClasses_id").value;
-        const dataOfBase = await (await fetch(`/lesson_plan/get_all_lesson_plan/${id_class}`)).json();
+        const dataOfBase = await (await fetch(`/lessonPlan/get_all_lesson_plan/${id_class}`)).json();
         if (isFull(dataOfBase)) {
            const dic = {"poniedziałek": lessonPlan.monday, "wtorek": lessonPlan.tuesday, "środa": lessonPlan.wednesday, "czwartek" :lessonPlan.thursday, "piątek":lessonPlan.friday};
             for(const i of dataOfBase){
@@ -81,55 +82,70 @@
             hours.forEach(h => lessonPlan.thursday[h.id] = {subject: null, teacher: null});
             hours.forEach(h => lessonPlan.friday[h.id] = {subject: null, teacher: null});
         }
+        return  hours;
     }
 
-    async function getTable() {
-        document.getElementById("table_id").innerHTML = '';
-        const hours = await (await fetch('/configuration_hours/getAllTime')).json();
-        initLessonPlan(lessonPlan, hours);
+    function createHeaderWithWeekDays() {
         const tableOfLessonPlan = document.getElementById("table_id");
         const Hrow = tableOfLessonPlan.createTHead().insertRow();
         for (const i of ['godziny', 'poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek']) {
             Hrow.insertCell().innerHTML = i;
-
         }
+        return tableOfLessonPlan;
+    }
+
+    function createSelectWithTeachers(listOfTeacher, days, i, j) {
+        const selectTeachers = createSelect(listOfTeacher,
+            (option, teacher) => {
+                option.innerHTML = `${teacher.name} ${teacher.last_name}`;
+                option.value = teacher.id;
+                if (teacher.id === days[i][j.id].teacher) {
+                    option.selected = true;
+                }
+            });
+        selectTeachers.onchange = () => days[i][j.id].teacher = selectTeachers.selectedOptions[0].value;
+        return selectTeachers;
+    }
+
+    function createSelectWithSubjects(listOfSubject, days, i, j) {
+        const subjectSelect = createSelect(
+            listOfSubject, (option, subject) => {
+                option.innerHTML = subject.name;
+                if (subject.name === days[i][j.id].subject) {
+                    option.selected = true;
+                }
+            }
+        );
+        subjectSelect.onchange = () => days[i][j.id].subject = subjectSelect.selectedOptions[0].value;
+        return subjectSelect;
+    }
+
+    async function fillTheLessonPlanTable(hours, tableOfLessonPlan) {
         const listOfTeacher = await (await fetch('/teacher/get_all_teacher')).json();
         const listOfSubject = await (await fetch('/subject/get_all')).json();
         const days = [null, lessonPlan.monday, lessonPlan.tuesday, lessonPlan.wednesday, lessonPlan.thursday, lessonPlan.friday]
+        const NUMBER_OF_WEEK_DAYS = 5;
         for (const j of hours) {
             const row = tableOfLessonPlan.insertRow();
             row.insertCell().innerHTML = `${j.from_hour}-${j.until_hours}`;
-            for (let i = 1; i <= 5; i++) {
-                const selectTeachers = createSelect(listOfTeacher,
-                    (option, teacher) => {
-                        option.innerHTML = `${teacher.name} ${teacher.last_name}`;
-                        option.value = teacher.id;
-                        if (teacher.id === days[i][j.id].teacher) {
-                            option.selected = true;
-                        }
-                    })
-
-
-                selectTeachers.onchange = () => days[i][j.id].teacher = selectTeachers.selectedOptions[0].value;
-                const selectSubject = createSelect(
-                    listOfSubject, (option, subject) => {
-                        option.innerHTML = subject.name;
-                        if(subject.name === days[i][j.id].subject){
-                            option.selected = true;
-                        }
-                    }
-                );
-                selectSubject.onchange = () => days[i][j.id].subject = selectSubject.selectedOptions[0].value;
+            for (let i = 1; i <= NUMBER_OF_WEEK_DAYS; i++) {
+                const selectTeachers = createSelectWithTeachers(listOfTeacher, days, i, j)
+                const selectSubject = createSelectWithSubjects(listOfSubject, days, i, j);
                 row.insertCell().innerHTML = '';
                 row.cells[i].appendChild(selectTeachers);
                 row.cells[i].appendChild(selectSubject);
             }
-
         }
     }
 
+    async function createLessonPlanTable() {
+        document.getElementById("table_id").innerHTML = '';
+        const hours = await initLessonPlan(lessonPlan);
+        const tableOfLessonPlan = createHeaderWithWeekDays();
+        await fillTheLessonPlanTable(hours, tableOfLessonPlan);
+    }
 
-    async function listOfClasses() {
+    async function fillListOfTheClasses() {
         const name_classes = await (await fetch('/class/get_all')).json();
         const select_name_classes = document.getElementById("listOfClasses_id");
         for (const i of name_classes) {
@@ -138,13 +154,11 @@
             option.innerHTML = i['name_class'];
             select_name_classes.appendChild(option);
         }
-
-
     }
 
     async function init() {
-        await listOfClasses();
-        await getTable();
+        await fillListOfTheClasses();
+        await createLessonPlanTable();
     }
 
     init();

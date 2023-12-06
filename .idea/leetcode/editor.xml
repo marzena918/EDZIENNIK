@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LeetcodeEditor">
+    <option name="projectConfig">
+      <map>
+        <entry key="$USER_HOME$/AppData/Local/Temp/leetcode/editor/en/[67]Add Binary.py">
+          <value>
+            <LeetcodeEditor>
+              <option name="contentPath" value="$USER_HOME$/AppData/Local/Temp/leetcode/editor/en/doc/content/[67]Add Binary.md" />
+              <option name="frontendQuestionId" value="leetcode.com67" />
+              <option name="host" value="leetcode.com" />
+              <option name="path" value="$USER_HOME$/AppData/Local/Temp/leetcode/editor/en/[67]Add Binary.py" />
+              <option name="titleSlug" value="add-binary" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
