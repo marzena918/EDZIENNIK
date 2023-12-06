@@ -25,7 +25,7 @@ def index():
 @student_blueprint.route('/student', methods=['POST'])
 def dodaj():
     data = request.json
-    uczniowie.dodaj(data['name'], data['last_name'], data['pesel'])
+    uczniowie.dodaj(data['name'], data['last_name'], data['pesel'], data['id_parents'])
     return ''
 
 

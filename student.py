@@ -16,8 +16,9 @@ cursor = sqliteConnection.cursor()
 
 class Student:
 
-    def dodaj(self, name, surname, pesel):
-        cursor.execute(f"insert into student(name, last_name, pesel) VALUES ('{name}','{surname}',{pesel})")
+    def dodaj(self, name, surname, pesel, id_parents):
+        cursor.execute(f"insert into student(name, last_name, pesel,parent_id) "
+                       f"VALUES ('{name}','{surname}',{pesel}, {id_parents})")
         sqliteConnection.commit()
 
     def usun(self, id):

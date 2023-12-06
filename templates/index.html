@@ -43,6 +43,10 @@
     async function selectOfParents() {
         const parents = await (await fetch('/parents/getAllParents')).json();
         const select = document.getElementById("parent_id");
+        const lack_as_choose = document.createElement("option")
+        lack_as_choose.value = null;
+        lack_as_choose.innerHTML = "brak";
+        select.appendChild(lack_as_choose);
         for (const i of parents) {
             const selectChild = document.createElement("option");
             selectChild.value = i.id;
@@ -72,7 +76,8 @@
         const data = {
             name: document.getElementById("imie_id").value,
             last_name: document.getElementById("nazwisko").value,
-            pesel: +document.getElementById("pesel").value
+            pesel: +document.getElementById("pesel").value,
+            id_parents: document.getElementById("parent_id").value
 
         };
         const response = await fetch('/student', {
