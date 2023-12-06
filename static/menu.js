@@ -2,6 +2,9 @@ function createMenu(parentObject) {
     const classs = document.createElement("a");
     classs.href = "/class";
     classs.innerHTML = 'class';
+    const parents = document.createElement("a");
+    parents.href="/parents"
+    parents.innerHTML ='parents'
     const nauczyciele = document.createElement("a");
     nauczyciele.href = "/teacher";
     nauczyciele.innerHTML = 'teacher';
@@ -32,4 +35,5 @@ function createMenu(parentObject) {
     parentObject.appendChild(index);
     parentObject.appendChild(marks);
     parentObject.appendChild(classs);
+    parentObject.appendChild(parents);
 }

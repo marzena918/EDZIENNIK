@@ -23,6 +23,7 @@
     <input type="text" id="nazwisko">
     <label for="pesel">pesel</label>
     <input type="number" id="pesel" onkeyup="checkPesel(this,document.getElementById('but_id'), null)">
+    <label for="parent_id">rodzic </label><select id="parent_id"></select>
     <button id="but_id" disabled="disabled" onclick="addStudent()"><span class="material-symbols-outlined button">person_add</span>
     </button>
 </div>
@@ -38,6 +39,18 @@
         const response = await fetch(`/student/check_pesel/${pesel}`)
         return +(await response.text());
     }
+
+    async function selectOfParents() {
+        const parents = await (await fetch('/parents/getAllParents')).json();
+        const select = document.getElementById("parent_id");
+        for (const i of parents) {
+            const selectChild = document.createElement("option");
+            selectChild.value = i.id;
+            selectChild.innerHTML = `${i.name} ${i.last_name}`;
+            select.appendChild(selectChild);
+        }
+    }
+
 
     async function checkPesel(peselInput, buton, originValue) {
         let isValueNotCorrect = peselInput.value.length < 2;
@@ -60,6 +73,7 @@
             name: document.getElementById("imie_id").value,
             last_name: document.getElementById("nazwisko").value,
             pesel: +document.getElementById("pesel").value
+
         };
         const response = await fetch('/student', {
             method: 'POST',
@@ -210,7 +224,10 @@
         });
         fetch(`/student/oceny/${params.studentId}`)
     }
-
-    getAllStudents()
+    async function init() {
+        await getAllStudents();
+        await selectOfParents();
+    }
+    init();
 </script>
 </html>

@@ -57,12 +57,7 @@
     }
 
     function isFull(data) {
-        for (const i of data) {
-            if (i['teacher'] || i['subject'] !== 0) {
-                return 1
-            }
-        }
-        return 0;
+        return data.every(i=>!i['teacher'] && !i['subject']);
     }
 
     async function initLessonPlan(lessonPlan) {

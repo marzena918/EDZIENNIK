@@ -3,13 +3,10 @@ from student import cursor, sqliteConnection
 
 class Attendance:
     def get_sub_hour(self, day, classes):
-        res = []
-        is_full = cursor.execute(f"select hour_id, subject from lesson_plan where day='{day}' and "
-                                 f"classes_id = {classes}").fetchall()
-        for i in is_full:
-            if i['subject'] != '0':
-                res.append(i)
-        return res
+        return cursor.execute(f"select hour_id, subject from lesson_plan "
+                              f"join configurations_hours h on h.id = lesson_plan.hour_id "
+                              f"where day='{day}' and classes_id = {classes} and subject is not null "
+                              f"order by CAST(h.from_hour as integer) ").fetchall()
 
     def get_all_hour(self):
         di = {}
