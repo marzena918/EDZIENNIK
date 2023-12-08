@@ -6,6 +6,8 @@
     <script src="/static/menu.js"></script>
     <link rel="stylesheet" href="/static/main.style.css">
     <link rel="stylesheet" href="/static/class.style.css">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 
     <!--    <link rel="stylesheet"-->
     <!--          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>-->
@@ -15,6 +17,20 @@
 <body>
 <div id="menu_id" class="menu"></div>
 <script> createMenu(document.getElementById('menu_id'));</script>
+<div class="sectionAdd">
+    <label for="imie_id">imie</label>
+    <input type="text" id="imie_id">
+    <label for="nazwisko">nazwisko</label>
+    <input type="text" id="nazwisko">
+    <label for="pesel">pesel</label>
+    <input type="number" id="pesel" onkeyup="checkPesel(this,document.getElementById('but_id'), null)">
+    <button id="but_id" disabled="disabled" onclick="addStudent()"><span class="material-symbols-outlined button">person_add</span>
+    </button>
+</div>
+<table id="table_id" style=" border-collapse: collapse; border: black 1px solid"></table>
+<div class="table_grades">
+    <table id="table_oceny_id" style=" border-collapse: collapse; border: black 1px solid"></table>
+</div>
 <script>
     async function isPeselExist(pesel) {
         const response = await fetch(`/parents/check_pesel/${pesel}`)
@@ -77,7 +93,7 @@
     async function remove(parentId) {
         if (confirm("czy napewno chcesz usunąć")) {
             await fetch(`/student/${parentId}`, {method: 'DELETE'})
-            await getAllStudents()
+            await getAllParents()
         }
     }
 
@@ -123,7 +139,7 @@
         for (const i of ['No', 'imie', 'nazwisko', 'pesel', 'akcja']) {
             headerRow.insertCell().innerText = i;
         }
-        const parents = await (await fetch('/parents/all')).json();
+        const parents = await (await fetch('/parents/getAllParents')).json();
         let counter = 1;
         for (const i of parents) {
             const row = tableParents.insertRow();
@@ -136,7 +152,7 @@
             editButton.onclick = () => editData(editButton, row, i['name'], i['last_name'], i['pesel'], i['id']);
             row.insertCell().innerHTML =
                 `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
-            row.cells[5].appendChild(editButton);
+            row.cells[4].appendChild(editButton);
             // const editGrades = document.createElement("button");
             // editGrades.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
             // editGrades.onclick = () => window.location.href = `/student/oceny?studentId=${i['id']}`;
@@ -204,15 +220,10 @@
 
     }
 
-    function getAllStudentNotes() {
-        const params = new Proxy(new URLSearchParams(window.location.search), {
-            get: (searchParams, prop) => searchParams.get(prop),
-        });
-        fetch(`/student/oceny/${params.studentId}`)
-    }
+
     async function init() {
-        await getAllStudents();
-        await selectOfParents();
+        await getAllParents();
+        // await selectOfParents();
     }
     init();
     </script>
