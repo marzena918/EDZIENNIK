@@ -27,7 +27,7 @@
     <button id="but_id" disabled="disabled" onclick="addStudent()"><span class="material-symbols-outlined button">person_add</span>
     </button>
 </div>
-<a href="/subject">przed</a>
+<!--<a href="/subject">przed</a>-->
 <table id="table_id" style=" border-collapse: collapse; border: black 1px solid"></table>
 <div class="table_grades">
     <table id="table_oceny_id" style=" border-collapse: collapse; border: black 1px solid"></table>
@@ -40,19 +40,20 @@
         return +(await response.text());
     }
 
-    async function selectOfParents() {
+    async function selectOfParents(x) {
         const parents = await (await fetch('/parents/getAllParents')).json();
-        const select = document.getElementById("parent_id");
+        // const select = document.getElementById("parent_id");
         const lack_as_choose = document.createElement("option")
-        lack_as_choose.value = null;
+        lack_as_choose.value = 9999999;
         lack_as_choose.innerHTML = "brak";
-        select.appendChild(lack_as_choose);
+        x.appendChild(lack_as_choose);
         for (const i of parents) {
             const selectChild = document.createElement("option");
             selectChild.value = i.id;
             selectChild.innerHTML = `${i.name} ${i.last_name}`;
-            select.appendChild(selectChild);
+            x.appendChild(selectChild);
         }
+        x.value = '';
     }
 
 
@@ -90,6 +91,7 @@
             document.getElementById("imie_id").value = '';
             document.getElementById("nazwisko").value = '';
             document.getElementById("pesel").value = '';
+            document.getElementById("parent_id").value = '';
         }
     }
 
@@ -139,7 +141,7 @@
         tableStudent.innerHTML = '';
         const header = tableStudent.createTHead();
         const headerRow = header.insertRow();
-        for (const i of ['No', 'imie', 'nazwisko', 'pesel', 'akcja', 'oceny', 'frekwencja']) {
+        for (const i of ['No', 'imie', 'nazwisko', 'pesel', 'rodzic', 'akcja', 'oceny', 'frekwencja']) {
             headerRow.insertCell().innerText = i;
         }
         const students = await (await fetch('/student/all')).json();
@@ -147,20 +149,23 @@
         for (const i of students) {
             const row = tableStudent.insertRow();
             row.insertCell().innerText = `${counter++}`;
-            row.insertCell().innerText = i['name'];
-            row.insertCell().innerText = i['last_name'];
+            row.insertCell().innerText = i['student_name'];
+            row.insertCell().innerText = i['student_last_name'];
             row.insertCell().innerText = i['pesel'];
+            // row.insertCell().innerText = "-";
+            row.insertCell().innerText = `${i['parent_name']}` === "null" ? "brak" : `${i['parent_name']} ${i['parent_last_name']}`;
+            // row.insertCell().innerText = i['zrobic imie i naziwsko'];
             const editButton = document.createElement("button");
             editButton.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
-            editButton.onclick = () => editData(editButton, row, i['name'], i['last_name'], i['pesel'], i['id']);
+            editButton.onclick = () => editData(editButton, row, i['student_name'], i['student_last_name'], i['pesel'], i['id']);
             row.insertCell().innerHTML =
                 `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
-            row.cells[4].appendChild(editButton);
+            row.cells[5].appendChild(editButton);
             const editGrades = document.createElement("button");
             editGrades.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
             editGrades.onclick = () => window.location.href = `/student/oceny?studentId=${i['id']}`;
-            row.insertCell(5).appendChild(editGrades);
-            row.insertCell(6).innerHTML = '<button><span class="material-symbols-outlined button">edit</span></button>';
+            row.insertCell(6).appendChild(editGrades);
+            row.insertCell(7).innerHTML = '<button><span class="material-symbols-outlined button">edit</span></button>';
         }
 
     }
@@ -194,6 +199,7 @@
         row.cells[1].innerHTML = '';
         row.cells[2].innerHTML = '';
         row.cells[3].innerHTML = '';
+        row.cells[4].innerHTML = '';
         const input1 = document.createElement("input");
         input1.type = 'text';
         input1.value = imie;
@@ -205,19 +211,21 @@
         const input3 = document.createElement("input");
         input3.type = 'number';
         input3.value = pesel;
-
         row.cells[3].appendChild(input3);
+        const input4 = document.createElement("select");
+        await selectOfParents(input4);
+        row.cells[4].appendChild(input4);
         const doneButton = document.createElement("button");
         doneButton.innerHTML = '<span class="material-symbols-outlined button">done</span>';
         doneButton.disabled = "disabled";
         input1.onkeyup = () => action_keyword(doneButton, imie, input1)
         input2.onkeyup = () => action_keyword(doneButton, nazwisko, input2)
         input3.onkeyup = () => checkPesel(input3, doneButton, pesel);
-        row.cells[4].appendChild(doneButton);
+        row.cells[5].appendChild(doneButton);
         doneButton.onclick = () => upadeData(buton, exitButton, doneButton, row, id, input1, input2, input3);
         const exitButton = document.createElement("button");
         exitButton.innerHTML = '<span class="material-symbols-outlined">close</span>'
-        row.cells[4].appendChild(exitButton)
+        row.cells[5].appendChild(exitButton)
         exitButton.onclick = () => exit(buton, exitButton, doneButton, row, imie, nazwisko, pesel);
 
 
@@ -229,10 +237,12 @@
         });
         fetch(`/student/oceny/${params.studentId}`)
     }
+
     async function init() {
         await getAllStudents();
-        await selectOfParents();
+        await selectOfParents(document.getElementById("parent_id"));
     }
+
     init();
 </script>
 </html>

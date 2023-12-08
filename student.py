@@ -31,8 +31,12 @@ class Student:
         sqliteConnection.commit()
 
     def get_all(self):
-        return cursor.execute("select * from student").fetchall()
-
+        b = cursor.execute("select student.id as student_id, student.name as student_name, student.last_name "
+                           "as student_last_name, student.pesel, student.parent_id, parents.name as parent_name, "
+                           "parents.last_name as parent_last_name from student left join parents on student.parent_id = "
+                           "parents.id ").fetchall()
+        print(b)
+        return b
     def is_pesel_exist(self, pesel) -> bool:
         return bool(cursor.execute(f"select pesel from student where pesel = '{pesel}'").fetchall())
 

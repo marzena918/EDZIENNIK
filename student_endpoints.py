@@ -6,9 +6,12 @@ student_blueprint = Blueprint('student_blueprint', __name__)
 
 uczniowie = Student()
 
+
 @student_blueprint.route('/student/oceny/<id>')
 def oceny(id):
     return uczniowie.get_all_grades(id)
+
+
 # @student_blueprint.route('/student/oceny')
 # def index():
 #     return render_template('studen-nauczyciele.html')
@@ -16,6 +19,7 @@ def oceny(id):
 @student_blueprint.route('/student/daneStudenta/<id>')
 def student_data(id):
     return uczniowie.student_data(id)
+
 
 @student_blueprint.route('/student')
 def index():
@@ -43,7 +47,7 @@ def usun(id_student_for_delete):
 @student_blueprint.route('/student/<int:id_student>', methods=['PUT'])
 def update(id_student):
     data = request.json
-    uczniowie.update(id_student,data['name'], data['last_name'], data['pesel'])
+    uczniowie.update(id_student, data['name'], data['last_name'], data['pesel'])
     return ''
 
 

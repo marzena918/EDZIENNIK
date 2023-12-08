@@ -3,18 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <title>parents</title>
-    <link rel="stylesheet" href="/main.style.css">
-    <link rel="stylesheet" href="/class.style.css">
-    <link rel="stylesheet" href="/degree.css">
-<!--    <link rel="stylesheet"-->
-<!--          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>-->
-<!--    <link rel="stylesheet"-->
-<!--          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>-->
+    <script src="/static/menu.js"></script>
+    <link rel="stylesheet" href="/static/main.style.css">
+    <link rel="stylesheet" href="/static/class.style.css">
+
+    <!--    <link rel="stylesheet"-->
+    <!--          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>-->
+    <!--    <link rel="stylesheet"-->
+    <!--          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>-->
 </head>
-<body class="mainContent">
+<body>
 <div id="menu_id" class="menu"></div>
 <script> createMenu(document.getElementById('menu_id'));</script>
+<script>
+    async function isPeselExist(pesel) {
+        const response = await fetch(`/parents/check_pesel/${pesel}`)
+        return +(await response.text());
+    }
 
+    // async function selectOfParents() {
+    //     const parents = await (await fetch('/parents/getAllParents')).json();
+    //     const select = document.getElementById("parent_id");
+    //     const lack_as_choose = document.createElement("option")
+    //     lack_as_choose.value = 9999999;
+    //     lack_as_choose.innerHTML = "brak";
+    //     select.appendChild(lack_as_choose);
+    //     for (const i of parents) {
+    //         const selectChild = document.createElement("option");
+    //         selectChild.value = i.id;
+    //         selectChild.innerHTML = `${i.name} ${i.last_name}`;
+    //         select.appendChild(selectChild);
+    //     }
+    //     select.value= '';
+    // }
+
+
+    async function checkPesel(peselInput, buton, originValue) {
+        let isValueNotCorrect = peselInput.value.length < 2;
+        if (!isValueNotCorrect && originValue !== +peselInput.value) {
+            isValueNotCorrect = await isPeselExist(peselInput.value);
+        }
+        if (isValueNotCorrect) { // czy istnieje w bazie endpointem
+            peselInput.classList.remove("okInputData")
+            peselInput.classList.add("wrongInputData")
+            buton.disabled = true;
+        } else {
+            peselInput.classList.remove("wrongInputData")
+            peselInput.classList.add("okInputData")
+            buton.disabled = false;
+        }
+    }
+
+    async function addParent() {
+        const data = {
+            name: document.getElementById("imie_id").value,
+            last_name: document.getElementById("nazwisko").value,
+            pesel: +document.getElementById("pesel").value
+
+        };
+        const response = await fetch('/parents', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {'Content-Type': 'application/json'}
+        });
+        if (response.ok) {
+            await getAllStudents();
+            document.getElementById("imie_id").value = '';
+            document.getElementById("nazwisko").value = '';
+            document.getElementById("pesel").value = '';
+        }
+    }
+
+    async function remove(parentId) {
+        if (confirm("czy napewno chcesz usunąć")) {
+            await fetch(`/student/${parentId}`, {method: 'DELETE'})
+            await getAllStudents()
+        }
+    }
+
+    // async function addGrade(row, religia, angielski, polski, matematyka) {
+    //     row.cells[0][2].innerHTML = '';
+    //     const input1 = document.createElement("input");
+    //     input1.type = 'text';
+    //     input1.innerHTML = religia;
+    //     row.cells[2].appendChild(input1);
+    // }
+
+    // async function oceny(id) {
+    //     const response = await fetch(`/student/oceny/${id}`)
+    //     const oceny = await response.json();
+    //     const tableOceny = document.getElementById("table_oceny_id");
+    //     tableOceny.innerHTML = '';
+    //     const header = tableOceny.createTHead();
+    //     const headerRow = header.insertRow();
+    //     const dataStudent = await fetch(`/student/daneStudenta/${id}`);
+    //     const fullDataStudent = await dataStudent.json();
+    //     const imie = fullDataStudent[0]["name"];
+    //     const nazwisko = fullDataStudent[0]["last_name"];
+    //     headerRow.insertCell().innerHTML = `OCENY: ${imie} ${nazwisko}`;
+    //     for (const i of ['religia', 'angielski', 'polski', 'matematyka']) {
+    //         const row = header.insertRow();
+    //         row.insertCell().innerText = i;
+    //         row.insertCell().innerHTML = oceny[0][i];
+    //     }
+    //     const buttonAdd = document.createElement("button");
+    //     buttonAdd.innerHTML = '<span class="material-symbols-outlined">add</span>';
+    //     buttonAdd.onclick = () => addGrade(headerRow, oceny['religia'], oceny['angielski'], oceny['polski'], oceny['matematyka']);
+    //     headerRow.insertCell().appendChild(buttonAdd);
+    //
+    //
+    // }
+
+    async function getAllParents() {
+
+        const tableParents = document.getElementById("table_id");
+        tableParents.innerHTML = '';
+        const header = tableParents.createTHead();
+        const headerRow = header.insertRow();
+        for (const i of ['No', 'imie', 'nazwisko', 'pesel', 'akcja']) {
+            headerRow.insertCell().innerText = i;
+        }
+        const parents = await (await fetch('/parents/all')).json();
+        let counter = 1;
+        for (const i of parents) {
+            const row = tableParents.insertRow();
+            row.insertCell().innerText = `${counter++}`;
+            row.insertCell().innerText = i['name'];
+            row.insertCell().innerText = i['last_name'];
+            row.insertCell().innerText = i['pesel'];
+            const editButton = document.createElement("button");
+            editButton.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
+            editButton.onclick = () => editData(editButton, row, i['name'], i['last_name'], i['pesel'], i['id']);
+            row.insertCell().innerHTML =
+                `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
+            row.cells[5].appendChild(editButton);
+            // const editGrades = document.createElement("button");
+            // editGrades.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
+            // editGrades.onclick = () => window.location.href = `/student/oceny?studentId=${i['id']}`;
+            // row.insertCell(6).appendChild(editGrades);
+            // row.insertCell(7).innerHTML = '<button><span class="material-symbols-outlined button">edit</span></button>';
+        }
+
+    }
+
+    function upadeData(upBaton, butonExit, doneBaton, row, id, name, last_name, pesel) {
+        fetch(`/student/${id}`, {
+            method: 'PUT', body: JSON.stringify({name: name.value, last_name: last_name.value, pesel: pesel.value}),
+            headers: {'Content-Type': 'application/json'}
+        })
+        exit(upBaton, butonExit, doneBaton, row, name.value, last_name.value, pesel.value)
+    }
+
+    function exit(buton, bExit, bdone, row, imie, nazwisko, pesel) {
+        row.cells[1].innerHTML = imie;
+        row.cells[2].innerHTML = nazwisko;
+        row.cells[3].innerHTML = pesel;
+        bExit.remove();
+        bdone.remove();
+        buton.style.display = "inline";
+
+    }
+
+    function action_keyword(doneButton, nazwa, input) {
+        if (nazwa !== input.value)
+            doneButton.disabled = false;
+        else (doneButton.disabled = true);
+    }
+
+    async function editData(buton, row, imie, nazwisko, pesel, id) {
+        buton.style.display = "none";
+        row.cells[1].innerHTML = '';
+        row.cells[2].innerHTML = '';
+        row.cells[3].innerHTML = '';
+        const input1 = document.createElement("input");
+        input1.type = 'text';
+        input1.value = imie;
+        row.cells[1].appendChild(input1);
+        const input2 = document.createElement("input");
+        input2.type = 'text';
+        input2.value = nazwisko;
+        row.cells[2].appendChild(input2);
+        const input3 = document.createElement("input");
+        input3.type = 'number';
+        input3.value = pesel;
+
+        row.cells[3].appendChild(input3);
+        const doneButton = document.createElement("button");
+        doneButton.innerHTML = '<span class="material-symbols-outlined button">done</span>';
+        doneButton.disabled = "disabled";
+        input1.onkeyup = () => action_keyword(doneButton, imie, input1)
+        input2.onkeyup = () => action_keyword(doneButton, nazwisko, input2)
+        input3.onkeyup = () => checkPesel(input3, doneButton, pesel);
+        row.cells[4].appendChild(doneButton);
+        doneButton.onclick = () => upadeData(buton, exitButton, doneButton, row, id, input1, input2, input3);
+        const exitButton = document.createElement("button");
+        exitButton.innerHTML = '<span class="material-symbols-outlined">close</span>'
+        row.cells[4].appendChild(exitButton)
+        exitButton.onclick = () => exit(buton, exitButton, doneButton, row, imie, nazwisko, pesel);
+
+
+    }
+
+    function getAllStudentNotes() {
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        });
+        fetch(`/student/oceny/${params.studentId}`)
+    }
+    async function init() {
+        await getAllStudents();
+        await selectOfParents();
+    }
+    init();
+    </script>
 
 </body>
 </html>
