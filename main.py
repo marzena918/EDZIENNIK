@@ -10,6 +10,10 @@ from student_endpoints import student_blueprint
 from subject_endpoints import subject_blueprint
 from teacher_endpoints import teacher_blueprint
 from parents_endpoints import parents_blueprint
+from lesson_plan_for_parents_endpoints import lesson_plan_for_parents_blueprint
+
+
+
 
 app = Flask(__name__)
 
@@ -24,6 +28,7 @@ app.register_blueprint(configuration_hours_blueprint, url_prefix='/')
 app.register_blueprint(lesson_plan_blueprint, url_prefix='/')
 app.register_blueprint(attendance_blueprint, url_prefix='/')
 app.register_blueprint(parents_blueprint, url_prefix='/')
+app.register_blueprint(lesson_plan_for_parents_blueprint, url_prefix='/')
 
 
 app.run(port=4000)

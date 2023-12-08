@@ -24,7 +24,7 @@
     <input type="text" id="nazwisko">
     <label for="pesel">pesel</label>
     <input type="number" id="pesel" onkeyup="checkPesel(this,document.getElementById('but_id'), null)">
-    <button id="but_id" disabled="disabled" onclick="addStudent()"><span class="material-symbols-outlined button">person_add</span>
+    <button id="but_id" disabled="disabled" onclick="addParent()"><span class="material-symbols-outlined button">person_add</span>
     </button>
 </div>
 <table id="table_id" style=" border-collapse: collapse; border: black 1px solid"></table>
@@ -32,6 +32,28 @@
     <table id="table_oceny_id" style=" border-collapse: collapse; border: black 1px solid"></table>
 </div>
 <script>
+
+    async function addParent() {
+        const data = {
+            name: document.getElementById("imie_id").value,
+            last_name: document.getElementById("nazwisko").value,
+            pesel: +document.getElementById("pesel").value,
+
+        };
+        const response = await fetch('/parents/add', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {'Content-Type': 'application/json'}
+        });
+        if (response.ok) {
+            await getAllParents();
+            document.getElementById("imie_id").value = '';
+            document.getElementById("nazwisko").value = '';
+            document.getElementById("pesel").value = '';
+        }
+    }
+
+
     async function isPeselExist(pesel) {
         const response = await fetch(`/parents/check_pesel/${pesel}`)
         return +(await response.text());
@@ -57,7 +79,7 @@
 
     async function remove(parentId) {
         if (confirm("czy napewno chcesz usunąć")) {
-            await fetch(`/student/${parentId}`, {method: 'DELETE'})
+            await fetch(`/parents/${parentId}`, {method: 'DELETE'})
             await getAllParents()
         }
     }
@@ -91,17 +113,17 @@
     }
 
     function upadeData(upBaton, butonExit, doneBaton, row, id, name, last_name, pesel) {
-        fetch(`/student/${id}`, {
+        fetch(`/parents/update/${id}`, {
             method: 'PUT', body: JSON.stringify({name: name.value, last_name: last_name.value, pesel: pesel.value}),
             headers: {'Content-Type': 'application/json'}
         })
-        exit(upBaton, butonExit, doneBaton, row, name.value, last_name.value, pesel.value)
+        exit(upBaton, butonExit, doneBaton, row, name, last_name, pesel)
     }
 
     function exit(buton, bExit, bdone, row, imie, nazwisko, pesel) {
-        row.cells[1].innerHTML = imie;
-        row.cells[2].innerHTML = nazwisko;
-        row.cells[3].innerHTML = pesel;
+        row.cells[1].innerHTML = imie.value;
+        row.cells[2].innerHTML = nazwisko.value;
+        row.cells[3].innerHTML = pesel.value;
         bExit.remove();
         bdone.remove();
         buton.style.display = "inline";
