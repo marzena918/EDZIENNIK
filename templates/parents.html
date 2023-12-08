@@ -37,22 +37,6 @@
         return +(await response.text());
     }
 
-    // async function selectOfParents() {
-    //     const parents = await (await fetch('/parents/getAllParents')).json();
-    //     const select = document.getElementById("parent_id");
-    //     const lack_as_choose = document.createElement("option")
-    //     lack_as_choose.value = 9999999;
-    //     lack_as_choose.innerHTML = "brak";
-    //     select.appendChild(lack_as_choose);
-    //     for (const i of parents) {
-    //         const selectChild = document.createElement("option");
-    //         selectChild.value = i.id;
-    //         selectChild.innerHTML = `${i.name} ${i.last_name}`;
-    //         select.appendChild(selectChild);
-    //     }
-    //     select.value= '';
-    // }
-
 
     async function checkPesel(peselInput, buton, originValue) {
         let isValueNotCorrect = peselInput.value.length < 2;
@@ -70,25 +54,6 @@
         }
     }
 
-    async function addParent() {
-        const data = {
-            name: document.getElementById("imie_id").value,
-            last_name: document.getElementById("nazwisko").value,
-            pesel: +document.getElementById("pesel").value
-
-        };
-        const response = await fetch('/parents', {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: {'Content-Type': 'application/json'}
-        });
-        if (response.ok) {
-            await getAllStudents();
-            document.getElementById("imie_id").value = '';
-            document.getElementById("nazwisko").value = '';
-            document.getElementById("pesel").value = '';
-        }
-    }
 
     async function remove(parentId) {
         if (confirm("czy napewno chcesz usunąć")) {
@@ -97,38 +62,6 @@
         }
     }
 
-    // async function addGrade(row, religia, angielski, polski, matematyka) {
-    //     row.cells[0][2].innerHTML = '';
-    //     const input1 = document.createElement("input");
-    //     input1.type = 'text';
-    //     input1.innerHTML = religia;
-    //     row.cells[2].appendChild(input1);
-    // }
-
-    // async function oceny(id) {
-    //     const response = await fetch(`/student/oceny/${id}`)
-    //     const oceny = await response.json();
-    //     const tableOceny = document.getElementById("table_oceny_id");
-    //     tableOceny.innerHTML = '';
-    //     const header = tableOceny.createTHead();
-    //     const headerRow = header.insertRow();
-    //     const dataStudent = await fetch(`/student/daneStudenta/${id}`);
-    //     const fullDataStudent = await dataStudent.json();
-    //     const imie = fullDataStudent[0]["name"];
-    //     const nazwisko = fullDataStudent[0]["last_name"];
-    //     headerRow.insertCell().innerHTML = `OCENY: ${imie} ${nazwisko}`;
-    //     for (const i of ['religia', 'angielski', 'polski', 'matematyka']) {
-    //         const row = header.insertRow();
-    //         row.insertCell().innerText = i;
-    //         row.insertCell().innerHTML = oceny[0][i];
-    //     }
-    //     const buttonAdd = document.createElement("button");
-    //     buttonAdd.innerHTML = '<span class="material-symbols-outlined">add</span>';
-    //     buttonAdd.onclick = () => addGrade(headerRow, oceny['religia'], oceny['angielski'], oceny['polski'], oceny['matematyka']);
-    //     headerRow.insertCell().appendChild(buttonAdd);
-    //
-    //
-    // }
 
     async function getAllParents() {
 
@@ -153,11 +86,6 @@
             row.insertCell().innerHTML =
                 `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
             row.cells[4].appendChild(editButton);
-            // const editGrades = document.createElement("button");
-            // editGrades.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
-            // editGrades.onclick = () => window.location.href = `/student/oceny?studentId=${i['id']}`;
-            // row.insertCell(6).appendChild(editGrades);
-            // row.insertCell(7).innerHTML = '<button><span class="material-symbols-outlined button">edit</span></button>';
         }
 
     }
@@ -221,12 +149,9 @@
     }
 
 
-    async function init() {
-        await getAllParents();
-        // await selectOfParents();
-    }
-    init();
-    </script>
+    getAllParents();
+
+</script>
 
 </body>
 </html>
