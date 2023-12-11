@@ -25,9 +25,9 @@ class Student:
         cursor.execute(f"DELETE from student where id = '{id}'")
         sqliteConnection.commit()
 
-    def update(self, id,name, surname, pesel):
+    def update(self, id,name, surname, pesel, parents_id):
         cursor.execute(
-            f"UPDATE student set name = '{name}',last_name ='{surname}', pesel = '{pesel}' where id = '{id}'")
+            f"UPDATE student set name = '{name}',last_name ='{surname}', pesel = '{pesel}', parent_id= {parents_id} where id = '{id}'")
         sqliteConnection.commit()
 
     def get_all(self):

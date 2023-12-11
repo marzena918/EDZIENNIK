@@ -44,7 +44,7 @@
         const parents = await (await fetch('/parents/getAllParents')).json();
         // const select = document.getElementById("parent_id");
         const lack_as_choose = document.createElement("option")
-        lack_as_choose.value = 9999999;
+        lack_as_choose.value = null;
         lack_as_choose.innerHTML = "brak";
         x.appendChild(lack_as_choose);
         for (const i of parents) {
@@ -154,10 +154,11 @@
             row.insertCell().innerText = i['pesel'];
             // row.insertCell().innerText = "-";
             row.insertCell().innerText = `${i['parent_name']}` === "null" ? "brak" : `${i['parent_name']} ${i['parent_last_name']}`;
+            // row.cells[4].id=i['parents_id']
             // row.insertCell().innerText = i['zrobic imie i naziwsko'];
             const editButton = document.createElement("button");
             editButton.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
-            editButton.onclick = () => editData(editButton, row, i['student_name'], i['student_last_name'], i['pesel'], i['id']);
+            editButton.onclick = () => editData(editButton, row, i['student_name'], i['student_last_name'], i['pesel'], i['student_id']);
             row.insertCell().innerHTML =
                 `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
             row.cells[5].appendChild(editButton);
@@ -170,18 +171,19 @@
 
     }
 
-    function upadeData(upBaton, butonExit, doneBaton, row, id, name, last_name, pesel) {
+    function upadeData(upBaton, butonExit, doneBaton, row, id, name, last_name, pesel,parents_name) {
         fetch(`/student/${id}`, {
-            method: 'PUT', body: JSON.stringify({name: name.value, last_name: last_name.value, pesel: pesel.value}),
+            method: 'PUT', body: JSON.stringify({name: name.value, last_name: last_name.value, pesel: pesel.value, parents_id: +parents_name.selectedOptions[0].value}),
             headers: {'Content-Type': 'application/json'}
         })
-        exit(upBaton, butonExit, doneBaton, row, name.value, last_name.value, pesel.value)
+        exit(upBaton, butonExit, doneBaton, row, name.value, last_name.value, pesel.value,parents_name)
     }
 
-    function exit(buton, bExit, bdone, row, imie, nazwisko, pesel) {
+    function exit(buton, bExit, bdone, row, imie, nazwisko, pesel,parents_name) {
         row.cells[1].innerHTML = imie;
         row.cells[2].innerHTML = nazwisko;
         row.cells[3].innerHTML = pesel;
+        row.cells[4].innerHTML = parents_name.selectedOptions[0].innerHTML;
         bExit.remove();
         bdone.remove();
         buton.style.display = "inline";
@@ -221,9 +223,9 @@
         input1.onkeyup = () => action_keyword(doneButton, imie, input1)
         input2.onkeyup = () => action_keyword(doneButton, nazwisko, input2)
         input3.onkeyup = () => checkPesel(input3, doneButton, pesel);
-        input4.onchange = ()=> action_keyword(doneButton,input4.selectedOptions[0].innerHTML,input4)
+        input4.onchange = ()=> action_keyword(doneButton,input4.selectedOptions[0].innerHTML, input4)
         row.cells[5].appendChild(doneButton);
-        doneButton.onclick = () => upadeData(buton, exitButton, doneButton, row, id, input1, input2, input3);
+        doneButton.onclick = () => upadeData(buton, exitButton, doneButton, row, id, input1, input2, input3,input4);
         const exitButton = document.createElement("button");
         exitButton.innerHTML = '<span class="material-symbols-outlined">close</span>'
         row.cells[5].appendChild(exitButton)

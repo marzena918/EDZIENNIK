@@ -6,8 +6,8 @@ function createMenu(parentObject) {
     parents.href="/parents"
     parents.innerHTML ='parents'
     const LessonPlanForParents = document.createElement("a");
-    parents.href="/LessonPlanForParents"
-    parents.innerHTML ='LessonPlanForParents'
+    LessonPlanForParents.href="/LessonPlanForParents"
+    LessonPlanForParents.innerHTML ='LessonPlanForParents'
     const nauczyciele = document.createElement("a");
     nauczyciele.href = "/teacher";
     nauczyciele.innerHTML = 'teacher';

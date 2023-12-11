@@ -47,7 +47,7 @@ def usun(id_student_for_delete):
 @student_blueprint.route('/student/<int:id_student>', methods=['PUT'])
 def update(id_student):
     data = request.json
-    uczniowie.update(id_student, data['name'], data['last_name'], data['pesel'])
+    uczniowie.update(id_student, data['name'], data['last_name'], data['pesel'], data['parents_id'])
     return ''
 
 
