@@ -16,7 +16,8 @@ cursor = sqliteConnection.cursor()
 
 class Student:
     def get_student_by_parent(self,parent_id):
-        return cursor.execute(f"select * from student where parent_id = {parent_id}")
+        b= cursor.execute(f"select * from student where parent_id = {parent_id}").fetchall()
+        return b
     def dodaj(self, name, surname, pesel, id_parents):
         cursor.execute(f"insert into student(name, last_name, pesel,parent_id) "
                        f"VALUES ('{name}','{surname}',{pesel}, {id_parents})")
