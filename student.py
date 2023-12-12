@@ -15,19 +15,22 @@ cursor = sqliteConnection.cursor()
 
 
 class Student:
-
+    def get_student_by_parent(self,parent_id):
+        return cursor.execute(f"select * from student where parent_id = {parent_id}")
     def dodaj(self, name, surname, pesel, id_parents):
         cursor.execute(f"insert into student(name, last_name, pesel,parent_id) "
                        f"VALUES ('{name}','{surname}',{pesel}, {id_parents})")
         sqliteConnection.commit()
 
     def usun(self, id):
-        cursor.execute(f"DELETE from student where id = '{id}'")
+        cursor.execute(f"DELETE from student where id = {id}")
         sqliteConnection.commit()
 
     def update(self, id,name, surname, pesel, parents_id):
+        # print(type(parents_id), parents_id)
+        parents = parents_id if parents_id  else 'null'
         cursor.execute(
-            f"UPDATE student set name = '{name}',last_name ='{surname}', pesel = '{pesel}', parent_id= {parents_id} where id = '{id}'")
+            f"UPDATE student set name = '{name}',last_name ='{surname}', pesel = '{pesel}', parent_id= {parents} where id = '{id}'")
         sqliteConnection.commit()
 
     def get_all(self):

@@ -12,5 +12,22 @@
 <body>
 <div id="menu_id" class="menu"></div>
 <script> createMenu(document.getElementById('menu_id'));</script>
+<div>
+    <label for="childs_id">wybierz dziecko </label><select id="childs_id"></select>
+</div>
+<script>
+    async function createSelectOfChildrenForParent(){
+        const parent_id = 5;
+        const childrenOfParent = await(await fetch(`/student/get_all_children_for_parent/${parent_id}`)).json();
+       const selectOfChildren = document.getElementById("childs_id");
+       for(const i of childrenOfParent){
+           const option = document.createElement("option");
+           option.value = i.id
+           option.innerHTML = `${i.name} ${i.last_name}`
+           selectOfChildren.appendChild(option);
+       }
+    }
+     createSelectOfChildrenForParent();
+</script>
 </body>
 </html>

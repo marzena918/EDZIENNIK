@@ -40,7 +40,7 @@
         return +(await response.text());
     }
 
-    async function selectOfParents(x) {
+    async function selectOfParents(x,parent_selected_value) {
         const parents = await (await fetch('/parents/getAllParents')).json();
         // const select = document.getElementById("parent_id");
         const lack_as_choose = document.createElement("option")
@@ -51,9 +51,12 @@
             const selectChild = document.createElement("option");
             selectChild.value = i.id;
             selectChild.innerHTML = `${i.name} ${i.last_name}`;
+            if(`${i.name} ${i.last_name}`===parent_selected_value){
+                selectChild.selected='selected';
+            }
             x.appendChild(selectChild);
         }
-        x.value = '';
+        // x.selectedOptions=parent_selected_value == null ?lack_as_choose : parent_selected_value;
     }
 
 
@@ -158,9 +161,9 @@
             // row.insertCell().innerText = i['zrobic imie i naziwsko'];
             const editButton = document.createElement("button");
             editButton.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
-            editButton.onclick = () => editData(editButton, row, i['student_name'], i['student_last_name'], i['pesel'], i['student_id']);
+            editButton.onclick = () => editData(editButton, row, i['student_name'], i['student_last_name'], i['pesel'], i['student_id'],row.cells[4].innerText);
             row.insertCell().innerHTML =
-                `<button onclick="remove(${i.id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
+                `<button onclick="remove(${i.student_id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
             row.cells[5].appendChild(editButton);
             const editGrades = document.createElement("button");
             editGrades.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
@@ -172,8 +175,10 @@
     }
 
     function upadeData(upBaton, butonExit, doneBaton, row, id, name, last_name, pesel,parents_name) {
+        // const body = parents_name !=='' ? {name: name.value, last_name: last_name.value, pesel: pesel.value, parents_id: +parents_name.selectedOptions[0].value} : {name: name.value, last_name: last_name.value, pesel: pesel.value}
+        const value_parent = parents_name.value == `${null}` ? null : +parents_name.selectedOptions[0].value;
         fetch(`/student/${id}`, {
-            method: 'PUT', body: JSON.stringify({name: name.value, last_name: last_name.value, pesel: pesel.value, parents_id: +parents_name.selectedOptions[0].value}),
+            method: 'PUT', body: JSON.stringify({name: name.value, last_name: last_name.value, pesel: pesel.value, parents_id: value_parent}),
             headers: {'Content-Type': 'application/json'}
         })
         exit(upBaton, butonExit, doneBaton, row, name.value, last_name.value, pesel.value,parents_name)
@@ -196,7 +201,7 @@
         else (doneButton.disabled = true);
     }
 
-    async function editData(buton, row, imie, nazwisko, pesel, id) {
+    async function editData(buton, row, imie, nazwisko, pesel, id,parent_value) {
         buton.style.display = "none";
         row.cells[1].innerHTML = '';
         row.cells[2].innerHTML = '';
@@ -215,7 +220,8 @@
         input3.value = pesel;
         row.cells[3].appendChild(input3);
         const input4 = document.createElement("select");
-        await selectOfParents(input4);
+        await selectOfParents(input4,parent_value);
+        // input4.selectedOptions =row.cells[4].value;
         row.cells[4].appendChild(input4);
         const doneButton = document.createElement("button");
         doneButton.innerHTML = '<span class="material-symbols-outlined button">done</span>';

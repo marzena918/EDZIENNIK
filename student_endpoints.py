@@ -20,7 +20,9 @@ def oceny(id):
 def student_data(id):
     return uczniowie.student_data(id)
 
-
+@student_blueprint.route('/student/get_all_children_for_parent/<parent_id>')
+def get_student_by_parent(parent_id):
+    return uczniowie.get_student_by_parent(parent_id)
 @student_blueprint.route('/student')
 def index():
     return render_template('index.html')
