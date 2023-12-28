@@ -16,7 +16,7 @@ class Attendance:
         return di
 
     def save(self, student, hour, subject, classes, date, inputPresent, inputLate):
-        cursor.execute(f"delete from attendance where student= {student} and hour = {hour}")
+        cursor.execute(f"delete from attendance where student= {student} and hour = {hour} and day= '{date}'")
         cursor.execute(
             f"insert into attendance (day, hour, class, student, lesson, present, late) VALUES ('{date}', {hour}, "
             f"{classes}, {student}, '{subject}', {inputPresent}, {inputLate})")
