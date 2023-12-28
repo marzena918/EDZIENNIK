@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Plan lekcji - rodzic</title>
     <script src="/static/menu.js"></script>
-     <link rel="stylesheet" href="/static/main.style.css">
+    <link rel="stylesheet" href="/static/main.style.css">
     <link rel="stylesheet" href="/static/class.style.css">
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
@@ -13,22 +13,48 @@
 <div id="menu_id" class="menu"></div>
 <script> createMenu(document.getElementById('menu_id'));</script>
 <div>
-    <label for="childs_id">wybierz dziecko </label><select id="childs_id"></select>
+
+    <label for="childs_id">wybierz dziecko </label>
+    <select id="childs_id" onchange="createLessonPlanTableWithAttendance(this)"></select>
 </div>
+<div>
+    <label for="date_id">Date</label>
+    <input id="date_id" type="month" name="date"  onchange="createLessonPlanTableWithAttendance(this)">
+</div>
+<table class="table_grades" id="table_id"></table>
+
+<table id="calendar">
+    <thead>
+    <tr>
+        <th>Sun</th>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+    </tr>
+    </thead>
+    <tbody id="calendar-body"></tbody>
+</table>
+
+<select id=sel_id></select>
 </body>
 <script>
-    async function createSelectOfChildrenForParent(){
+    async function createSelectOfChildrenForParent() {
         const parent_id = 5;
-        const childrenOfParent = await(await fetch(`/student/get_all_children_for_parent/${parent_id}`)).json();
-       const selectOfChildren = document.getElementById("childs_id");
-       for(const i of childrenOfParent){
-           const option = document.createElement("option");
-           option.value = i.id
-           option.innerHTML = `${i.name} ${i.last_name}`
-           selectOfChildren.appendChild(option);
-       }
+        const childrenOfParent = await (await fetch(`/student/get_all_children_for_parent/${parent_id}`)).json();
+        const selectOfChildren = document.getElementById("childs_id");
+        for (const i of childrenOfParent) {
+            const option = document.createElement("option");
+            option.value = i.id
+            option.innerHTML = `${i.name} ${i.last_name}`
+            selectOfChildren.appendChild(option);
+        }
     }
-     createSelectOfChildrenForParent();
+
+    createSelectOfChildrenForParent();
+    document.getElementById('date_id').valueAsDate = new Date();
 </script>
 
 </html>
