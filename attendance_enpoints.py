@@ -26,3 +26,7 @@ def save_attendance():
 @attendance_blueprint.route('attendance/listOfAllCheckbox')
 def allCheckbox():
     return attendance.all_checkbox()
+
+@attendance_blueprint.route('/attendance/getAttendanceWithDateAndStudent/<date>/<int:student_id>')
+def get_attendance_with_date_and_student(student_id: int, date: str):
+    return attendance.get_attendance_with_date_and_student(int(date.split("-")[0]), int(date.split("-")[1]), student_id)

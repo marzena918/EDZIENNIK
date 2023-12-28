@@ -14,5 +14,5 @@ def save(clases):
     return ''
 
 @lesson_plan_blueprint.route('/lessonPlan/get_all_lesson_plan/<id_class>')
-def get_all0(id_class):
+def get_all(id_class):
     return lesson_plan.get_plan(id_class)

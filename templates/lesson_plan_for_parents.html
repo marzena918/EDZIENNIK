@@ -14,37 +14,33 @@
 <script> createMenu(document.getElementById('menu_id'));</script>
 <div>
 
-    <label for="childs_id">wybierz dziecko </label>
-    <select id="childs_id" onchange="createLessonPlanTableWithAttendance(this)"></select>
+    <label for="children_id">wybierz dziecko </label>
+    <select id="children_id" onchange="createLessonPlanTableWithAttendance()"></select>
 </div>
 <div>
     <label for="date_id">Date</label>
-    <input id="date_id" type="month" name="date"  onchange="createLessonPlanTableWithAttendance(this)">
+    <input id="date_id" type="month" name="date"  onchange="createLessonPlanTableWithAttendance()">
 </div>
-<table class="table_grades" id="table_id"></table>
 
-<table id="calendar">
-    <thead>
+<table id="calendar_id">
     <tr>
-        <th>Sun</th>
+        <th></th>
         <th>Mon</th>
         <th>Tue</th>
         <th>Wed</th>
         <th>Thu</th>
         <th>Fri</th>
         <th>Sat</th>
+        <th>Sun</th>
     </tr>
-    </thead>
-    <tbody id="calendar-body"></tbody>
 </table>
 
-<select id=sel_id></select>
 </body>
 <script>
     async function createSelectOfChildrenForParent() {
         const parent_id = 5;
         const childrenOfParent = await (await fetch(`/student/get_all_children_for_parent/${parent_id}`)).json();
-        const selectOfChildren = document.getElementById("childs_id");
+        const selectOfChildren = document.getElementById("children_id");
         for (const i of childrenOfParent) {
             const option = document.createElement("option");
             option.value = i.id
@@ -55,6 +51,27 @@
 
     createSelectOfChildrenForParent();
     document.getElementById('date_id').valueAsDate = new Date();
+
+    async function createLessonPlanTableWithAttendance(){
+        const attendance = await getAttendance()
+        const summary = fillTable(attendance)
+        displaySummary(summary);
+
+        function displaySummary(summary) {
+
+        }
+
+        function fillTable(attendance) {
+            return undefined;
+        }
+
+        async function getAttendance() {
+                const student_id = document.getElementById("children_id").value;
+                const date = document.getElementById("date_id").value;
+                return await(await fetch(`/attendance/getAttendanceWithDateAndStudent/${date}/${student_id}`)).json();
+        }
+    }
+
 </script>
 
 </html>

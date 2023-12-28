@@ -1,4 +1,7 @@
+from collections import defaultdict
+
 from student import cursor, sqliteConnection
+import calendar
 
 
 class Attendance:
@@ -26,5 +29,21 @@ class Attendance:
     def all_checkbox(self):
         return cursor.execute("select *  from attendance").fetchall()
 
+    def get_attendance_with_date_and_student(self, year: int, month: int, student_id: int):
+        last_day = calendar.monthrange(year, month)[1]
+        query = (
+            "select CAST(strftime('%d', att.day) as integer) as day, ch.from_hour as hour, lesson as subject, "
+            "case when att.late = 1 then 'SP' else case when att.present = 1 then 'OB' else 'NB' end end as attendance "
+            "from attendance att "
+            "join configurations_hours ch on ch.id = att.hour "
+            f"where student = {student_id} "
+            f"  and day >= '{year}-{month}-01' and day <= '{year}-{month}-{last_day}'"
+            f"order by att.day, ch.lp "
+        )
+        db_result = cursor.execute(query).fetchall()
+        result = defaultdict(lambda: [])
+        for i in db_result:
+            result[str(i["day"])].append({"h": i["hour"], "att": i['attendance'], "sub": i['subject']})
+        return result
 
 attendance = Attendance()
