@@ -25,3 +25,6 @@ class Parents:
 
 
 parents = Parents()
+#
+# d = {"1":[{"g":"33"}, {"ff":'34'}]}
+# for i in d:

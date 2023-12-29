@@ -19,21 +19,10 @@
 </div>
 <div>
     <label for="date_id">Date</label>
-    <input id="date_id" type="month" name="date"  onchange="createLessonPlanTableWithAttendance()">
+    <input id="date_id" type="month" name="date" onchange="createLessonPlanTableWithAttendance()">
 </div>
 
-<table id="calendar_id">
-    <tr>
-        <th></th>
-        <th>Mon</th>
-        <th>Tue</th>
-        <th>Wed</th>
-        <th>Thu</th>
-        <th>Fri</th>
-        <th>Sat</th>
-        <th>Sun</th>
-    </tr>
-</table>
+<table id="calendar_id"></table>
 
 </body>
 <script>
@@ -43,35 +32,97 @@
         const selectOfChildren = document.getElementById("children_id");
         for (const i of childrenOfParent) {
             const option = document.createElement("option");
-            option.value = i.id
+            option.value = i.id;
             option.innerHTML = `${i.name} ${i.last_name}`
+            option.selected=true;
             selectOfChildren.appendChild(option);
         }
     }
 
-    createSelectOfChildrenForParent();
-    document.getElementById('date_id').valueAsDate = new Date();
 
-    async function createLessonPlanTableWithAttendance(){
-        const attendance = await getAttendance()
-        const summary = fillTable(attendance)
+
+    async function createLessonPlanTableWithAttendance() {
+        const attendance = await getAttendance();
+        const summary = await fillTable(attendance)
         displaySummary(summary);
 
         function displaySummary(summary) {
 
         }
 
-        function fillTable(attendance) {
+        async function fillTable(attendance) {
+            createThRow();
+            const allRows = await createTable();
+            fillData(attendance, allRows);
             return undefined;
+
+            function createThRow() {
+                const table = document.getElementById("calendar_id");
+                table.innerHTML = '';
+                const hRow = table.createTHead().insertRow();
+                for (const i of ['', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela']) {
+                    hRow.insertCell().innerHTML = i;
+                }
+            }
+
+            function findRow(h, allRows) {
+                return allRows[h];
+            }
+
+            function findDay(key, date) {
+                return new Date(`${date}-${key}`).getDay()
+            }
+
+            async function createTable() {
+                const hours = await (await fetch('/configuration_hours/getAllTime')).json();
+                const thTable = document.getElementById("calendar_id");
+                const rowsToFind = {}
+                for (const i of hours) {
+                    const row = thTable.insertRow();
+                    row.insertCell();
+                    row.insertCell();
+                    row.insertCell();
+                    row.insertCell();
+                    row.insertCell();
+                    row.insertCell();
+                    row.insertCell();
+                    row.insertCell();
+                    row.cells[0].innerHTML = `${i.from_hour} - ${i.until_hours}`;
+                    row.cells[0].id = i.lp;
+                    rowsToFind[i.from_hour] = i.lp;
+                }
+                return rowsToFind;
+            }
+
+            function fillData(attendance, allRow) {
+                const date = document.getElementById("date_id").value;
+                const table = document.getElementById("calendar_id");
+                for (const [key, value] of Object.entries(attendance)) {
+                    const numberDay = key;
+                    for (const j of value) {
+                        const row = findRow(j.h, allRow);
+                        const cell = findDay(numberDay, date);
+                        table.rows[row].cells[cell].innerHTML += `<span><div>${numberDay} ${j["sub"]} ${j["att"]}</div></span>`
+
+                    }
+                }
+            }
         }
+
 
         async function getAttendance() {
-                const student_id = document.getElementById("children_id").value;
-                const date = document.getElementById("date_id").value;
-                return await(await fetch(`/attendance/getAttendanceWithDateAndStudent/${date}/${student_id}`)).json();
+            const student_id = document.getElementById("children_id").value;
+            const date = document.getElementById("date_id").value;
+            return await (await fetch(`/attendance/getAttendanceWithDateAndStudent/${date}/${student_id}`)).json();
         }
     }
-
+    async function init()
+    {
+        document.getElementById('date_id').valueAsDate = new Date();
+        await createSelectOfChildrenForParent();
+        await createLessonPlanTableWithAttendance();
+    }
+    init();
 </script>
 
 </html>
