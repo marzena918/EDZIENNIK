@@ -23,7 +23,7 @@
 </body>
 <script>
 
-    async function sendData(subject, j, hour, classes, all_date, inputLate, inputPresent) {
+    async function sendData(subject, j, hour, classes, all_date, inputLate, inputPresent, inputNoPresent) {
         const data2 = {
             student_id: j.id,
             hour: hour,
@@ -31,7 +31,8 @@
             classes: classes,
             date: all_date,
             inputPresent: inputPresent.checked,
-            inputLate: inputLate.checked
+            inputLate: inputLate.checked,
+            inputNoPresent: inputNoPresent.checked
         }
         await fetch('/attendance/saveAttendance', {
             method: 'POST',
@@ -83,13 +84,13 @@
         const students = await (await fetch(`/class/listStudentInThisClass/${classes}`)).json();
         const table = document.getElementById("table_id");
         const hRow = table.createTHead().insertRow();
-        for (const i of ['lp', 'uczeń', 'obecny', 'spóźniony']) {
+        for (const i of ['lp', 'uczeń', 'obecny', 'spóźniony', 'nieobecny']) {
             hRow.insertCell().innerHTML = i;
         }
         const listAllAttendanceForChecbox = await (await fetch('/attendance/listOfAllCheckbox')).json();
         bb = {};
-        for(l of listAllAttendanceForChecbox){
-            bb[[l.student, l.hour, l.class, l.lesson, l.day]] = [l.present, l.late]
+        for (l of listAllAttendanceForChecbox) {
+            bb[[l.student, l.hour, l.class, l.lesson, l.day]] = [l.present, l.late, l.noPresent]
         }
         let lp = 1;
         for (const j of students) {
@@ -99,31 +100,48 @@
             const inputPresent = document.createElement("input");
             inputPresent.type = 'checkbox';
             row.insertCell().appendChild(inputPresent);
-
             const inputLate = document.createElement("input");
             inputLate.type = 'checkbox';
             row.insertCell().appendChild(inputLate);
-            if(bb[[j.id,hour, classes,subject,all_date]]) {
+            const inputNoPresent = document.createElement("input");
+            inputNoPresent.type = 'checkbox';
+            row.insertCell().appendChild(inputNoPresent)
+            if (bb[[j.id, hour, classes, subject, all_date]]) {
                 inputPresent.checked = bb[[j.id, hour, classes, subject, all_date]][0];
-                inputLate.checked = bb[[j.id, hour, classes, subject, all_date]][1]
+                inputLate.checked = bb[[j.id, hour, classes, subject, all_date]][1];
+                inputNoPresent.checked = bb[[j.id, hour, classes, subject, all_date]][2];
             }
             inputLate.onclick = async () => {
-                if(inputLate.checked){
+                if (inputLate.checked) {
                     inputPresent.checked = true;
                 }
-                sendData(subject, j, hour, classes, all_date, inputLate, inputPresent);
+                await sendData(subject, j, hour, classes, all_date, inputLate, inputPresent, inputNoPresent);
             }
-            inputPresent.onclick = async () => sendData(subject, j, hour, classes, all_date, inputLate, inputPresent);
+            inputPresent.onclick = async () => sendData(subject, j, hour, classes, all_date, inputLate, inputPresent, inputNoPresent);
+            inputNoPresent.onclick = async () => {
+                if (inputNoPresent.checked) {
+                    inputPresent.checked = false;
+                    inputLate.checked = false;
+                    inputPresent.disabled = true;
+                    inputLate.disabled = true;
+                } else {
+                    inputPresent.disabled = false;
+                    inputLate.disabled = false;
+                }
+                await sendData(subject, j, hour, classes, all_date, inputLate, inputPresent, inputNoPresent);
+            }
         }
+
     }
 
     async function displayData() {
         const data = document.getElementById("date_id");
         const days = {1: "poniedziałek", 2: "wtorek", 3: "środa", 4: "czwartek", 5: "piątek"}
         const classes = document.getElementById("classes_id").value;
-        subHourPerDay(days[(data.valueAsDate.getDay())], data.value, classes);
+        await subHourPerDay(days[(data.valueAsDate.getDay())], data.value, classes);
     }
 
+    document.getElementById('date_id').valueAsDate = new Date();
     createClases();
 </script>
 </html>
