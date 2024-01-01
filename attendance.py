@@ -31,6 +31,7 @@ class Attendance:
 
     def get_attendance_with_date_and_student(self, year: int, month: int, student_id: int):
         last_day = calendar.monthrange(year, month)[1]
+        month = '0' + str(month) if month <= 9 else month
         query = (
             "select CAST(strftime('%d', att.day) as integer) as day, ch.from_hour as hour, lesson as subject, "
             "case when att.late = 1 then 'SP' else case when att.present = 1 then 'OB' else 'NB' end end as attendance "
@@ -41,9 +42,12 @@ class Attendance:
             f"order by att.day, ch.lp "
         )
         db_result = cursor.execute(query).fetchall()
+        print(db_result)
         result = defaultdict(lambda: [])
         for i in db_result:
             result[str(i["day"])].append({"h": i["hour"], "att": i['attendance'], "sub": i['subject']})
+        print(result, year, month)
         return result
+
 
 attendance = Attendance()
