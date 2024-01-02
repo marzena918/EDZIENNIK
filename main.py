@@ -5,6 +5,7 @@ from class_endpoints import class_blueprint
 from configuration_hours_endpoints import configuration_hours_blueprint
 from degre_endpoints import degre_blueprint
 from lesson_plan_endpoints import lesson_plan_blueprint
+from lesson_plan_for_students_endpoints import lesson_plan_for_students_blueprint
 from mark_endopoints import marks_blueprint
 from student_endpoints import student_blueprint
 from subject_endpoints import subject_blueprint
@@ -29,6 +30,7 @@ app.register_blueprint(lesson_plan_blueprint, url_prefix='/')
 app.register_blueprint(attendance_blueprint, url_prefix='/')
 app.register_blueprint(parents_blueprint, url_prefix='/')
 app.register_blueprint(lesson_plan_for_parents_blueprint, url_prefix='/')
+app.register_blueprint(lesson_plan_for_students_blueprint, url_prefix='/')
 
 
 app.run(port=4000)

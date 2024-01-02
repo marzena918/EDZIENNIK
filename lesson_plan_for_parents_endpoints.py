@@ -11,6 +11,3 @@ def index():
 @lesson_plan_for_parents_blueprint.route('/lessonPlanForParents/lessonPlanWithAttendance/<student_id>/<month>')
 def get_attendance(student_id,month):
     return lesson_plan_for_parents.lesson_plan_with_attendance(student_id,month)
-# 1. wybierz dziecko
-# 2. plan lekcji wyswietlic
-# 3.obecnosc per miesiac przy kazdej nieobecnosci checkbox z mozliwoscia zaznaczenia i ponizej przycisk "usprawiedliw"
