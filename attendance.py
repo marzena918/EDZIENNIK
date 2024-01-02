@@ -42,11 +42,9 @@ class Attendance:
             f"order by att.day, ch.lp "
         )
         db_result = cursor.execute(query).fetchall()
-        print(db_result)
         result = defaultdict(lambda: [])
         for i in db_result:
             result[str(i["day"])].append({"h": i["hour"], "att": i['attendance'], "sub": i['subject']})
-        print(result, year, month)
         return result
 
 

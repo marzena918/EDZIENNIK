@@ -32,3 +32,7 @@ def update(id_student):
     data = request.json
     parents.update(id_student, data['name'], data['last_name'], data['pesel'])
     return ''
+
+@parents_blueprint.route('/parents/getParent/<int:id_parent>')
+def get_parent(id_parent):
+    return parents.get_parent(id_parent)

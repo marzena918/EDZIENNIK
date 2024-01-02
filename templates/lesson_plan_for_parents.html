@@ -17,6 +17,7 @@
     <label for="children_id">wybierz dziecko </label>
     <select id="children_id" onchange="createLessonPlanTableWithAttendance()"></select>
 </div>
+<div id="name_parents"></div>
 <div>
     <label for="date_id">Date</label>
     <input id="date_id" type="month" name="date" onchange="createLessonPlanTableWithAttendance()">
@@ -26,6 +27,11 @@
 
 </body>
 <script>
+    async function createParentsName(parent_id){
+        const dataParent = await(await fetch(`/parents/getParent/${parent_id}`)).json();
+        const parent = document.getElementById("name_parents");
+        parent.innerHTML = `jesteś zalogowany jako rodzic: ${dataParent.name} ${dataParent.last_name}`;
+    }
     async function createSelectOfChildrenForParent() {
         const parent_id = 5;
         const childrenOfParent = await (await fetch(`/student/get_all_children_for_parent/${parent_id}`)).json();
@@ -37,6 +43,7 @@
             option.selected=true;
             selectOfChildren.appendChild(option);
         }
+    await createParentsName(parent_id);
     }
 
 

@@ -23,6 +23,8 @@ class Parents:
     def is_pesel_exist(self, pesel) -> bool:
         return bool(cursor.execute(f"select pesel from parents where pesel = '{pesel}'").fetchall())
 
+    def get_parent(self,id):
+        return cursor.execute(f"select name, last_name from parents where id= {id}").fetchall()[0]
 
 parents = Parents()
 #
