@@ -12,12 +12,15 @@
 <body>
 <div id="menu_id" class="menu"></div>
 <script> createMenu(document.getElementById('menu_id'));</script>
+<div id="name_parents" class="separated"></div>
+<div id="log_out" class="separated">
+    <button>wyloguj</button>
+</div>
 <div>
 
     <label for="children_id">wybierz dziecko </label>
     <select id="children_id" onchange="createLessonPlanTableWithAttendance()"></select>
 </div>
-<div id="name_parents"></div>
 <div>
     <label for="date_id">Date</label>
     <input id="date_id" type="month" name="date" onchange="createLessonPlanTableWithAttendance()">
@@ -27,11 +30,12 @@
 
 </body>
 <script>
-    async function createParentsName(parent_id){
-        const dataParent = await(await fetch(`/parents/getParent/${parent_id}`)).json();
+    async function createParentsName(parent_id) {
+        const dataParent = await (await fetch(`/parents/getParent/${parent_id}`)).json();
         const parent = document.getElementById("name_parents");
         parent.innerHTML = `jesteś zalogowany jako rodzic: ${dataParent.name} ${dataParent.last_name}`;
     }
+
     async function createSelectOfChildrenForParent() {
         const parent_id = 5;
         const childrenOfParent = await (await fetch(`/student/get_all_children_for_parent/${parent_id}`)).json();
@@ -40,12 +44,11 @@
             const option = document.createElement("option");
             option.value = i.id;
             option.innerHTML = `${i.name} ${i.last_name}`
-            option.selected=true;
+            option.selected = true;
             selectOfChildren.appendChild(option);
         }
-    await createParentsName(parent_id);
+        await createParentsName(parent_id);
     }
-
 
 
     async function createLessonPlanTableWithAttendance() {
@@ -101,7 +104,7 @@
                 return rowsToFind;
             }
 
-            function fillData(attendance, allRow) {
+            async function fillData(attendance, allRow) {
                 const date = document.getElementById("date_id").value;
                 const table = document.getElementById("calendar_id");
                 for (const [key, value] of Object.entries(attendance)) {
@@ -110,26 +113,64 @@
                         const row = findRow(j.h, allRow);
                         const cell = findDay(numberDay, date);
                         table.rows[row].cells[cell].innerHTML += `<span><div>${numberDay} ${j["sub"]} ${j["att"]}</div></span>`
+                        colouringAttendance(j, row, cell);
+                        await excuseForAbsence(j, table, row, cell,date,numberDay);
 
+                    }
+
+                }
+
+
+                function colouringAttendance(j, row, cell) {
+                    if (j["att"] === "NB") {
+                        table.rows[row].cells[cell].classList.add("wrongInputData");
+                    } else if (j["att"] === "SP") {
+                        table.rows[row].cells[cell].classList.add("midInputData");
+                    } else {
+                        table.rows[row].cells[cell].classList.add("okInputData");
+                    }
+                }
+
+                async function excuseForAbsence(j, table, row, cell,date,day) {
+                    day = day<=9 ? `${0}${day}` : day;
+                    if (j["att"] === "NB") {
+                        const data = {
+                            "student_id": j.student_id,
+                            "attendance": 1
+                        }
+                        const buttonExcuseForAbsence = document.createElement("button");
+                        buttonExcuseForAbsence.innerHTML = `<span class="button" title="usprawiedliw ${date}-${day}">usp</span>`;
+                        table.rows[row].cells[cell].appendChild(buttonExcuseForAbsence);
+                        buttonExcuseForAbsence.onclick = async () => {
+                            await fetch('/attendance/updateData', {
+                                method: 'PUT', body: JSON.stringify(data),
+                                headers: {'Content-Type': 'application/json'}
+                            });
+
+                        }
                     }
                 }
             }
         }
 
+            async function getAttendance() {
+                const student_id = document.getElementById("children_id").value;
+                const date = document.getElementById("date_id").value;
+                return await (await fetch(`/attendance/getAttendanceWithDateAndStudent/${date}/${student_id}`)).json();
+            }
 
-        async function getAttendance() {
-            const student_id = document.getElementById("children_id").value;
-            const date = document.getElementById("date_id").value;
-            return await (await fetch(`/attendance/getAttendanceWithDateAndStudent/${date}/${student_id}`)).json();
-        }
     }
-    async function init()
-    {
-        document.getElementById('date_id').valueAsDate = new Date();
-        await createSelectOfChildrenForParent();
-        await createLessonPlanTableWithAttendance();
-    }
-    init();
+
+            async function init() {
+                document.getElementById('date_id').valueAsDate = new Date();
+                await createSelectOfChildrenForParent();
+                await createLessonPlanTableWithAttendance();
+            }
+
+
+
+        init();
+
 </script>
 
 </html>

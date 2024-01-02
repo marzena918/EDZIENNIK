@@ -12,7 +12,10 @@
 <body>
 <div id="menu_id" class="menu"></div>
 <script> createMenu(document.getElementById('menu_id'));</script>
-<div id="name_student"></div>
+<div id="name_student" class="separated"></div>
+<div id="log_out" class="separated">
+    <button>wyloguj</button>
+</div>
 
 <div>
     <label for="date_id">Date</label>
@@ -92,7 +95,18 @@
                         const row = findRow(j.h, allRow);
                         const cell = findDay(numberDay, date);
                         table.rows[row].cells[cell].innerHTML += `<span><div>${numberDay} ${j["sub"]} ${j["att"]}</div></span>`
+                        colouringAttendance(j, row, cell);
 
+                    }
+                }
+
+                function colouringAttendance(j, row, cell) {
+                    if (j["att"] === "NB") {
+                        table.rows[row].cells[cell].classList.add("wrongInputData");
+                    } else if (j["att"] === "SP") {
+                        table.rows[row].cells[cell].classList.add("midInputData");
+                    } else {
+                        table.rows[row].cells[cell].classList.add("okInputData");
                     }
                 }
             }

@@ -33,8 +33,8 @@ class Attendance:
         last_day = calendar.monthrange(year, month)[1]
         month = '0' + str(month) if month <= 9 else month
         query = (
-            "select CAST(strftime('%d', att.day) as integer) as day, ch.from_hour as hour, lesson as subject, "
-            "case when att.late = 1 then 'SP' else case when att.present = 1 then 'OB' else 'NB' end end as attendance "
+            "select CAST(strftime('%d', att.day) as integer) as day, att.student, ch.from_hour as hour, lesson as subject, "
+            "case when att.late = 1 then 'SP' else case when att.present = 1 then 'OB' else case when att.excuse=1 then 'USP' else 'NB' end end end as attendance "
             "from attendance att "
             "join configurations_hours ch on ch.id = att.hour "
             f"where student = {student_id} "
@@ -44,8 +44,12 @@ class Attendance:
         db_result = cursor.execute(query).fetchall()
         result = defaultdict(lambda: [])
         for i in db_result:
-            result[str(i["day"])].append({"h": i["hour"], "att": i['attendance'], "sub": i['subject']})
+            result[str(i["day"])].append({"h": i["hour"], "att": i['attendance'], "sub": i['subject'], "student_id":i['student']})
         return result
+
+    def update(self,student_id,attendance):
+        cursor.execute(f" update attendance SET excuse='{attendance}' where student='{student_id}'")
+        cursor.connection.commit()
 
 
 attendance = Attendance()

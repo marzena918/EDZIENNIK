@@ -45,6 +45,10 @@ table, th, td {
     color: red;
 }
 
+.midInputData{
+    color: #525202;
+}
+
 .material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,
@@ -70,4 +74,10 @@ table, th, td {
   /*display:flex;*/
   /*  gap: 8px;*/
     display: -moz-flex;
+}
+
+.separated{
+    text-align: right;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
