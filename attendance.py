@@ -44,12 +44,20 @@ class Attendance:
         db_result = cursor.execute(query).fetchall()
         result = defaultdict(lambda: [])
         for i in db_result:
-            result[str(i["day"])].append({"h": i["hour"], "att": i['attendance'], "sub": i['subject'], "student_id":i['student']})
+            result[str(i["day"])].append(
+                {"h": i["hour"], "att": i['attendance'], "sub": i['subject'], "student_id": i['student']})
         return result
 
-    def update(self,student_id,attendance_to_change,date):
-        cursor.execute(f"update attendance SET excuse='{attendance_to_change}' where student = {student_id} and day='{date}' and present = 0")
+    def update(self, all_data):
+        data_to_base = {}
+        for i in range(len(all_data)):
+            data_to_base[i] = {"day": (all_data[i].split("+")[1]), "student_id": all_data[i].split("+")[0],"sub": all_data[i].split("+")[2]}
+        print(data_to_base)
+        for k,v in data_to_base.items():
+            # print(v)
+            cursor.execute(f"update attendance SET excuse=1 where student = {v['student_id']} and day='{v['day']}' and lesson = '{v['sub']}'")
         cursor.connection.commit()
+
     #     hour_id = cursor.execute(f"select hour from attendance join main.configurations_hours ch on attendance.hour ="
     #                              f" ch.id where ch.from_hour='{hours}'").fetchall()[0]
     #     print(hour_id)
@@ -57,8 +65,7 @@ class Attendance:
     #                    f"and present =0 and day='{day}' ")
     #     cursor.connection.commit()
 
-
-    def summary(self,student_id):
+    def summary(self, student_id):
         b = cursor.execute(f"select late,present,excuse from attendance where student = {student_id}").fetchall()
         return b
 
