@@ -25,9 +25,10 @@
     <label for="date_id">Date</label>
     <input id="date_id" type="month" name="date" onchange="createLessonPlanTableWithAttendance()">
 </div>
+<div class="buttonAnditeminDiv"><ul id="divId" style="display: none"></ul><button id="buttonExcuseId"  title="usprawiedliw nieobecności dziecka" style="display: none">usprawiedliw</button>
 
-<table id="calendar_id"></table>
-
+    <table id="calendar_id"></table>
+</div>
 </body>
 <script>
     async function createParentsName(parent_id) {
@@ -57,19 +58,21 @@
         displaySummary(summary);
 
         function displaySummary(summary) {
-
+            console.log(summary);
         }
 
         async function fillTable(attendance) {
             createThRow();
             const allRows = await createTable();
-            fillData(attendance, allRows);
-            return undefined;
+            await fillData(attendance, allRows);
+            const studentId = document.getElementById("children_id").value;
+            return await (await fetch(`/attendance/summary/${studentId}`)).json()
 
             function createThRow() {
                 const table = document.getElementById("calendar_id");
                 table.innerHTML = '';
                 const hRow = table.createTHead().insertRow();
+
                 for (const i of ['', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela']) {
                     hRow.insertCell().innerHTML = i;
                 }
@@ -107,69 +110,103 @@
             async function fillData(attendance, allRow) {
                 const date = document.getElementById("date_id").value;
                 const table = document.getElementById("calendar_id");
+
                 for (const [key, value] of Object.entries(attendance)) {
                     const numberDay = key;
                     for (const j of value) {
                         const row = findRow(j.h, allRow);
                         const cell = findDay(numberDay, date);
-                        table.rows[row].cells[cell].innerHTML += `<span><div>${numberDay} ${j["sub"]} ${j["att"]}</div></span>`
-                        colouringAttendance(j, row, cell);
-                        await excuseForAbsence(j, table, row, cell,date,numberDay);
+                        const day = numberDay <= 9 ? '0' + numberDay : numberDay;
+                        checkButtonExcuse(j,attendance,date);
+                        table.rows[row].cells[cell].innerHTML += `<div id="${numberDay} ${j["sub"]} ${j["att"]} ${j.h}"><div> ${j["sub"]} ${j["att"]}</div>
+                        <div style="=text-align: right; font-size: 10px">${date}-${day}</div></div>`
+                        colouringAttendance(table, j, row, cell, numberDay);
+                        await excuseForAbsence(j, table, row, cell, date, numberDay);
 
                     }
 
                 }
 
-
-                function colouringAttendance(j, row, cell) {
+                function checkButtonExcuse(j,attendance,date) {
+                    const buttonExcuse = document.getElementById("buttonExcuseId");
                     if (j["att"] === "NB") {
-                        table.rows[row].cells[cell].classList.add("wrongInputData");
-                    } else if (j["att"] === "SP") {
-                        table.rows[row].cells[cell].classList.add("midInputData");
+                        buttonExcuse.style.display='inline';
+                        buttonExcuse.onclick=()=>createSelectWithNoPresents(attendance,date);
+                    }
+                }
+            function createSelectWithNoPresents(attendance,date) {
+                const ul = document.getElementById("divId");
+                ul.style.display = 'inline';
+                for (const [key, value] of Object.entries(attendance)) {
+                    for (const i of value) {
+                        if (i["att"] === "NB") {
+                            const li = document.createElement("li");
+                            const option = document.createElement("input");
+                           option.type="checkbox";
+                            li.innerHTML = `${date}-${key<=9?'0'+key : key} godzina ${i.h} ${i["sub"]}`;
+                            li.value = `${date}${key<=9?'0'+key : key}${i.h}${i["sub"]}`;
+                            li.appendChild(option);
+                            ul.appendChild(li);
+                        }
+                    }
+                }
+            }
+
+                function colouringAttendance(table, j, row, cell, numberDay) {
+
+                    const id = document.getElementById(`${numberDay} ${j["sub"]} ${j["att"]} ${j.h}`)
+                    if (j["att"] === "NB") {
+                        id.classList.add("wrongInputData");
+
+                    }
+                    if (j["att"] === "SP") {
+                        id.classList.add("midInputData");
                     } else {
-                        table.rows[row].cells[cell].classList.add("okInputData");
+                        id.classList.add("okInputData");
                     }
                 }
 
-                async function excuseForAbsence(j, table, row, cell,date,day) {
-                    day = day<=9 ? `${0}${day}` : day;
+                async function excuseForAbsence(j, table, row, cell, date, day) {
+                    day = day <= 9 ? `${0}${day}` : day;
                     if (j["att"] === "NB") {
-                        const data = {
+                        const datar = {
                             "student_id": j.student_id,
-                            "attendance": 1
+                            "attendance": 1,
+                            "hour": j.h,
+                            "day": `${date}-${day}`
                         }
-                        const buttonExcuseForAbsence = document.createElement("button");
-                        buttonExcuseForAbsence.innerHTML = `<span class="button" title="usprawiedliw ${date}-${day}">usp</span>`;
-                        table.rows[row].cells[cell].appendChild(buttonExcuseForAbsence);
-                        buttonExcuseForAbsence.onclick = async () => {
-                            await fetch('/attendance/updateData', {
-                                method: 'PUT', body: JSON.stringify(data),
-                                headers: {'Content-Type': 'application/json'}
-                            });
+                        // const buttonExcuseForAbsence = document.createElement("button");
+                        // buttonExcuseForAbsence.innerHTML = `<span class="button" title="usprawiedliw ${date}-${day}">usp</span>`;
+                        // table.rows[row].cells[cell].appendChild(buttonExcuseForAbsence);
+                        // buttonExcuseForAbsence.onclick = async () => {
+                        //     await fetch('/attendance/updateData', {
+                        //         method: 'PUT', body: JSON.stringify(datar),
+                        //         headers: {'Content-Type': 'application/json'}
+                        //     });
+                        //     await createLessonPlanTableWithAttendance();
 
-                        }
+                        // }
                     }
                 }
             }
         }
 
-            async function getAttendance() {
-                const student_id = document.getElementById("children_id").value;
-                const date = document.getElementById("date_id").value;
-                return await (await fetch(`/attendance/getAttendanceWithDateAndStudent/${date}/${student_id}`)).json();
-            }
+        async function getAttendance() {
+            const student_id = document.getElementById("children_id").value;
+            const date = document.getElementById("date_id").value;
+            return await (await fetch(`/attendance/getAttendanceWithDateAndStudent/${date}/${student_id}`)).json();
+        }
 
     }
 
-            async function init() {
-                document.getElementById('date_id').valueAsDate = new Date();
-                await createSelectOfChildrenForParent();
-                await createLessonPlanTableWithAttendance();
-            }
+    async function init() {
+        document.getElementById('date_id').valueAsDate = new Date();
+        await createSelectOfChildrenForParent();
+        await createLessonPlanTableWithAttendance();
+    }
 
 
-
-        init();
+    init();
 
 </script>
 
