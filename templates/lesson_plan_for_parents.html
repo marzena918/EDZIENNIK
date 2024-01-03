@@ -25,8 +25,13 @@
     <label for="date_id">Date</label>
     <input id="date_id" type="month" name="date" onchange="createLessonPlanTableWithAttendance()">
 </div>
-<div class="buttonAnditeminDiv"><ul id="divId" style="display: none"></ul><button id="buttonExcuseId"  title="usprawiedliw nieobecności dziecka" style="display: none">usprawiedliw</button>
-
+<div class="buttonAnditeminDiv">
+    <div id="excuseId">
+        <button id="selectAll" onclick="selectAll()" style="display: none">zaznacz wszystko</button>
+        <button id="buttonSendId" style="display: none">wyślij</button>
+        <ul id="divId" style="display: none"></ul>
+    </div>
+    <button id="buttonExcuseId" title="usprawiedliw nieobecności dziecka" style="display: none">usprawiedliw</button>
     <table id="calendar_id"></table>
 </div>
 </body>
@@ -117,40 +122,66 @@
                         const row = findRow(j.h, allRow);
                         const cell = findDay(numberDay, date);
                         const day = numberDay <= 9 ? '0' + numberDay : numberDay;
-                        checkButtonExcuse(j,attendance,date);
+                        checkButtonExcuse(j, attendance, date);
                         table.rows[row].cells[cell].innerHTML += `<div id="${numberDay} ${j["sub"]} ${j["att"]} ${j.h}"><div> ${j["sub"]} ${j["att"]}</div>
                         <div style="=text-align: right; font-size: 10px">${date}-${day}</div></div>`
                         colouringAttendance(table, j, row, cell, numberDay);
-                        await excuseForAbsence(j, table, row, cell, date, numberDay);
+                        // await excuseForAbsence(j, table, row, cell, date, numberDay);
 
                     }
 
                 }
 
-                function checkButtonExcuse(j,attendance,date) {
+                function checkButtonExcuse(j, attendance, date) {
                     const buttonExcuse = document.getElementById("buttonExcuseId");
                     if (j["att"] === "NB") {
-                        buttonExcuse.style.display='inline';
-                        buttonExcuse.onclick=()=>createSelectWithNoPresents(attendance,date);
+                        buttonExcuse.style.display = 'inline';
+                        buttonExcuse.onclick = () => createSelectWithNoPresents(attendance, date,buttonExcuse);
                     }
                 }
-            function createSelectWithNoPresents(attendance,date) {
-                const ul = document.getElementById("divId");
-                ul.style.display = 'inline';
-                for (const [key, value] of Object.entries(attendance)) {
-                    for (const i of value) {
-                        if (i["att"] === "NB") {
-                            const li = document.createElement("li");
-                            const option = document.createElement("input");
-                           option.type="checkbox";
-                            li.innerHTML = `${date}-${key<=9?'0'+key : key} godzina ${i.h} ${i["sub"]}`;
-                            li.value = `${date}${key<=9?'0'+key : key}${i.h}${i["sub"]}`;
-                            li.appendChild(option);
-                            ul.appendChild(li);
+
+                function createSelectWithNoPresents(attendance, date,bExcuse) {
+                    const ul = document.getElementById("divId");
+                    ul.style.display = 'inline';
+                    let stan = 0
+                    for (const [key, value] of Object.entries(attendance)) {
+                        for (const i of value) {
+                            if (i["att"] === "NB") {
+                                const li = document.createElement("li");
+                                const option = document.createElement("input");
+                                option.type = "checkbox";
+                                option.onclick=()=>disabled(option);
+                                li.innerHTML = `${date}-${key <= 9 ? '0' + key : key} godzina ${i.h}- ${i["sub"]}`;
+                                li.value = `${date}${key <= 9 ? '0' + key : key}${i.h}${i["sub"]}`;
+                                li.appendChild(option);
+                                ul.appendChild(li);
+                            }
+
                         }
+                         function disabled(option)
+                            {
+                                    if (option.checked) {
+                                        stan += 1
+                                    } else {
+                                        stan -= 1
+                                    }
+
+                                    if (stan) {
+                                        document.getElementById("buttonSendId").disabled = false;
+                                    }
+                                    else{
+                                        document.getElementById("buttonSendId").disabled = 'disabled';
+                                    }
+                                }
                     }
+                    bExcuse.style.display='none';
+                    document.getElementById("selectAll").style.display = 'inline';
+                    document.getElementById("buttonSendId").style.display = 'inline';
+                    document.getElementById("buttonSendId").disabled='disabled';
+
+
+
                 }
-            }
 
                 function colouringAttendance(table, j, row, cell, numberDay) {
 
@@ -166,15 +197,15 @@
                     }
                 }
 
-                async function excuseForAbsence(j, table, row, cell, date, day) {
-                    day = day <= 9 ? `${0}${day}` : day;
-                    if (j["att"] === "NB") {
-                        const datar = {
-                            "student_id": j.student_id,
-                            "attendance": 1,
-                            "hour": j.h,
-                            "day": `${date}-${day}`
-                        }
+                // async function excuseForAbsence(j, table, row, cell, date, day) {
+                //     day = day <= 9 ? `${0}${day}` : day;
+                //     if (j["att"] === "NB") {
+                //         const datar = {
+                //             "student_id": j.student_id,
+                //             "attendance": 1,
+                //             "hour": j.h,
+                //             "day": `${date}-${day}`
+                //         }
                         // const buttonExcuseForAbsence = document.createElement("button");
                         // buttonExcuseForAbsence.innerHTML = `<span class="button" title="usprawiedliw ${date}-${day}">usp</span>`;
                         // table.rows[row].cells[cell].appendChild(buttonExcuseForAbsence);
@@ -186,8 +217,8 @@
                         //     await createLessonPlanTableWithAttendance();
 
                         // }
-                    }
-                }
+                //     }
+                // }
             }
         }
 
@@ -197,6 +228,17 @@
             return await (await fetch(`/attendance/getAttendanceWithDateAndStudent/${date}/${student_id}`)).json();
         }
 
+    }
+    function selectAll(){
+        // const listCheckbox = []
+        // for (const i of checkBox.childNodes) {
+        //     if (i.childNodes[0]['checked']) {
+        //         listCheckbox.push(+i.childNodes[0].value);
+        const checkboxes = document.getElementById("divId");
+        for(const i of checkboxes.childNodes){
+            i.childNodes[1]['checked']=true;
+        }
+        document.getElementById("buttonSendId").disabled=false;
     }
 
     async function init() {

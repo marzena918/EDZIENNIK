@@ -34,7 +34,7 @@ class Attendance:
         month = '0' + str(month) if month <= 9 else month
         query = (
             "select CAST(strftime('%d', att.day) as integer) as day, att.student, ch.from_hour as hour, lesson as subject, "
-            "case when att.late = 1 then 'SP' else case when att.present = 1 then 'OB' else case when att.excuse=1 then 'USP' else 'NB' end end end as attendance "
+            "case when att.late = 1 then 'SP' else case when att.present = 1 then 'OB' else case when att.excuse=1 then 'USP' else case when att.present = 0 then'NB' end end end end as attendance "
             "from attendance att "
             "join configurations_hours ch on ch.id = att.hour "
             f"where student = {student_id} "
@@ -47,9 +47,20 @@ class Attendance:
             result[str(i["day"])].append({"h": i["hour"], "att": i['attendance'], "sub": i['subject'], "student_id":i['student']})
         return result
 
-    def update(self,student_id,attendance):
-        cursor.execute(f" update attendance SET excuse='{attendance}' where student='{student_id}'")
+    def update(self,student_id,attendance_to_change,date):
+        cursor.execute(f"update attendance SET excuse='{attendance_to_change}' where student = {student_id} and day='{date}' and present = 0")
         cursor.connection.commit()
+    #     hour_id = cursor.execute(f"select hour from attendance join main.configurations_hours ch on attendance.hour ="
+    #                              f" ch.id where ch.from_hour='{hours}'").fetchall()[0]
+    #     print(hour_id)
+    #     cursor.execute(f"update attendance SET excuse='{attendance_to_change}' where student='{student_id}' "
+    #                    f"and present =0 and day='{day}' ")
+    #     cursor.connection.commit()
+
+
+    def summary(self,student_id):
+        b = cursor.execute(f"select late,present,excuse from attendance where student = {student_id}").fetchall()
+        return b
 
 
 attendance = Attendance()

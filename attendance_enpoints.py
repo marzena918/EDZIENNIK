@@ -26,12 +26,16 @@ def save_attendance():
 @attendance_blueprint.route('/attendance/updateData', methods=['PUT'])
 def update_attendance():
     body = request.json
-    print(body['student_id'])
-    attendance.update(body['student_id'],body['attendance'])
+    print(body)
+    attendance.update(body['student_id'],body['attendance'],body['day'])
     return ''
 @attendance_blueprint.route('/attendance/listOfAllCheckbox')
 def allCheckbox():
     return attendance.all_checkbox()
+
+@attendance_blueprint.route('/attendance/summary/<int:student_id>')
+def summary(student_id):
+    return attendance.summary(student_id)
 
 @attendance_blueprint.route('/attendance/getAttendanceWithDateAndStudent/<date>/<int:student_id>')
 def get_attendance_with_date_and_student(student_id: int, date: str):
