@@ -18,11 +18,12 @@ class Attendance:
             di[i['id']] = "-".join([i['from_hour'], i['until_hours']])
         return di
 
-    def save(self, student, hour, subject, classes, date, inputPresent, inputLate):
+    def save(self, student, hour, subject, classes, date, inputPresent, inputLate, input_no_present):
+        # no_present = False if input_no_present else None
         cursor.execute(f"delete from attendance where student= {student} and hour = {hour} and day= '{date}'")
         cursor.execute(
-            f"insert into attendance (day, hour, class, student, lesson, present, late) VALUES ('{date}', {hour}, "
-            f"{classes}, {student}, '{subject}', {inputPresent}, {inputLate})")
+            f"insert into attendance (day, hour, class, student, lesson, present, late,excuse) VALUES ('{date}', {hour}, "
+            f"{classes}, {student}, '{subject}', {inputPresent}, {inputLate},{input_no_present})")
 
         sqliteConnection.commit()
 

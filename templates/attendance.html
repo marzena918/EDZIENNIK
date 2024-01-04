@@ -32,7 +32,7 @@
             date: all_date,
             inputPresent: inputPresent.checked,
             inputLate: inputLate.checked,
-            inputNoPresent: inputNoPresent.checked
+            inputNoPresent: inputNoPresent.checked===true?0:'null'
         }
         await fetch('/attendance/saveAttendance', {
             method: 'POST',
@@ -90,7 +90,8 @@
         const listAllAttendanceForChecbox = await (await fetch('/attendance/listOfAllCheckbox')).json();
         bb = {};
         for (l of listAllAttendanceForChecbox) {
-            bb[[l.student, l.hour, l.class, l.lesson, l.day]] = [l.present, l.late, l.noPresent]
+            const excuse= l.excuse===0?1:0;
+                bb[[l.student, l.hour, l.class, l.lesson, l.day]] = [l.present, l.late, excuse]
         }
         let lp = 1;
         for (const j of students) {

@@ -19,8 +19,9 @@ def get_all_hour():
 @attendance_blueprint.route('/attendance/saveAttendance', methods=['POST'])
 def save_attendance():
     body = request.json
+    print(body)
     attendance.save(body['student_id'], body['hour'], body['subject'], body['classes'], body['date'],
-                    body['inputPresent'], body['inputLate'])
+                    body['inputPresent'], body['inputLate'], body['inputNoPresent'])
     return ''
 
 @attendance_blueprint.route('/attendance/upDate/', methods=['PUT'])
