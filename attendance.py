@@ -52,7 +52,7 @@ class Attendance:
     def update(self, all_data):
         data_to_base = {}
         for i in range(len(all_data)):
-            data_to_base[i] = {"day": (all_data[i].split("+")[1]), "student_id": all_data[i].split("+")[0],"sub": all_data[i].split("+")[2],"hour":all_data[i].split("+")[3]}
+            data_to_base[i] = {"day": (all_data[i][0].split("+")[1]), "student_id": all_data[i][0].split("+")[0],"sub": all_data[i][0].split("+")[2],"hour":all_data[i][0].split("+")[3]}
         print(data_to_base)
         for k,v in data_to_base.items():
 
@@ -61,18 +61,6 @@ class Attendance:
                            f"join attendance on configurations_hours.id = attendance.hour "
                            f"where from_hour = {v['hour']} limit 1)")
         cursor.connection.commit()
-
-        # print(v)
-        # cursor.execute(f"update attendance SET excuse=1 where student = {v['student_id']} and day='{v['day']}' "
-        #                f"and lesson = '{v['sub']}' and hour = {v['hour']} join main.configurations_hour on"
-        #                f"attendance.hour = configurations_hour.id ")
-
-    #     hour_id = cursor.execute(f"select hour from attendance join main.configurations_hours ch on attendance.hour ="
-    #                              f" ch.id where ch.from_hour='{hours}'").fetchall()[0]
-    #     print(hour_id)
-    #     cursor.execute(f"update attendance SET excuse='{attendance_to_change}' where student='{student_id}' "
-    #                    f"and present =0 and day='{day}' ")
-    #     cursor.connection.commit()
 
     def summary(self, student_id):
         b = cursor.execute(f"select late,present,excuse from attendance where student = {student_id}").fetchall()
