@@ -90,8 +90,7 @@
         const listAllAttendanceForChecbox = await (await fetch('/attendance/listOfAllCheckbox')).json();
         bb = {};
         for (l of listAllAttendanceForChecbox) {
-            const excuse= l.excuse===0?1:0;
-                bb[[l.student, l.hour, l.class, l.lesson, l.day]] = [l.present, l.late, excuse]
+                bb[[l.student, l.hour, l.class, l.lesson, l.day]] = [l.present, l.late]
         }
         let lp = 1;
         for (const j of students) {
@@ -110,7 +109,7 @@
             if (bb[[j.id, hour, classes, subject, all_date]]) {
                 inputPresent.checked = bb[[j.id, hour, classes, subject, all_date]][0];
                 inputLate.checked = bb[[j.id, hour, classes, subject, all_date]][1];
-                inputNoPresent.checked = bb[[j.id, hour, classes, subject, all_date]][2];
+                inputNoPresent.checked = !bb[[j.id, hour, classes, subject, all_date]][0];
             }
             inputLate.onclick = async () => {
                 if (inputLate.checked) {

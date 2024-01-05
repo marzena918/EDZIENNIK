@@ -59,7 +59,7 @@
 
     async function createLessonPlanTableWithAttendance() {
         const attendance = await getAttendance();
-        checkButtonExcuse(attendance);
+        // checkButtonExcuse(attendance);
 
         const summary = await fillTable(attendance)
         displaySummary(summary);
@@ -67,13 +67,8 @@
         function displaySummary(summary) {
             console.log(summary);
         }
-        function checkButtonExcuse(j, attendance, date) {
-                    const buttonExcuse = document.getElementById("buttonExcuseId");
-                    if (j["att"] === "NB") {
-                        buttonExcuse.style.display = 'inline';
-                        buttonExcuse.onclick = () => createSelectWithNoPresents(attendance, date, buttonExcuse);
-                    }
-                }
+
+
 
         async function fillTable(attendance) {
             createThRow();
@@ -142,53 +137,14 @@
 
 
 
-                function createSelectWithNoPresents(attendance, date, bExcuse) {
-                    const ul = document.getElementById("divId");
-                    const child = document.getElementById("children_id").value;
-                    ul.style.display = 'inline';
-                    let stan = 0
-                    for (const [key, value] of Object.entries(attendance)) {
-                        for (const i of value) {
-                            if (i["att"] === "NB") {
-                                const li = document.createElement("li");
-                                const option = document.createElement("input");
-                                option.type = "checkbox";
-                                option.onclick = () => disabled(option);
-                                li.innerHTML = `${date}-${key <= 9 ? '0' + key : key} godzina ${i.h}- ${i["sub"]}`;
-                                li.id = `${child}+${date}-${key <= 9 ? '0' + key : key}+${i["sub"]}`;
-                                li.appendChild(option);
-                                ul.appendChild(li);
-                            }
 
-                        }
-
-                        function disabled(option) {
-                            if (option.checked) {
-                                stan += 1
-                            } else {
-                                stan -= 1
-                            }
-
-                            if (stan) {
-                                document.getElementById("buttonSendId").disabled = false;
-                            } else {
-                                document.getElementById("buttonSendId").disabled = 'disabled';
-                            }
-                        }
-                    }
-                    bExcuse.style.display = 'none';
-                    document.getElementById("selectAll").style.display = 'inline';
-                    document.getElementById("buttonSendId").style.display = 'inline';
-                    document.getElementById("buttonSendId").disabled = 'disabled';
-
-
-                }
 
                 function colouringAttendance(table, j, row, cell, numberDay) {
 
                     const id = document.getElementById(`${numberDay} ${j["sub"]} ${j["att"]} ${j.h}`)
                     if (j["att"] === "NB") {
                         id.classList.add("wrongInputData");
+                        checkButtonExcuse(attendance);
 
                     }
                     if (j["att"] === "SP") {
@@ -223,12 +179,12 @@
             }
         }
 
-        async function getAttendance() {
-            const student_id = document.getElementById("children_id").value;
-            const date = document.getElementById("date_id").value;
-            return await (await fetch(`/attendance/getAttendanceWithDateAndStudent/${date}/${student_id}`)).json();
-        }
 
+    }
+    async function getAttendance() {
+        const student_id = document.getElementById("children_id").value;
+        const date = document.getElementById("date_id").value;
+        return await (await fetch(`/attendance/getAttendanceWithDateAndStudent/${date}/${student_id}`)).json();
     }
 
     function selectAll() {
@@ -245,25 +201,89 @@
 
     async function sendDaysOfExcuse() {
         const allDaysToExcuse = document.getElementById("divId");
-        const listCheckbox = []
-        for (const i of allDaysToExcuse.childNodes) {
-            if (i.childNodes[1]['checked']) {
-                listCheckbox.push(i.childNodes[0].parentElement["id"]);
+        const listCheckbox = [];
+        const listSelectCheckbox=[];
+        for (let i=0; i< allDaysToExcuse.childNodes.length; i++) {
+            if (allDaysToExcuse.childNodes[i].childNodes[1]['checked']) {
+                listCheckbox.push(allDaysToExcuse.childNodes[i].childNodes[0].parentElement["id"]);
+                listSelectCheckbox.push(allDaysToExcuse.childNodes[i])
+                console.log(allDaysToExcuse.childNodes[i], "dupa");
             }
+            // for(let j=0;j<listCheckbox.length; j++) {
+            //
+            //     allDaysToExcuse.removeChild(allDaysToExcuse.childNodes[j]);
+            // }
+        }
+        for(const j of listSelectCheckbox){
+            allDaysToExcuse.removeChild(j);
         }
         await fetch(`/attendance/upDate/`, {
             method: 'PUT', body: JSON.stringify(listCheckbox),
             headers: {'Content-Type': 'application/json'}
         });
         await createLessonPlanTableWithAttendance();
-        if(listCheckbox.length===allDaysToExcuse.childNodes.length){
-            document.getElementById("buttonExcuseId").display='none';
+        if(listCheckbox.length===0){
              document.getElementById("selectAll").style.display = 'none';
-             document.getElementById("divId").innerHTML='';
+            // document.getElementById("divId").innerHTML='';
+            document.getElementById("buttonSendId").style.display = 'none';
         }
-        document.getElementById("buttonSendId").style.display = 'none';
-
+        document.getElementById("buttonSendId").disabled='disabled';
+        // await checkButtonExcuse();
+        document.getElementById("buttonExcuseId").style.display='none';
     }
+  async  function checkButtonExcuse(attendance) {
+                    const buttonExcuse = document.getElementById("buttonExcuseId");
+                    for (const [key, value] of Object.entries(attendance)) {
+                        for (const j of value) {
+                            if (j["att"] === "NB") {
+                                buttonExcuse.style.display = 'inline';
+                                buttonExcuse.onclick = () => createSelectWithNoPresents(attendance, buttonExcuse);
+                            }
+                        }
+                    }
+                      function createSelectWithNoPresents(attendance, bExcuse) {
+                    const date = document.getElementById("date_id").value;
+                    const ul = document.getElementById("divId");
+                    const child = document.getElementById("children_id").value;
+                    ul.style.display = 'inline';
+                    let stan = 0
+                    for (const [key, value] of Object.entries(attendance)) {
+                        for (const i of value) {
+                            if (i["att"] === "NB") {
+                                const li = document.createElement("li");
+                                const option = document.createElement("input");
+                                option.type = "checkbox";
+                                option.onclick = () => disabled(option,stan);
+                                li.innerHTML = `${date}-${key <= 9 ? '0' + key : key} godzina ${i.h}- ${i["sub"]}`;
+                                li.id = `${child}+${date}-${key <= 9 ? '0' + key : key}+${i["sub"]}+${i.h}`;
+                                li.appendChild(option);
+                                ul.appendChild(li);
+                            }
+
+                        }
+
+                        function disabled(option,stan) {
+                            if (option.checked) {
+                                stan += 1
+                            } else {
+                                stan -= 1
+                            }
+
+                            if (stan) {
+                                document.getElementById("buttonSendId").disabled = false;
+                            } else {
+                                document.getElementById("buttonSendId").disabled = 'disabled';
+                            }
+                        }
+                    }
+                    bExcuse.style.display = 'none';
+                    document.getElementById("selectAll").style.display = 'inline';
+                    document.getElementById("buttonSendId").style.display = 'inline';
+                    document.getElementById("buttonSendId").disabled = 'disabled';
+
+
+                }
+                }
 
     async function init() {
         document.getElementById('date_id').valueAsDate = new Date();
