@@ -53,7 +53,6 @@ class Attendance:
         data_to_base = {}
         for i in range(len(all_data)):
             data_to_base[i] = {"day": (all_data[i][0].split("+")[1]), "student_id": all_data[i][0].split("+")[0],"sub": all_data[i][0].split("+")[2],"hour":all_data[i][0].split("+")[3]}
-        print(data_to_base)
         for k,v in data_to_base.items():
 
             cursor.execute(f"update attendance SET excuse=1 where student = {v['student_id']} and day='{v['day']}' "

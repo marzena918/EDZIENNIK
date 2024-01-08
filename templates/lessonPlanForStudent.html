@@ -29,7 +29,6 @@
         const student_id = 33;
         const student = document.getElementById("name_student");
         const dataStudent = await (await fetch(`/student/daneStudenta/${student_id}`)).json();
-        console.log(dataStudent);
         student.innerHTML = `jesteś zalogowany jako uczeń: ${dataStudent[0].name} ${dataStudent[0].last_name}`;
     }
 

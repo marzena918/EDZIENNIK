@@ -25,6 +25,7 @@
     <label for="date_id">Date</label>
     <input id="date_id" type="month" name="date" onchange="createLessonPlanTableWithAttendance()">
 </div>
+<div class="flex-container">
 <div class="buttonAnditeminDiv">
     <div id="excuseId">
         <button id="selectAll" onclick="selectAll()" style="display: none">zaznacz wszystko</button>
@@ -34,6 +35,8 @@
     <button id="buttonExcuseId" title="usprawiedliw nieobecności dziecka" style="display: none">usprawiedliw</button>
     <table id="calendar_id"></table>
 </div>
+    <div id="summaryId"></div>
+    </div>
 </body>
 <script>
     async function createParentsName(parent_id) {
@@ -58,6 +61,7 @@
 
 
     async function createLessonPlanTableWithAttendance() {
+        document.getElementById("summaryId").innerHTML='';
         const attendance = await getAttendance();
         // checkButtonExcuse(attendance);
 
@@ -65,7 +69,28 @@
         displaySummary(summary);
 
         function displaySummary(summary) {
-            console.log(summary);
+            const displaySummary = document.getElementById("summaryId");
+                const attendanceSummary={"attendance":{"ilosc nieobecnych godzin":0,"ilosc usprawiedliwionych godzin":0,"ilosc nieusprawiedliwionych godzin":0, "ilosc spoznien":0}};
+            for(let i=0; i< summary.length; i++){
+                if(summary[i]["late"]){
+                    attendanceSummary["attendance"]["ilosc spoznien"]+=1
+                }
+                if(summary[i]["excuse"]){
+                    attendanceSummary["attendance"]["ilosc usprawiedliwionych godzin"]+=1
+                }if(!summary[i]["excuse"] && !summary[i]["present"]){
+                    attendanceSummary["attendance"]["ilosc nieusprawiedliwionych godzin"]+=1
+                }
+                if(!summary[i]["present"]){
+                    attendanceSummary["attendance"]["ilosc nieobecnych godzin"]+=1
+                }
+            }
+            for(const i of ["ilosc nieobecnych godzin", "ilosc usprawiedliwionych godzin",
+                "ilosc nieusprawiedliwionych godzin", "ilosc spoznien"]){
+                const span1= document.createElement("div");
+                span1.innerHTML=`${i}: ${attendanceSummary["attendance"][i]}`;
+                displaySummary.appendChild(span1);
+            }
+            // console.log(summary);
         }
 
 

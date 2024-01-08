@@ -13,7 +13,6 @@ class LessonPlanForParents:
                     mon = datetime.strptime(v, '%Y-%m-%d')
                     if mon.month ==int(month):
                         attendance_by_month.append(i)
-        print(attendance_by_month)
         return attendance_by_month
 
 lesson_plan_for_parents = LessonPlanForParents()
