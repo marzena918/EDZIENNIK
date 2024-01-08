@@ -26,17 +26,18 @@
     <input id="date_id" type="month" name="date" onchange="createLessonPlanTableWithAttendance()">
 </div>
 <div class="flex-container">
-<div class="buttonAnditeminDiv">
-    <div id="excuseId">
-        <button id="selectAll" onclick="selectAll()" style="display: none">zaznacz wszystko</button>
-        <button id="buttonSendId" style="display: none" onclick="sendDaysOfExcuse()">wyślij</button>
-        <ul id="divId" style="display: none"></ul>
+    <div class="buttonAnditeminDiv">
+        <div id="excuseId">
+            <button id="selectAll" onclick="selectAll()" style="display: none">zaznacz wszystko</button>
+            <button id="buttonSendId" style="display: none" onclick="sendDaysOfExcuse()">wyślij</button>
+            <ul id="divId" style="display: none"></ul>
+        </div>
+        <button id="buttonExcuseId" title="usprawiedliw nieobecności dziecka" style="display: none">usprawiedliw
+        </button>
+        <table id="calendar_id"></table>
     </div>
-    <button id="buttonExcuseId" title="usprawiedliw nieobecności dziecka" style="display: none">usprawiedliw</button>
-    <table id="calendar_id"></table>
-</div>
     <div id="summaryId"></div>
-    </div>
+</div>
 </body>
 <script>
     async function createParentsName(parent_id) {
@@ -61,7 +62,7 @@
 
 
     async function createLessonPlanTableWithAttendance() {
-        document.getElementById("summaryId").innerHTML='';
+        document.getElementById("summaryId").innerHTML = '';
         const attendance = await getAttendance();
         // checkButtonExcuse(attendance);
 
@@ -69,28 +70,45 @@
         displaySummary(summary);
 
         function displaySummary(summary) {
-            const displaySummary = document.getElementById("summaryId");
-                const attendanceSummary={"attendance":{"ilosc nieobecnych godzin":0,"ilosc usprawiedliwionych godzin":0,"ilosc nieusprawiedliwionych godzin":0, "ilosc spoznien":0}};
-            for(let i=0; i< summary.length; i++){
-                if(summary[i]["late"]){
-                    attendanceSummary["attendance"]["ilosc spoznien"]+=1
-                }
-                if(summary[i]["excuse"]){
-                    attendanceSummary["attendance"]["ilosc usprawiedliwionych godzin"]+=1
-                }if(!summary[i]["excuse"] && !summary[i]["present"]){
-                    attendanceSummary["attendance"]["ilosc nieusprawiedliwionych godzin"]+=1
-                }
-                if(!summary[i]["present"]){
-                    attendanceSummary["attendance"]["ilosc nieobecnych godzin"]+=1
+            const attendanceSummaryDict = attendanceSummary(summary);
+            viewSummary();
+
+            function viewSummary() {
+                const displaySummary = document.getElementById("summaryId");
+                for (const i of ["ilosc nieobecnych godzin", "ilosc usprawiedliwionych godzin",
+                    "ilosc nieusprawiedliwionych godzin", "ilosc spoznien"]) {
+                    const span1 = document.createElement("div");
+                    span1.innerHTML = `${i}: ${attendanceSummaryDict["attendance"][i]}`;
+                    displaySummary.appendChild(span1);
                 }
             }
-            for(const i of ["ilosc nieobecnych godzin", "ilosc usprawiedliwionych godzin",
-                "ilosc nieusprawiedliwionych godzin", "ilosc spoznien"]){
-                const span1= document.createElement("div");
-                span1.innerHTML=`${i}: ${attendanceSummary["attendance"][i]}`;
-                displaySummary.appendChild(span1);
+
+
+            function attendanceSummary(summary) {
+                const attendanceSummary = {
+                    "attendance": {
+                        "ilosc nieobecnych godzin": 0,
+                        "ilosc usprawiedliwionych godzin": 0,
+                        "ilosc nieusprawiedliwionych godzin": 0,
+                        "ilosc spoznien": 0
+                    }
+                };
+                for (let i = 0; i < summary.length; i++) {
+                    if (summary[i]["late"]) {
+                        attendanceSummary["attendance"]["ilosc spoznien"] += 1
+                    }
+                    if (summary[i]["excuse"]) {
+                        attendanceSummary["attendance"]["ilosc usprawiedliwionych godzin"] += 1
+                    }
+                    if (!summary[i]["excuse"] && !summary[i]["present"]) {
+                        attendanceSummary["attendance"]["ilosc nieusprawiedliwionych godzin"] += 1
+                    }
+                    if (!summary[i]["present"]) {
+                        attendanceSummary["attendance"]["ilosc nieobecnych godzin"] += 1
+                    }
+                }
+                return attendanceSummary;
             }
-            // console.log(summary);
         }
 
 
@@ -220,11 +238,10 @@
         }
         document.getElementById("buttonSendId").disabled = 'disabled';
         document.getElementById("buttonExcuseId").style.display = 'none';
-        if(dateToSend.length!==1) {
-            alert(`usprawiedliwiono dni: ${Array.from(dateToSend).map(element=>element[1].textContent)}`)
-        }
-        else{
-            alert(`usprawiedliwiono dzień: ${Array.from(dateToSend).map(element=>element[1].textContent)}`)
+        if (dateToSend.length !== 1) {
+            alert(`usprawiedliwiono dni: ${Array.from(dateToSend).map(element => element[1].textContent)}`)
+        } else {
+            alert(`usprawiedliwiono dzień: ${Array.from(dateToSend).map(element => element[1].textContent)}`)
         }
     }
 
