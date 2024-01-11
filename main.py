@@ -8,6 +8,7 @@ from lesson_plan_endpoints import lesson_plan_blueprint
 from lesson_plan_for_students_endpoints import lesson_plan_for_students_blueprint
 from mark_endopoints import marks_blueprint
 from marks_for_parents_endpoints import marks_for_parents_blueprint
+from marks_for_student_endpoints import marks_for_students_blueprint
 from student_endpoints import student_blueprint
 from subject_endpoints import subject_blueprint
 from teacher_endpoints import teacher_blueprint
@@ -33,6 +34,7 @@ app.register_blueprint(parents_blueprint, url_prefix='/')
 app.register_blueprint(lesson_plan_for_parents_blueprint, url_prefix='/')
 app.register_blueprint(lesson_plan_for_students_blueprint, url_prefix='/')
 app.register_blueprint(marks_for_parents_blueprint, url_prefix='/')
+app.register_blueprint(marks_for_students_blueprint, url_prefix='/')
 
 
 app.run(port=4000)

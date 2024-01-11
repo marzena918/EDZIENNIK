@@ -1,4 +1,7 @@
 function createMenu(parentObject) {
+    const marksForStudents = document.createElement("a");
+    marksForStudents.href='/marksForStudents';
+    marksForStudents.innerHTML='marks for student';
     const marksForParents = document.createElement("a");
     marksForParents.href='/marks_for_parents';
     marksForParents.innerHTML= 'marks for parent';
@@ -48,4 +51,5 @@ function createMenu(parentObject) {
     parentObject.appendChild(LessonPlanForParents);
     parentObject.appendChild(lessonPlanForStudent);
     parentObject.appendChild(marksForParents);
+    parentObject.appendChild(marksForStudents);
 }
