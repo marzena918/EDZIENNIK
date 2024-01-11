@@ -25,3 +25,8 @@ def degreWithThisSubjectForThisStudent(subject, student_id):
 def remove_degre(degre_for_delete_id):
     degre.remove_degre(degre_for_delete_id)
     return ''
+
+
+@degre_blueprint.route('/degre/getAllDegree/<int:student_id>')
+def get_all_degre(student_id):
+    return degre.get_all_degre(student_id)

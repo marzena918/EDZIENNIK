@@ -24,5 +24,7 @@ class Degre:
         cursor.execute(f"DELETE from marks where id ={degre_id}")
         sqliteConnection.commit()
 
+    def get_all_degre(self,student_id):
+        return cursor.execute(f"select * from marks where student = {student_id}").fetchall()
 
 degre = Degre()

@@ -117,7 +117,7 @@
             const allRows = await createTable();
             await fillData(attendance, allRows);
             const studentId = document.getElementById("children_id").value;
-            return await (await fetch(`/attendance/summary/${studentId}`)).json()
+            return await (await fetch(`/attendance/summary/${studentId}`)).json();
 
             function createThRow() {
                 const table = document.getElementById("calendar_id");
