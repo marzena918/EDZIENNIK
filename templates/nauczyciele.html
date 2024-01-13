@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>oceny</title>
+    <title>nauczyciel</title>
     <script src="/static/menu.js"></script>
     <script src="/static/teacher-admin/teacherApi.js"></script>
     <link rel="stylesheet" href="/static/main.style.css">
@@ -23,7 +23,7 @@
         <label for="subject">wybierz przedmiot</label><br/>
         <select id="subject" name="subjects" multiple="multiple" onchange="checkData()"></select>
     </div>
-    <button id="acceptButtonId" disabled="disabled" onclick="addNewTeacher(); tableTeacher();"><span
+    <button id="acceptButtonId" disabled="disabled" onclick="addNewTeacher(); location.reload();"><span
             class="material-symbols-outlined button">person_add</span>
     </button>
 </div>
