@@ -31,7 +31,6 @@ class Teacher:
         sqliteConnection.commit()
         cursor.execute(f"DELETE from teacher_subject where teacher_id ={id}")
         for i in subjects:
-            print(i)
             cursor.execute(f"insert into teacher_subject (teacher_id, subject) VALUES({id},'{i}')")
         sqliteConnection.commit()
 teachers = Teacher()

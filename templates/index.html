@@ -144,7 +144,7 @@
         tableStudent.innerHTML = '';
         const header = tableStudent.createTHead();
         const headerRow = header.insertRow();
-        for (const i of ['No', 'imie', 'nazwisko', 'pesel', 'rodzic', 'akcja', 'oceny', 'frekwencja']) {
+        for (const i of ['No', 'imie', 'nazwisko', 'pesel', 'rodzic', 'akcja']) {
             headerRow.insertCell().innerText = i;
         }
         const students = await (await fetch('/student/all')).json();
@@ -155,21 +155,14 @@
             row.insertCell().innerText = i['student_name'];
             row.insertCell().innerText = i['student_last_name'];
             row.insertCell().innerText = i['pesel'];
-            // row.insertCell().innerText = "-";
             row.insertCell().innerText = `${i['parent_name']}` === "null" ? "brak" : `${i['parent_name']} ${i['parent_last_name']}`;
-            // row.cells[4].id=i['parents_id']
-            // row.insertCell().innerText = i['zrobic imie i naziwsko'];
             const editButton = document.createElement("button");
             editButton.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
             editButton.onclick = () => editData(editButton, row, i['student_name'], i['student_last_name'], i['pesel'], i['student_id'],row.cells[4].innerText);
             row.insertCell().innerHTML =
                 `<button onclick="remove(${i.student_id})"><span class="material-symbols-outlined button">person_remove</span></button>`;
             row.cells[5].appendChild(editButton);
-            const editGrades = document.createElement("button");
-            editGrades.innerHTML = '<span class="material-symbols-outlined button">edit</span>';
-            editGrades.onclick = () => window.location.href = `/student/oceny?studentId=${i['id']}`;
-            row.insertCell(6).appendChild(editGrades);
-            row.insertCell(7).innerHTML = '<button><span class="material-symbols-outlined button">edit</span></button>';
+
         }
 
     }
@@ -240,12 +233,7 @@
 
     }
 
-    function getAllStudentNotes() {
-        const params = new Proxy(new URLSearchParams(window.location.search), {
-            get: (searchParams, prop) => searchParams.get(prop),
-        });
-        fetch(`/student/oceny/${params.studentId}`)
-    }
+
 
     async function init() {
         await getAllStudents();
