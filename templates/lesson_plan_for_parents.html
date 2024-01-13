@@ -143,14 +143,8 @@
                 const rowsToFind = {}
                 for (const i of hours) {
                     const row = thTable.insertRow();
-                    row.insertCell();
-                    row.insertCell();
-                    row.insertCell();
-                    row.insertCell();
-                    row.insertCell();
-                    row.insertCell();
-                    row.insertCell();
-                    row.insertCell();
+                    for(let j = 0; j < 8; j++) row.insertCell();
+
                     row.cells[0].innerHTML = `${i.from_hour} - ${i.until_hours}`;
                     row.cells[0].id = i.lp;
                     rowsToFind[i.from_hour] = i.lp;
