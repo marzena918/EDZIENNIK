@@ -1,7 +1,7 @@
 from flask import render_template, Blueprint
 
 subject_blueprint = Blueprint('subject_blueprint', __name__)
-from classes import classes
+from subjectdb import classes
 
 
 @subject_blueprint.route('/subject')
